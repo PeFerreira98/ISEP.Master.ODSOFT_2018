@@ -19,6 +19,7 @@ dependencies {
 javadoc {
     source = sourceSets.main.allJava
     options.overview = "src/main/javadoc/overview.html" // relative to source root
+    options.addBooleanOption('html5', true)
 }
 
 task renderPlantUml(type: RenderPlantUmlTask) {
@@ -37,7 +38,5 @@ task runApp (type: JavaExec, dependsOn: classes){
 javadoc.dependsOn renderPlantUml
 
 task runAll {
-    dependsOn clean
-    dependsOn build
-    dependsOn javadoc
+    dependsOn = ['clean', 'build', 'javadoc']
 }
