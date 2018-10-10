@@ -1,0 +1,262 @@
+package com.twu.calculator;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.ExpectedSystemExit;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+public class CalculatorTest {
+
+    @Rule
+    public final ExpectedSystemExit exit = ExpectedSystemExit.none();
+    private double actualResult;
+
+    @Test
+    public void shouldReturnZeroWhenZeroIsAddedAsInitialCommand() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("add", 0);
+
+        assertThat(actualResult, is(0.0));
+    }
+
+    @Test
+    public void shouldReturnCorrectValueWhenAValueIsAddedAsInitialCommand() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("add", 10);
+
+        assertThat(actualResult, is(10.0));
+    }
+
+    @Test
+    public void shouldReturnCorrectValueWhenTwoAddCommandAreGiven() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 10);
+
+        double actualResult = calculator.doOperation("add", 20);
+
+        assertThat(actualResult, is(30.0));
+    }
+
+    @Test
+    public void shouldReturnCorrectValueWhenFirstCommandIsAddAndSecondCommandIsSubtract() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 30);
+
+        double actualResult = calculator.doOperation("subtract", 20);
+
+        assertThat(actualResult, is(10.0));
+    }
+
+    @Test
+    public void shouldReturnCorrectValueWhenFirstCommandIsAddAndSecondCommandIsMultiply() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 10);
+
+        actualResult = calculator.doOperation("multiply", 20);
+
+        assertThat(actualResult, is(200.0));
+    }
+
+    @Test
+    public void shouldReturnCorrectValueWhenFirstCommandIsAddAndSecondCommandIsDivide() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 10);
+
+        double actualResult = calculator.doOperation("divide", 2);
+
+        assertThat(actualResult, is(5.0));
+    }
+
+    @Test
+    public void shouldSetTheCalculatorStateToZeroWhenCancelCommandIsGiven() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 10);
+
+        double actualResult = calculator.doOperation("cancel", 0);
+
+        assertThat(actualResult, is(0.0));
+    }
+
+    @Test
+    public void shouldExitOutOfTheCalculatorAppWhenExitCommandIsGiven() {
+        Calculator calculator = new Calculator();
+        exit.expectSystemExitWithStatus(0);
+        calculator.doOperation("exit", 0);
+    }
+
+    @Test
+    public void shouldReturnAbsoluteValueOfResult() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", -10);
+
+        double actualResult = calculator.doOperation("abs", 0);
+
+        assertThat(actualResult, is(10.0));
+    }
+
+    @Test
+    public void shouldReturnNegativeValueOfResult() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 10);
+
+        double actualResult = calculator.doOperation("neg", 0);
+
+        assertThat(actualResult, is(-10.0));
+    }
+
+    @Test
+    public void shouldReturnSquareRootOfResult() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 16);
+
+        double actualResult = calculator.doOperation("sqrt", 0);
+
+        assertThat(actualResult, is(4.0));
+    }
+
+    @Test
+
+    public void shouldReturnSquareOfResult() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 4);
+
+        double actualResult = calculator.doOperation("sqr", 0);
+
+        assertThat(actualResult, is(16.0));
+    }
+
+    @Test
+    public void shouldReturnCubeOfResult() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 4);
+
+        double actualResult = calculator.doOperation("cube", 0);
+
+        assertThat(actualResult, is(64.0));
+    }
+
+    @Test
+    public void shouldReturnCubeRootOfResult() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 64);
+
+        double actualResult = calculator.doOperation("cubert", 0);
+
+        assertThat(actualResult, is(4.0));
+    }
+
+    // New operators
+    @Test
+    public void shouldReturnFactorialOf5() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("factorial", 5.0);
+
+        assertThat(actualResult, is(120.0));
+    }
+
+    @Test
+    public void shouldReturnFactorialOf1() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("factorial", 1.0);
+
+        assertThat(actualResult, is(1.0));
+    }
+
+    @Test
+    public void shouldReturnFactorialOfNegative() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("factorial", -3.0);
+
+        assertThat(actualResult, is(1.0));
+    }
+
+    @Test
+    public void shouldReturnDoubleOf1() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("double", 1);
+
+        assertThat(actualResult, is(2.0));
+    }
+
+    @Test
+    public void shouldReturnDoubleOfNeg2_5() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("double", -2.5);
+
+        assertThat(actualResult, is(-5.0));
+    }
+
+    @Test
+    public void shouldReturnDoubleOf0() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("double", 0.0);
+
+        assertThat(actualResult, is(0.0));
+    }
+
+    @Test
+    public void shouldReturnThirdOf0() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("third", 0.0);
+
+        assertThat(actualResult, is(0.0));
+    }
+
+    @Test
+    public void shouldReturnThirdOf6() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("third", 6.0);
+
+        assertThat(actualResult, is(2.0));
+    }
+
+    @Test
+    public void shouldReturnThirdOfNeg3() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("third", -3.0);
+
+        assertThat(actualResult, is(-1.0));
+    }
+
+    @Test
+    public void shouldReturn2ExponentialOf4() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", 2.0);
+
+        double actualResult = calculator.doOperation("exponential", 4.0);
+
+        assertThat(actualResult, is(16.0));
+    }
+
+    @Test
+    public void shouldReturnNeg2ExponentialOf4() {
+        Calculator calculator = new Calculator();
+        calculator.doOperation("add", -2.0);
+
+        double actualResult = calculator.doOperation("exponential", 4.0);
+
+        assertThat(actualResult, is(16.0));
+    }
+
+    @Test
+    public void shouldReturnNeg0ExponentialOf5() {
+        Calculator calculator = new Calculator();
+
+        double actualResult = calculator.doOperation("exponential", 5.0);
+
+        assertThat(actualResult, is(0.0));
+    }
+}
