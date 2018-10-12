@@ -1,0 +1,7 @@
+@startuml viewContact-SD.png
+
+unknown -> ContactsServiceImpl: getContact(Id)
+
+unknown <-- ContactsServiceImpl: contact
+
+@enduml
