@@ -26,6 +26,21 @@ dependencies {
 	testCompile 'com.google.gwt:gwt-dev:2.8.1'
 }
 
+javadoc {
+	group "docs"
+    description "Cria Javadocs."
+
+	dependsOn = ['renderPlantUml']
+    source = sourceSets.main.allJava
+	options.addStringOption("sourcepath", "")    // <===== SOLUCAO
+    classpath = configurations.compile
+    options.overview = "src/main/javadoc/overview.html" // relative to source root
+    //options.addBooleanOption('html5', true)
+}
+
+task renderPlantUml(type: RenderPlantUmlTask) {
+}
+
 // If we woant to use the default ant build inside gradle
 // ant.importBuild "build.xml"
 
