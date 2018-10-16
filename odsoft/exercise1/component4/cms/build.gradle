@@ -9,15 +9,13 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 
-//mainClassName = ''
-
 //Java version compatibility to use when compiling Java source.
 sourceCompatibility = 1.8
 //Java version to generate classes for.
 targetCompatibility = 1.8
 //Script Version
 version = '1.0'
- 
+
 repositories { 
 	mavenCentral() 
 }
@@ -58,7 +56,7 @@ putnami{
 // Jacoco
 jacocoTestReport {
     reports {
-        xml.enabled true
+        xml.enabled false
         csv.enabled false
     }
 }
@@ -72,7 +70,7 @@ task jacocoIntegrationReport(type: org.gradle.testing.jacoco.tasks.JacocoReport)
     
     reports {
         html.enabled = true
-        xml.enabled = true
+        xml.enabled = false
         csv.enabled = false
     }
 }
