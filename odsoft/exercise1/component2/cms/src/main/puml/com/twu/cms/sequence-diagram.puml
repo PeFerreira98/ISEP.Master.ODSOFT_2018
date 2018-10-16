@@ -1,0 +1,15 @@
+@startuml
+
+actor User
+participant ContactsApp
+participant ContactsController
+participant ContactsService
+
+User ->> ContactsApp : "delete contact"
+ContactsApp ->> ContactsController : deleteContacts()
+ContactsController ->> ContactsService : deleteContacts()
+ContactsController <<-- ContactsService : getContactDetails()
+ContactsApp <<-- ContactsController : showContactDetails()
+User <<-- ContactsApp : "contact deleted"
+
+@enduml
