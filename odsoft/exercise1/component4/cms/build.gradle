@@ -119,3 +119,7 @@ javadoc {
 
 task renderPlantUml(type: RenderPlantUmlTask) {
 }
+
+task runTestsAndGenerateReport {
+    dependsOn = ['test', 'integrationTest', 'jacocoTestReport', 'jacocoIntegrationReport']
+}
