@@ -15,7 +15,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 //Script Version
 version = '1.0'
- 
+
 repositories { 
 	mavenCentral() 
 }
@@ -23,8 +23,7 @@ repositories {
 dependencies {
  	testCompile 'junit:junit:4.12'
  	testCompile 'org.easymock:easymock:2.5.2'
-	testCompile 'com.google.gwt:gwt-dev:2.8.1'
-
+	testCompile 'com.google.gwt:gwt-dev:2.8.2'
 }
 
 // If we woant to use the default ant build inside gradle
@@ -57,7 +56,7 @@ putnami{
 // Jacoco
 jacocoTestReport {
     reports {
-        xml.enabled true
+        xml.enabled false
         csv.enabled false
     }
 }
@@ -71,7 +70,7 @@ task jacocoIntegrationReport(type: org.gradle.testing.jacoco.tasks.JacocoReport)
     
     reports {
         html.enabled = true
-        xml.enabled = true
+        xml.enabled = false
         csv.enabled = false
     }
 }
@@ -111,17 +110,12 @@ test {
 }
 
 javadoc {
-    dependsOn = ['renderPlantUml'/*, 'copyDiagramImages'*/]
+    dependsOn = ['renderPlantUml']
+
     source = sourceSets.main.allJava
+    options.addStringOption("sourcepath", "")
     options.overview = "src/main/javadoc/overview.html" // relative to source root
 }
 
 task renderPlantUml(type: RenderPlantUmlTask) {
 }
-
-/*
-task copyDiagramImages(type: Copy) {
-    from file("${buildDir}/puml")
-    into file("${buildDir}/docs/javadoc")
-}
-*/
