@@ -53,5 +53,9 @@
   <!-- Specify the paths for translatable code source for Contacts  -->
   <source path="contacts/client" />
   <source path="contacts/shared" />
+
+    <!-- Specify the paths for translatable code source for Students  -->
+  <source path="students/client" />
+  <source path="students/shared" />
   
 </module>
