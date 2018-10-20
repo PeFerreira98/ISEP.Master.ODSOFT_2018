@@ -9,256 +9,184 @@ import pt.isep.cms.contacts.client.ContactsService;
 import pt.isep.cms.contacts.client.ContactsServiceAsync;
 import pt.isep.cms.contacts.client.presenter.ContactsPresenter;
 import pt.isep.cms.contacts.client.view.ContactsView;
+import pt.isep.cms.contacts.server.ContactsServiceImpl;
 import pt.isep.cms.contacts.shared.Contact;
 import pt.isep.cms.contacts.shared.ContactDetails;
-
-// Nao se pode usar o easymock com testes GWT pois este usar reflection e o GWT não consegue "transpile"....
-//import static org.easymock.EasyMock.createStrictMock;
 
 import java.util.ArrayList;
 
 public class ContactsServiceAsyncGWTTest extends GWTTestCase
 {
-	private ContactsPresenter contactsPresenter;
-	private ContactsServiceAsync rpcService;
-	private HandlerManager eventBus;
-	private ContactsPresenter.Display mockDisplay;
-	
-	private ContactsServiceAsync contactsService;
 
-	public String getModuleName() {
-		return "pt.isep.cms.contacts.ContactsServiceAsyncTest";
+	public String getModuleName()
+	{
+		return "pt.isep.cms.contacts.TestContactsServiceAsync";
 	}
 
-	public void gwtSetUp() {
-		contactsService = GWT.create(ContactsService.class);
+	public void gwtSetUp()
+	{
 	}
 
-	public void testContactsService() {
+	public void testAddContactToService()
+	{
 		// Create the service that we will test.
+		ContactsServiceAsync contactsService = GWT.create(ContactsService.class);
 		ServiceDefTarget target = (ServiceDefTarget) contactsService;
 		target.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
 
 		// Since RPC calls are asynchronous, we will need to wait for a response
 		// after this test method returns. This line tells the test runner to wait
 		// up to 10 seconds before timing out.
-		delayTestFinish(10000);
+		delayTestFinish(20000);
 
-		// fail("Ainda nao implementado");
-
-		// Send a request to the server.
-		contactsService.getContact("2", new AsyncCallback<Contact>() {
-			public void onFailure(Throwable caught) {
-				// The request resulted in an unexpected error.
-				fail("Request failure: " + caught.getMessage());
-			}
-
-			public void onSuccess(Contact result) {
-				// Verify that the response is correct.
-				assertTrue(result != null);
-
-				// Now that we have received a response, we need to tell the test runner
-				// that the test is complete. You must call finishTest() after an
-				// asynchronous test finishes successfully, or the test will time out.
-				finishTest();
-			}
-		});
-	}
-
-	public void testAddContactToService() {
-		// Create the service that we will test.
-		ServiceDefTarget target = (ServiceDefTarget) contactsService;
-		target.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
-
-		// Since RPC calls are asynchronous, we will need to wait for a response
-		// after this test method returns. This line tells the test runner to wait
-		// up to 10 seconds before timing out.
-		delayTestFinish(10000);
-
-		Contact c = new Contact();
+		final Contact c = new Contact();
 		c.setFirstName("test");
 
 		// Send a request to the server.
-		contactsService.addContact(c, new AsyncCallback<Contact>() {
-			public void onFailure(Throwable caught) {
+		contactsService.addContact(c, new AsyncCallback<Contact>()
+		{
+			public void onFailure(Throwable caught)
+			{
 				// The request resulted in an unexpected error.
 				fail("Request failure: " + caught.getMessage());
 			}
 
-			public void onSuccess(Contact result) {
-				// Verify that the response is correct.
-				assertTrue(result != null);
-
-				assertTrue(result.getFirstName().equals("test"));
-				assertTrue(result.getId() != null);
-
-				// Now that we have received a response, we need to tell the test runner
-				// that the test is complete. You must call finishTest() after an
-				// asynchronous test finishes successfully, or the test will time out.
-				finishTest();
-			}
-		});
-
-		delayTestFinish(10000);
-
-		// Send a request to the server.
-		contactsService.getContact(c.getId(), new AsyncCallback<Contact>() {
-			public void onFailure(Throwable caught) {
-				// The request resulted in an unexpected error.
-				fail("Request failure: " + caught.getMessage());
-			}
-
-			public void onSuccess(Contact result) {
+			public void onSuccess(final Contact result) {
 				// Verify that the response is correct.
 				assertTrue(result != null);
 
 				assertTrue(result.getFirstName().equals(c.getFirstName()));
-				assertTrue(result.getId().equals(c.getId()));	
+				assertTrue(result.getId() != null);
+				
+				testGetContact(result);
 
-				// Now that we have received a response, we need to tell the test runner
-				// that the test is complete. You must call finishTest() after an
-				// asynchronous test finishes successfully, or the test will time out.
 				finishTest();
 			}
 		});
 	}
 
 	// I've found a serious bug in this shitty project
-	public void testAddRemoveAddContactToService() {
+	// Welcome to callback hell!
+	public void testAddRemoveAddContactToService()
+	{
 		// Create the service that we will test.
-		ServiceDefTarget target = (ServiceDefTarget) contactsService;
+		ContactsServiceAsync cs = GWT.create(ContactsService.class);
+		ServiceDefTarget target = (ServiceDefTarget) cs;
 		target.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
 
 		// Since RPC calls are asynchronous, we will need to wait for a response
 		// after this test method returns. This line tells the test runner to wait
 		// up to 10 seconds before timing out.
-		delayTestFinish(10000);
+		delayTestFinish(50000);
 
-		Contact c1 = new Contact();
+		final Contact c1 = new Contact();
 		c1.setFirstName("test1");
 
-		Contact c2 = new Contact();
+		final Contact c2 = new Contact();
 		c2.setFirstName("test2");
 
 		// add test1
-		contactsService.addContact(c1, new AsyncCallback<Contact>() {
-			public void onFailure(Throwable caught) {
+		cs.addContact(c1, new AsyncCallback<Contact>()
+		{
+			public void onFailure(Throwable caught)
+			{
 				// The request resulted in an unexpected error.
 				fail("Request failure: " + caught.getMessage());
 			}
 
-			public void onSuccess(Contact result) {
+			// result = c1
+			public void onSuccess(final Contact resC1)
+			{
 				// Verify that the response is correct.
-				assertTrue(result != null);
+				assertTrue(resC1 != null);
 
-				assertTrue(result.getFirstName().equals(c1.getFirstName()));
-				assertTrue(result.getId().equals(c1.getId()));
+				assertTrue(resC1.getFirstName().equals(c1.getFirstName()));
+				assertTrue(resC1.getId() != null);
 
-				finishTest();
+				// verify that it was added
+				testGetContact(resC1);
+
+
+				// Create the service that we will test.
+				ContactsServiceAsync cs1 = GWT.create(ContactsService.class);
+				ServiceDefTarget target1 = (ServiceDefTarget) cs1;
+				target1.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
+
+				// delete contact with lowest ID
+				cs1.deleteContact("0", new AsyncCallback<Boolean>() {
+					public void onFailure(Throwable caught) {
+						// The request resulted in an unexpected error.
+						fail("Request failure: " + caught.getMessage());
+					}
+
+					public void onSuccess(final Boolean resDel) {
+						// Verify that the response is correct.
+						assertTrue(resDel != null);
+						assertTrue(resDel);
+
+
+						// Create the service that we will test.
+						ContactsServiceAsync cs2 = GWT.create(ContactsService.class);
+						ServiceDefTarget target2 = (ServiceDefTarget) cs2;
+						target2.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
+
+						// add test2
+						cs2.addContact(c2, new AsyncCallback<Contact>() {
+							public void onFailure(Throwable caught) {
+								// The request resulted in an unexpected error.
+								fail("Request failure: " + caught.getMessage());
+							}
+
+							public void onSuccess(Contact resC2) {
+								// Verify that the response is correct.
+								assertTrue(resC2 != null);
+
+								assertTrue(resC2.getFirstName().equals(c2.getFirstName()));
+								assertTrue(resC2.getId() != null);
+
+								testGetContact(resC2);
+
+								/*
+								// check test contact 1 again just to be sure (no way it will just vanish right?)
+								testGetContact(resC1);
+
+								// can't have the same id (in theory, but not in this project)
+								assertTrue(!resC1.getId().equals(resC2.getId()));
+								*/
+
+								finishTest();
+							}
+						});
+					}
+				});
 			}
 		});
 
-		delayTestFinish(10000);
+	}
 
-		// check
-		contactsService.getContact(c1.getId(), new AsyncCallback<Contact>() {
-			public void onFailure(Throwable caught) {
+	private void testGetContact(final Contact c)
+	{
+		ContactsServiceAsync contactsService = GWT.create(ContactsService.class);
+		ServiceDefTarget target = (ServiceDefTarget) contactsService;
+		target.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
+
+		contactsService.getContact(c.getId(), new AsyncCallback<Contact>()
+		{
+			public void onFailure(Throwable caught)
+			{
 				// The request resulted in an unexpected error.
 				fail("Request failure: " + caught.getMessage());
 			}
 
-			public void onSuccess(Contact result) {
+			public void onSuccess(Contact result)
+			{
 				// Verify that the response is correct.
 				assertTrue(result != null);
 
-				assertTrue(result.getFirstName().equals(c1.getFirstName()));
-				assertTrue(result.getId().equals(c1.getId()));
-
-				finishTest();
+				assertTrue(result.getFirstName().equals(c.getFirstName()));
+				assertTrue(result.getId().equals(c.getId()));
 			}
 		});
-
-		delayTestFinish(10000);
-
-		// delete contact with lower ID
-		contactsService.deleteContact("0", new AsyncCallback<Boolean>() {
-			public void onFailure(Throwable caught) {
-				// The request resulted in an unexpected error.
-				fail("Request failure: " + caught.getMessage());
-			}
-
-			public void onSuccess(Boolean result) {
-				// Verify that the response is correct.
-				assertTrue(result != null);
-
-				assertTrue(result);
-
-				finishTest();
-			}
-		});
-
-		delayTestFinish(10000);
-
-		// add test2
-		contactsService.addContact(c2, new AsyncCallback<Contact>() {
-			public void onFailure(Throwable caught) {
-				// The request resulted in an unexpected error.
-				fail("Request failure: " + caught.getMessage());
-			}
-
-			public void onSuccess(Contact result) {
-				// Verify that the response is correct.
-				assertTrue(result != null);
-
-				assertTrue(result.getFirstName().equals(c2.getFirstName()));
-				assertTrue(result.getId().equals(c2.getId()));
-
-				finishTest();
-			}
-		});
-
-		delayTestFinish(10000);
-
-		// check test contact 2
-		contactsService.getContact(c2.getId(), new AsyncCallback<Contact>() {
-			public void onFailure(Throwable caught) {
-				// The request resulted in an unexpected error.
-				fail("Request failure: " + caught.getMessage());
-			}
-
-			public void onSuccess(Contact result) {
-				// Verify that the response is correct.
-				assertTrue(result != null);
-
-				assertTrue(result.getFirstName().equals(c2.getFirstName()));
-				assertTrue(result.getId().equals(c2.getId()));
-
-				finishTest();
-			}
-		});
-
-		delayTestFinish(10000);
-
-		// check test contact 1 again just to be sure (no way it will just vanish right?)
-		contactsService.getContact(c1.getId(), new AsyncCallback<Contact>() {
-			public void onFailure(Throwable caught) {
-				// The request resulted in an unexpected error.
-				fail("Request failure: " + caught.getMessage());
-			}
-
-			public void onSuccess(Contact result) {
-				// Verify that the response is correct.
-				assertTrue(result != null);
-
-				assertTrue(result.getFirstName().equals(c1.getFirstName()));
-				assertTrue(result.getId().equals(c1.getId()));
-
-				finishTest();
-			}
-		});
-
-		// can't have the same id (in theory, but not in this project)
-		assertTrue(!c1.getId().equals(c2.getId()));
 	}
 	
 }
