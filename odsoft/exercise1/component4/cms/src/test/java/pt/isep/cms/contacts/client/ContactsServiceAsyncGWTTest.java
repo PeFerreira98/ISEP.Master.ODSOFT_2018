@@ -51,18 +51,42 @@ public class ContactsServiceAsyncGWTTest extends GWTTestCase
 				fail("Request failure: " + caught.getMessage());
 			}
 
-			public void onSuccess(final Contact result) {
+			public void onSuccess(final Contact resC1) {
 				// Verify that the response is correct.
-				assertTrue(result != null);
+				assertTrue(resC1 != null);
 
-				assertTrue(result.getFirstName().equals(c.getFirstName()));
-				assertTrue(result.getId() != null);
-				
-				testGetContact(result);
+				assertTrue(resC1.getFirstName().equals(c.getFirstName()));
+				assertTrue(resC1.getId() != null);
 
-				finishTest();
+
+				ContactsServiceAsync cs1 = GWT.create(ContactsService.class);
+				ServiceDefTarget target1 = (ServiceDefTarget) cs1;
+				target1.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
+
+				cs1.getContact(resC1.getId(), new AsyncCallback<Contact>()
+				{
+					public void onFailure(Throwable caught)
+					{
+						// The request resulted in an unexpected error.
+						fail("Request failure: " + caught.getMessage());
+					}
+
+					public void onSuccess(final Contact result)
+					{
+						// Verify that the response is correct.
+						assertTrue(result != null);
+
+						System.out.println("getContact " + result.getFirstName().equals(resC1.getFirstName()));
+						assertTrue(result.getFirstName().equals(resC1.getFirstName()));
+						assertTrue(result.getId().equals(resC1.getId()));
+						
+						finishTest();
+					}
+				});
+
 			}
 		});
+
 	}
 
 	// I've found a serious bug in this shitty project
@@ -104,89 +128,129 @@ public class ContactsServiceAsyncGWTTest extends GWTTestCase
 				assertTrue(resC1.getId() != null);
 
 				// verify that it was added
-				testGetContact(resC1);
+				ContactsServiceAsync cs3 = GWT.create(ContactsService.class);
+				ServiceDefTarget target3 = (ServiceDefTarget) cs3;
+				target3.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
 
-
-				// Create the service that we will test.
-				ContactsServiceAsync cs1 = GWT.create(ContactsService.class);
-				ServiceDefTarget target1 = (ServiceDefTarget) cs1;
-				target1.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
-
-				// delete contact with lowest ID
-				cs1.deleteContact("0", new AsyncCallback<Boolean>() {
-					public void onFailure(Throwable caught) {
+				cs3.getContact(resC1.getId(), new AsyncCallback<Contact>()
+				{
+					public void onFailure(Throwable caught)
+					{
 						// The request resulted in an unexpected error.
 						fail("Request failure: " + caught.getMessage());
 					}
 
-					public void onSuccess(final Boolean resDel) {
+					public void onSuccess(final Contact resC1_2)
+					{
 						// Verify that the response is correct.
-						assertTrue(resDel != null);
-						assertTrue(resDel);
+						assertTrue(resC1_2 != null);
+
+						assertTrue(resC1_2.getFirstName().equals(resC1.getFirstName()));
+						assertTrue(resC1_2.getId().equals(resC1.getId()));
 
 
 						// Create the service that we will test.
-						ContactsServiceAsync cs2 = GWT.create(ContactsService.class);
-						ServiceDefTarget target2 = (ServiceDefTarget) cs2;
-						target2.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
+						ContactsServiceAsync cs1 = GWT.create(ContactsService.class);
+						ServiceDefTarget target1 = (ServiceDefTarget) cs1;
+						target1.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
 
-						// add test2
-						cs2.addContact(c2, new AsyncCallback<Contact>() {
+						// delete contact with lowest ID
+						cs1.deleteContact("0", new AsyncCallback<Boolean>() {
 							public void onFailure(Throwable caught) {
 								// The request resulted in an unexpected error.
 								fail("Request failure: " + caught.getMessage());
 							}
 
-							public void onSuccess(Contact resC2) {
+							public void onSuccess(final Boolean resDel) {
 								// Verify that the response is correct.
-								assertTrue(resC2 != null);
+								assertTrue(resDel != null);
+								assertTrue(resDel);
 
-								assertTrue(resC2.getFirstName().equals(c2.getFirstName()));
-								assertTrue(resC2.getId() != null);
 
-								testGetContact(resC2);
+								// Create the service that we will test.
+								ContactsServiceAsync cs2 = GWT.create(ContactsService.class);
+								ServiceDefTarget target2 = (ServiceDefTarget) cs2;
+								target2.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
 
-								/*
-								// check test contact 1 again just to be sure (no way it will just vanish right?)
-								testGetContact(resC1);
+								// add test2
+								cs2.addContact(c2, new AsyncCallback<Contact>() {
+									public void onFailure(Throwable caught) {
+										// The request resulted in an unexpected error.
+										fail("Request failure: " + caught.getMessage());
+									}
 
-								// can't have the same id (in theory, but not in this project)
-								assertTrue(!resC1.getId().equals(resC2.getId()));
-								*/
+									public void onSuccess(Contact resC2) {
+										// Verify that the response is correct.
+										assertTrue(resC2 != null);
 
-								finishTest();
+										assertTrue(resC2.getFirstName().equals(c2.getFirstName()));
+										assertTrue(resC2.getId() != null);
+
+
+										ContactsServiceAsync cs4 = GWT.create(ContactsService.class);
+										ServiceDefTarget target4 = (ServiceDefTarget) cs4;
+										target4.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
+
+										cs4.getContact(resC2.getId(), new AsyncCallback<Contact>()
+										{
+											public void onFailure(Throwable caught)
+											{
+												// The request resulted in an unexpected error.
+												fail("Request failure: " + caught.getMessage());
+											}
+
+											public void onSuccess(final Contact resC2_2)
+											{
+												// Verify that the response is correct.
+												assertTrue(resC2_2 != null);
+
+												assertTrue(resC2_2.getFirstName().equals(resC2.getFirstName()));
+												assertTrue(resC2_2.getId().equals(resC2.getId()));
+												
+												
+												// check test contact 1 again just to be sure (no way it will just vanish right?)
+												ContactsServiceAsync cs5 = GWT.create(ContactsService.class);
+												ServiceDefTarget target5 = (ServiceDefTarget) cs5;
+												target5.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
+
+												cs5.getContact(resC1.getId(), new AsyncCallback<Contact>()
+												{
+													public void onFailure(Throwable caught)
+													{
+														// The request resulted in an unexpected error.
+														fail("Request failure: " + caught.getMessage());
+													}
+
+													public void onSuccess(final Contact resC1Error)
+													{
+														// Verify that the response is correct.
+														assertTrue(resC1Error != null);
+
+														assertTrue(resC1Error.getFirstName().equals(resC1.getFirstName()));
+														assertTrue(resC1Error.getId().equals(resC1.getId()));
+														
+														// can't have the same id (in theory, but not in this project)
+														assertFalse(resC1.getId().equals(resC2.getId()));
+
+														finishTest();
+													}
+												});
+
+											}
+										});
+
+									}
+								});
+
 							}
 						});
+
 					}
 				});
+
 			}
 		});
 
-	}
-
-	private void testGetContact(final Contact c)
-	{
-		ContactsServiceAsync contactsService = GWT.create(ContactsService.class);
-		ServiceDefTarget target = (ServiceDefTarget) contactsService;
-		target.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
-
-		contactsService.getContact(c.getId(), new AsyncCallback<Contact>()
-		{
-			public void onFailure(Throwable caught)
-			{
-				// The request resulted in an unexpected error.
-				fail("Request failure: " + caught.getMessage());
-			}
-
-			public void onSuccess(Contact result)
-			{
-				// Verify that the response is correct.
-				assertTrue(result != null);
-
-				assertTrue(result.getFirstName().equals(c.getFirstName()));
-				assertTrue(result.getId().equals(c.getId()));
-			}
-		});
 	}
 	
 }

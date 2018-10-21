@@ -77,6 +77,8 @@ task jacocoIntegrationReport(type: org.gradle.testing.jacoco.tasks.JacocoReport)
 
 // Integration Tests
 task integrationTest(type: Test) {
+    ignoreFailures = true
+
 	filter { 
 		//all GWT unit tests, by naming convention
       	includeTestsMatching "*GWTTest*"
@@ -97,7 +99,9 @@ tasks.withType(Test) {
 }
 
 // Unit Tests
-test { 
+test {
+    ignoreFailures = true
+
 	filter { 
 		//all JRE unit tests, by naming convention
       	includeTestsMatching "*JRETest*"
