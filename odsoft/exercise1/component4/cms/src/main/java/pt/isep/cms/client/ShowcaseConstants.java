@@ -21,13 +21,18 @@ import pt.isep.cms.contacts.client.CwContacts;
 import pt.isep.cms.contacts.client.view.ContactsDialog;
 import pt.isep.cms.contacts.client.ContactsController;
 
+import pt.isep.cms.students.client.CwStudents;
+import pt.isep.cms.students.client.view.StudentsDialog;
+import pt.isep.cms.students.client.StudentsController;
+
 
 /**
  * Constants used throughout the showcase.
  */
 public interface ShowcaseConstants extends MenuConstants, 
     CwContacts.CwConstants, ContactsDialog.CwConstants,
-    ContactsController.CwConstants {
+    ContactsController.CwConstants, CwStudents.CwConstants,
+    StudentsDialog.CwConstants, StudentsController.CwConstants {
 
   /**
    * The path to source code for examples, raw files, and style definitions.

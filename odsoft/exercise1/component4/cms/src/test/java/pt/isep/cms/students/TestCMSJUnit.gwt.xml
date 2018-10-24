@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module rename-to='testcontactsservice'>
+<module rename-to='teststudentsservice'>
   <!-- Inherit our applications main module.                      -->
   <inherits name='pt.isep.cms.Showcase'/>
 
   <!-- Specify the path to any remote services.                   -->
-  <servlet path="/contacts/contactsService" class="pt.isep.cms.contacts.server.ContactsServiceImpl" />
+  <servlet path="/students/studentsService" class="pt.isep.cms.students.server.ContactsServiceImpl" />
 
 </module>

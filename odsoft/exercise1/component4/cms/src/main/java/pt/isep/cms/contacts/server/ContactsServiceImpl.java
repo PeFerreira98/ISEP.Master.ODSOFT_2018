@@ -51,8 +51,8 @@ public class ContactsServiceImpl extends RemoteServiceServlet implements
   }
   
   public Contact addContact(Contact contact) {
-    contact.setId(String.valueOf(contacts.size()));
-    contacts.put(contact.getId(), contact); 
+    contact.setId(String.valueOf(contacts.size())); // contacts.size() !? what are you even doing?
+    contacts.put(contact.getId(), contact);         // what happens when you delete someone? last contact vanishes?
     return contact;
   }
 

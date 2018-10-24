@@ -43,7 +43,10 @@ cleanJacocoTestReport
 cleanJacocoIntegrationReport
 build
 javadoc
-runTestsAndGenerateReport</tasks>
+test
+integrationTest
+jacocoTestReport
+jacocoIntegrationReport</tasks>
       <rootBuildScriptDir>odsoft/exercise1/component4/cms/</rootBuildScriptDir>
       <buildFile></buildFile>
       <gradleName>(Default)</gradleName>
@@ -61,7 +64,7 @@ runTestsAndGenerateReport</tasks>
       <artifacts>odsoft/exercise1/component4/cms/build/libs/*.war</artifacts>
       <allowEmptyArchive>true</allowEmptyArchive>
       <onlyIfSuccessful>true</onlyIfSuccessful>
-      <fingerprint>false</fingerprint>
+      <fingerprint>true</fingerprint>
       <defaultExcludes>true</defaultExcludes>
       <caseSensitive>true</caseSensitive>
     </hudson.tasks.ArtifactArchiver>
@@ -76,10 +79,10 @@ runTestsAndGenerateReport</tasks>
       <keepAll>true</keepAll>
     </hudson.tasks.JavadocArchiver>
     <hudson.plugins.jacoco.JacocoPublisher plugin="jacoco@3.0.3">
-      <execPattern>odsoft/exercise1/component4/cms/build/jacoco*.exec</execPattern>
+      <execPattern>odsoft/exercise1/component4/cms/build/jacoco/*.exec</execPattern>
       <classPattern>odsoft/exercise1/component4/cms/build/classes</classPattern>
       <sourcePattern>odsoft/exercise1/component4/cms/src/main/java</sourcePattern>
-      <sourceInclusionPattern></sourceInclusionPattern>
+      <sourceInclusionPattern>**/*.java</sourceInclusionPattern>
       <sourceExclusionPattern>**/*Test*.java</sourceExclusionPattern>
       <inclusionPattern></inclusionPattern>
       <exclusionPattern>**/*Test*.class</exclusionPattern>
