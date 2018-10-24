@@ -17,4 +17,15 @@
     <url-pattern>/showcase/contactsService</url-pattern>
   </servlet-mapping>
 
+  <!-- Servlets for the students -->
+  <servlet>
+    <servlet-name>studentsServiceServlet</servlet-name>
+    <servlet-class>pt.isep.cms.students.server.ContactsServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>studentsServiceServlet</servlet-name>
+    <url-pattern>/showcase/studentsService</url-pattern>
+  </servlet-mapping>
+
 </web-app>
