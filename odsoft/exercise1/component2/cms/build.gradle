@@ -92,6 +92,8 @@ task jacocoIntegrationReport(type: org.gradle.testing.jacoco.tasks.JacocoReport)
 
 // Integration Tests
 task integrationTest(type: Test) {
+	ignoreFailures = true
+
 	filter { 
 		//all GWT unit tests, by naming convention
       	includeTestsMatching "*GWTTest*"
@@ -126,4 +128,12 @@ test {
 
 war {
     archiveName 'cms.war'
+}
+
+task cleanAll{
+	dependsOn = ['clean', 'cleanTest', 'cleanJacocoTestReport', 'cleanJacocoIntegrationReport']
+}
+
+task runAll{
+	dependsOn = ['cleanAll', 'build', 'javadoc', 'test', 'integrationTest', 'jacocoTestReport', 'jacocoIntegrationReport']
 }

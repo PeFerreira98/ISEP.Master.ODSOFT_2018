@@ -30,7 +30,7 @@ public class StudentsServiceImpl extends RemoteServiceServlet implements
   
   private void initStudents() {
     // TODO: Create a real UID for each student
-    //
+    
     for (int i = 0; i < studentsFirstNameData.length && i < studentsLastNameData.length && i < studentsEmailData.length; ++i) {
       Student student = new Student(String.valueOf(i), studentsFirstNameData[i], studentsLastNameData[i], studentsEmailData[i]);
       students.put(student.getId(), student); 
