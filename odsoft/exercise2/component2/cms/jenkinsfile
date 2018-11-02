@@ -6,20 +6,28 @@ node {
         checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '0b06b803-ab5a-4de6-b9b2-26cef342e853', url: 'https://rafael95@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git']]])
     }
     stage('Build') {
-        build 'cms'
         if (isUnix()) {
-            sh "'${mvnHome}/bin/mvn' -Dmaven.test.failure.ignore clean package"
+            sh 'odsoft/exercise2/component2/cms/gradlew build'
         } else {
-            bat(/"${mvnHome}\bin\mvn" -Dmaven.test.failure.ignore clean package/)
+            bat 'odsoft/exercise2/component2/cms/gradlew.bat build'
         }
     }
-    stage('Archive'){
-        archiveArtifacts allowEmptyArchive: true, artifacts: 'odsoft/exercise2/component2/cms/build/libs/*.war', fingerprint: true, onlyIfSuccessful: true
+    stage('Archive war file and generate Javadoc'){
+        steps {
+            parallel(
+                war: {
+                    archiveArtifacts allowEmptyArchive: true, artifacts: 'odsoft/exercise2/component2/cms/build/libs/*.war', fingerprint: true, onlyIfSuccessful: true
+                },
+                javadoc: {
+                    step([$class: 'JavadocArchiver', javadocDir: 'odsoft/exercise2/component2/cms/build/docs/javadoc', keepAll: false])
+                }
+            )
+        }
     }
     stage('Publish Tests Report'){
-        junit allowEmptyResults: true, testResults: 'odsoft/exercise1/component4/cms/build/test-results/test/*.xml'
+        junit allowEmptyResults: true, testResults: 'odsoft/exercise2/component2/cms/build/test-results/test/*.xml'
     }
     stage('Publish Coverage Report'){
-        jacoco classPattern: 'odsoft/exercise1/component4/cms/build/classes', exclusionPattern: '**/*Test*.class', execPattern: 'odsoft/exercise1/component4/cms/build/jacoco/*.exec', sourceExclusionPattern: '**/*Test*.java', sourcePattern: 'odsoft/exercise1/component4/cms/src/main/java'
+        jacoco classPattern: 'odsoft/exercise2/component2/cms/build/classes', exclusionPattern: '**/*Test*.class', execPattern: 'odsoft/exercise2/component2/cms/build/jacoco/*.exec', sourceExclusionPattern: '**/*Test*.java', sourcePattern: 'odsoft/exercise2/component2/cms/src/main/java'
     }
 }
