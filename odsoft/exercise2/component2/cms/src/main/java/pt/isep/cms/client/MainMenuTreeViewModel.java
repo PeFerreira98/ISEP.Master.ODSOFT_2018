@@ -24,6 +24,8 @@ import com.google.gwt.view.client.TreeViewModel;
 
 import pt.isep.cms.contacts.client.CwContacts;
 
+import pt.isep.cms.students.client.CwStudents;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -226,6 +228,7 @@ public class MainMenuTreeViewModel implements TreeViewModel {
 
 			// Will it load?!!!
 			category.addCwPanel(new CwContacts(constants));
+			category.addCwPanel(new CwStudents(constants));
 		}
 
 		// Services.

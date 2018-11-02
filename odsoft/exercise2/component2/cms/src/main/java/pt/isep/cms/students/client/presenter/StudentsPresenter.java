@@ -1,9 +1,9 @@
-package pt.isep.cms.contacts.client.presenter;
+package pt.isep.cms.students.client.presenter;
 
-import pt.isep.cms.contacts.client.ContactsServiceAsync;
-import pt.isep.cms.contacts.client.event.AddContactEvent;
-import pt.isep.cms.contacts.client.event.EditContactEvent;
-import pt.isep.cms.contacts.shared.ContactDetails;
+import pt.isep.cms.students.client.StudentsServiceAsync;
+import pt.isep.cms.students.client.event.AddStudentEvent;
+import pt.isep.cms.students.client.event.EditStudentEvent;
+import pt.isep.cms.students.shared.StudentDetails;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -17,9 +17,9 @@ import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContactsPresenter implements Presenter {
+public class StudentsPresenter implements Presenter {
 
-	private List<ContactDetails> contactDetails;
+	private List<StudentDetails> studentDetails;
 
 	public interface Display {
 		HasClickHandlers getAddButton();
@@ -37,11 +37,11 @@ public class ContactsPresenter implements Presenter {
 		Widget asWidget();
 	}
 
-	private final ContactsServiceAsync rpcService;
+	private final StudentsServiceAsync rpcService;
 	private final HandlerManager eventBus;
 	private final Display display;
 
-	public ContactsPresenter(ContactsServiceAsync rpcService, HandlerManager eventBus, Display view) {
+	public StudentsPresenter(StudentsServiceAsync rpcService, HandlerManager eventBus, Display view) {
 		this.rpcService = rpcService;
 		this.eventBus = eventBus;
 		this.display = view;
@@ -50,23 +50,23 @@ public class ContactsPresenter implements Presenter {
 	public void bind() {
 		display.getAddButton().addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				eventBus.fireEvent(new AddContactEvent());
+				eventBus.fireEvent(new AddStudentEvent());
 			}
 		});
 
 		display.getDeleteButton().addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				deleteSelectedContacts();
+				deleteSelectedStudents();
 			}
-		});
+		});	
 
 		display.getList().addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				int selectedRow = display.getClickedRow(event);
 
 				if (selectedRow >= 0) {
-					String id = contactDetails.get(selectedRow).getId();
-					eventBus.fireEvent(new EditContactEvent(id));
+					String id = studentDetails.get(selectedRow).getId();
+					eventBus.fireEvent(new EditStudentEvent(id));
 				}
 			}
 		});
@@ -77,72 +77,73 @@ public class ContactsPresenter implements Presenter {
 		container.clear();
 		container.add(display.asWidget());
 
-		fetchContactDetails();
+		fetchStudentDetails();
 	}
 
-	public void sortContactDetails() {
+	public void sortStudentDetails() {
 
 		// Yes, we could use a more optimized method of sorting, but the
 		// point is to create a test case that helps illustrate the higher
 		// level concepts used when creating MVP-based applications.
 		//
-		for (int i = 0; i < contactDetails.size(); ++i) {
-			for (int j = 0; j < contactDetails.size() - 1; ++j) {
-				if (contactDetails.get(j).getDisplayName()
-						.compareToIgnoreCase(contactDetails.get(j + 1).getDisplayName()) >= 0) {
-					ContactDetails tmp = contactDetails.get(j);
-					contactDetails.set(j, contactDetails.get(j + 1));
-					contactDetails.set(j + 1, tmp);
+		for (int i = 0; i < studentDetails.size(); ++i) {
+			for (int j = 0; j < studentDetails.size() - 1; ++j) {
+				if (studentDetails.get(j).getDisplayName()
+						.compareToIgnoreCase(studentDetails.get(j + 1).getDisplayName()) >= 0) {
+					StudentDetails tmp = studentDetails.get(j);
+					studentDetails.set(j, studentDetails.get(j + 1));
+					studentDetails.set(j + 1, tmp);
 				}
 			}
 		}
 	}
 
-	public void setContactDetails(List<ContactDetails> contactDetails) {
-		this.contactDetails = contactDetails;
+	public void setStudentDetails(List<StudentDetails> studentDetails) {
+		this.studentDetails = studentDetails;
 	}
 
-	public ContactDetails getContactDetail(int index) {
-		return contactDetails.get(index);
+	public StudentDetails getStudentDetail(int index) {
+		return studentDetails.get(index);
 	}
 
-	private void fetchContactDetails() {
+	private void fetchStudentDetails() {
 
-		rpcService.getContactDetails(new AsyncCallback<ArrayList<ContactDetails>>() {
-			public void onSuccess(ArrayList<ContactDetails> result) {
-				contactDetails = result;
-				sortContactDetails();
+		rpcService.getStudentDetails(new AsyncCallback<ArrayList<StudentDetails>>() {
+			public void onSuccess(ArrayList<StudentDetails> result) {
+				studentDetails = result;
+				sortStudentDetails();
 				List<String> data = new ArrayList<String>();
 
 				for (int i = 0; i < result.size(); ++i) {
-					data.add(contactDetails.get(i).getDisplayName());
+					data.add(studentDetails.get(i).getDisplayName());
 				}
 
 				display.setData(data);
 			}
 
 			public void onFailure(Throwable caught) {
-				Window.alert("Error fetching contact details");
+				Window.alert("Error fetching studentdetails");
 			}
 		});
+		
 	}
 
-	private void deleteSelectedContacts() {
+	private void deleteSelectedStudents() {
 		List<Integer> selectedRows = display.getSelectedRows();
 		ArrayList<String> ids = new ArrayList<String>();
 
 		for (int i = 0; i < selectedRows.size(); ++i) {
-			ids.add(contactDetails.get(selectedRows.get(i)).getId());
+			ids.add(studentDetails.get(selectedRows.get(i)).getId());
 		}
 
-		rpcService.deleteContacts(ids, new AsyncCallback<ArrayList<ContactDetails>>() {
-			public void onSuccess(ArrayList<ContactDetails> result) {
-				contactDetails = result;
-				sortContactDetails();
+		rpcService.deleteStudents(ids, new AsyncCallback<ArrayList<StudentDetails>>() {
+			public void onSuccess(ArrayList<StudentDetails> result) {
+				studentDetails = result;
+				sortStudentDetails();
 				List<String> data = new ArrayList<String>();
 
 				for (int i = 0; i < result.size(); ++i) {
-					data.add(contactDetails.get(i).getDisplayName());
+					data.add(studentDetails.get(i).getDisplayName());
 				}
 
 				display.setData(data);
@@ -150,7 +151,7 @@ public class ContactsPresenter implements Presenter {
 			}
 
 			public void onFailure(Throwable caught) {
-				Window.alert("Error deleting selected contacts");
+				Window.alert("Error deleting selected students");
 			}
 		});
 	}

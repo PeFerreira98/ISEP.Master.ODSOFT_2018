@@ -1,28 +1,31 @@
-package pt.isep.cms.contacts.shared;
+package pt.isep.cms.students.shared;
 
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class Contact implements Serializable {
+public class Student implements Serializable
+{
 	public String id;
   public String firstName;
   public String lastName;
   public String emailAddress;
 	
-	public Contact() {}
+	public Student() {}
 	
-	public Contact(String id, String firstName, String lastName, String emailAddress) {
+  public Student(String id, String firstName, String lastName, String emailAddress)
+  {
 		this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
 		this.emailAddress = emailAddress;
 	}
 	
-	public ContactDetails getLightWeightContact() {
-	  return new ContactDetails(id, getFullName());
+  public StudentDetails getLightWeightStudent()
+  {
+	  return new StudentDetails(id, getFullName());
 	}
 	
-  public String getId() { return id; }
+  public String getId(){ return id; }
   public void setId(String id) { this.id = id; }
 
   public String getFirstName() { return firstName; }
@@ -34,5 +37,8 @@ public class Contact implements Serializable {
   public String getEmailAddress() { return emailAddress; }
   public void setEmailAddress(String emailAddress) { this.emailAddress = emailAddress; }
   
-  public String getFullName() { return firstName + " " + lastName; }
+  public String getFullName()
+  {
+    return firstName == null || lastName == null ? null : firstName + " " + lastName;
+  }
 }

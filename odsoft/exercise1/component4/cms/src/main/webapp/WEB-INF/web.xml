@@ -20,7 +20,7 @@
   <!-- Servlets for the students -->
   <servlet>
     <servlet-name>studentsServiceServlet</servlet-name>
-    <servlet-class>pt.isep.cms.students.server.ContactsServiceImpl</servlet-class>
+    <servlet-class>pt.isep.cms.students.server.StudentsServiceImpl</servlet-class>
   </servlet>
   
   <servlet-mapping>
