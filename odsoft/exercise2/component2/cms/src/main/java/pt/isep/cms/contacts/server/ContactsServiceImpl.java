@@ -36,9 +36,11 @@ public class ContactsServiceImpl extends RemoteServiceServlet implements
       "user31065@example.com", "ftsgeolbx@example.com"};
       
   private final HashMap<String, Contact> contacts = new HashMap<String, Contact>();
+  private int serialId;
 
   public ContactsServiceImpl() {
     initContacts();
+    serialId = 0;
   }
   
   private void initContacts() {
@@ -46,13 +48,13 @@ public class ContactsServiceImpl extends RemoteServiceServlet implements
     //
     for (int i = 0; i < contactsFirstNameData.length && i < contactsLastNameData.length && i < contactsEmailData.length; ++i) {
       Contact contact = new Contact(String.valueOf(i), contactsFirstNameData[i], contactsLastNameData[i], contactsEmailData[i]);
-      contacts.put(contact.getId(), contact); 
+      addContact(contact); 
     }
   }
   
   public Contact addContact(Contact contact) {
-    contact.setId(String.valueOf(contacts.size())); // contacts.size() !? what are you even doing?
-    contacts.put(contact.getId(), contact);         // what happens when you delete someone? last contact vanishes?
+    contact.setId(String.valueOf(serialId++)); 
+    contacts.put(contact.getId(), contact);
     return contact;
   }
 

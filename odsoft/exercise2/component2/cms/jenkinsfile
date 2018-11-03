@@ -1,33 +1,149 @@
 node {
-    stage('Preparation') {
-        // Get some code from a GitHub repository
-    }
+
     stage('Checkout'){
         checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '0b06b803-ab5a-4de6-b9b2-26cef342e853', url: 'https://rafael95@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git']]])
     }
-    stage('Build') {
+
+    stage('Preparation') {
+
         if (isUnix()) {
-            sh 'odsoft/exercise2/component2/cms/gradlew build'
+            dir('odsoft/exercise2/component2/cms') {sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport'}
         } else {
-            bat 'odsoft/exercise2/component2/cms/gradlew.bat build'
+            dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport'}
         }
     }
-    stage('Archive war file and generate Javadoc'){
-        steps {
-            parallel(
-                war: {
-                    archiveArtifacts allowEmptyArchive: true, artifacts: 'odsoft/exercise2/component2/cms/build/libs/*.war', fingerprint: true, onlyIfSuccessful: true
-                },
-                javadoc: {
-                    step([$class: 'JavadocArchiver', javadocDir: 'odsoft/exercise2/component2/cms/build/docs/javadoc', keepAll: false])
-                }
-            )
+
+    stage('Build') {
+
+        if (isUnix()) {
+            dir('odsoft/exercise2/component2/cms') {sh './gradlew build'}
+        } else {
+            dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat build'}
         }
     }
+
+    stage('Archive war file'){
+        archiveArtifacts allowEmptyArchive: true, artifacts: 'odsoft/exercise2/component2/cms/build/libs/*.war', fingerprint: true, onlyIfSuccessful: true
+    }
+
+    stage('Javadoc'){
+        
+        if (isUnix()) {
+            dir('odsoft/exercise2/component2/cms') {sh './gradlew javadoc'}
+        } else {
+            dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat javadoc'}
+        }
+
+        step([$class: 'JavadocArchiver', javadocDir: 'odsoft/exercise2/component2/cms/build/docs/javadoc', keepAll: false])
+    }
+
+    stage('Unit Tests'){
+        
+        if (isUnix()) {
+            dir('odsoft/exercise2/component2/cms') {sh './gradlew test'}
+        } else {
+            dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat test'}
+        }
+    }
+
+    stage('Integration Tests'){
+        
+        if (isUnix()) {
+            dir('odsoft/exercise2/component2/cms') {sh './gradlew integrationTest'}
+        } else {
+            dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat integrationTest'}
+        }
+    }
+
     stage('Publish Tests Report'){
         junit allowEmptyResults: true, testResults: 'odsoft/exercise2/component2/cms/build/test-results/test/*.xml'
     }
+
     stage('Publish Coverage Report'){
         jacoco classPattern: 'odsoft/exercise2/component2/cms/build/classes', exclusionPattern: '**/*Test*.class', execPattern: 'odsoft/exercise2/component2/cms/build/jacoco/*.exec', sourceExclusionPattern: '**/*Test*.java', sourcePattern: 'odsoft/exercise2/component2/cms/src/main/java'
+    }
+}
+
+
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Preparation') {
+            if (isUnix()) {
+                sh 'odsoft/exercise2/component2/cms/gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport'
+            } else {
+                bat 'odsoft/exercise2/component2/cms/gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport'
+            }
+        }
+
+        stage('Git Checkout'){
+            checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '0b06b803-ab5a-4de6-b9b2-26cef342e853', url: 'https://rafael95@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git']]])
+        }
+
+        stage('Build') {
+            
+            steps {
+                if (isUnix()) {
+                    sh 'odsoft/exercise2/component2/cms/gradlew build'
+                } else {
+                    bat 'odsoft/exercise2/component2/cms/gradlew.bat build'
+                }
+            }
+            post {
+                always {
+                    parallel(
+                        war: {
+                            archiveArtifacts allowEmptyArchive: true, artifacts: 'odsoft/exercise2/component2/cms/build/libs/*.war', fingerprint: true, onlyIfSuccessful: true
+                        },
+                        javadoc: {
+                            steps {
+                                if (isUnix()) {
+                                    sh 'odsoft/exercise2/component2/cms/gradlew javadoc'
+                                } else {
+                                    bat 'odsoft/exercise2/component2/cms/gradlew.bat javadoc'
+                                }
+                            }
+                            post{
+                                always{
+                                    step([$class: 'JavadocArchiver', javadocDir: 'odsoft/exercise2/component2/cms/build/docs/javadoc', keepAll: false])
+                    
+                                }
+                            }
+                        }
+                    )   
+                }
+            }
+        }
+
+        stage('Tests'){
+            parallel(
+                stage('Unit Tests'){
+                    if (isUnix()) {
+                        sh 'odsoft/exercise2/component2/cms/gradlew test'
+                    } else {
+                        bat 'odsoft/exercise2/component2/cms/gradlew.bat test'
+                    }
+                },
+                stage('Integration Tests'){
+                    if (isUnix()) {
+                        sh 'odsoft/exercise2/component2/cms/gradlew integrationTest'
+                    } else {
+                        bat 'odsoft/exercise2/component2/cms/gradlew.bat integrationTest'
+                    }
+                }
+            )
+        }
+
+        stage('Publish Tests Report'){
+            junit allowEmptyResults: true, testResults: 'odsoft/exercise2/component2/cms/build/test-results/test/*.xml'
+        }
+
+        stage('Publish Coverage Report'){
+            jacoco classPattern: 'odsoft/exercise2/component2/cms/build/classes', exclusionPattern: '**/*Test*.class', execPattern: 'odsoft/exercise2/component2/cms/build/jacoco/*.exec', sourceExclusionPattern: '**/*Test*.java', sourcePattern: 'odsoft/exercise2/component2/cms/src/main/java'
+        }
+
     }
 }

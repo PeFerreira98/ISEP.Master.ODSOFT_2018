@@ -8,7 +8,7 @@ public class ContactDetails implements Serializable {
   private String displayName;
   
   public ContactDetails() {
-    new ContactDetails("0", ""); // WTF?! do you even Java???
+    this("0", "");
   }
 
   public ContactDetails(String id, String displayName) {
