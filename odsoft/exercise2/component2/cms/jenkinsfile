@@ -33,7 +33,7 @@ pipeline {
             }
     	}
     
-        stage("build and deploy on Windows and Linux") {
+        stage("Archive War, Generate/Publish Javadoc and Run Tests") {
             parallel {
                 
                 stage('Archive war file'){

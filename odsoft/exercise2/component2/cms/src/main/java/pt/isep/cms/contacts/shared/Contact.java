@@ -34,5 +34,8 @@ public class Contact implements Serializable {
   public String getEmailAddress() { return emailAddress; }
   public void setEmailAddress(String emailAddress) { this.emailAddress = emailAddress; }
   
-  public String getFullName() { return firstName + " " + lastName; }
+  public String getFullName()
+  {
+    return firstName == null || lastName == null ? null : firstName + " " + lastName;
+  }
 }
