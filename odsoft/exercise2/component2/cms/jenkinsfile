@@ -3,9 +3,9 @@ pipeline {
 
     stages {
         
-    	stage('Checkout'){
+    	stage('Checkout') {
             steps {
-           		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '0b06b803-ab5a-4de6-b9b2-26cef342e853', url: 'https://rafael95@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git']]])
+           		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a1e7ee23-40f2-46fe-82d5-048f0790e80e', url: 'https://rafael95@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git']]])
             }
     	}
     
@@ -36,13 +36,13 @@ pipeline {
         stage("Archive War, Generate/Publish Javadoc and Run Tests") {
             parallel {
                 
-                stage('Archive war file'){
+                stage('Archive war file') {
                     steps {
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'odsoft/exercise2/component2/cms/build/libs/*.war', fingerprint: true, onlyIfSuccessful: true
                     }
                 }
     
-                stage('Javadoc'){
+                stage('Javadoc') {
                     steps {
                         script {
                             if (isUnix()) {
@@ -56,7 +56,7 @@ pipeline {
                     }
                 }
     
-                stage('Unit Tests'){
+                stage('Unit Tests') {
                     steps {
                         script {
                             if (isUnix()) {
@@ -68,7 +68,7 @@ pipeline {
                     }
                 }
     
-                stage('Integration Tests'){
+                stage('Integration Tests') {
                     steps {
                         script {
                             if (isUnix()) {
@@ -80,8 +80,24 @@ pipeline {
                     }
 
                 }
+
+                stage('Mutation Tests') {
+                    steps {
+                        /*
+                        script {
+                            if (isUnix()) {
+                                dir('odsoft/exercise2/component2/cms') {sh './gradlew mutationTest'}
+                            } else {
+                                dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat mutationTest'}
+                            }
+                        }
+                        */
+                        
+                        echo "mutation tests under construction"
+                    }
+                }
             
-                stage('System Tests'){
+                stage('System Tests') {
                     steps {
                         /*
                         script {
@@ -99,13 +115,13 @@ pipeline {
             }
         }
 
-        stage('Publish Tests Report'){
+        stage('Publish Tests Report') {
             steps {
                 junit allowEmptyResults: true, testResults: 'odsoft/exercise2/component2/cms/build/test-results/test/*.xml'
             }
         }
 
-        stage('Publish Coverage Report'){
+        stage('Publish Coverage Report') {
             steps {
                 jacoco classPattern: 'odsoft/exercise2/component2/cms/build/classes', exclusionPattern: '**/*Test*.class', execPattern: 'odsoft/exercise2/component2/cms/build/jacoco/*.exec', sourceExclusionPattern: '**/*Test*.java', sourcePattern: 'odsoft/exercise2/component2/cms/src/main/java'
             }
@@ -126,7 +142,7 @@ pipeline {
             }
         }
     
-        stage('Smoke Tests'){
+        stage('Smoke Tests') {
             steps {
                 /*
                 script {
@@ -138,6 +154,44 @@ pipeline {
                 }
                 */
                 echo "Smoke tests under construction"
+            }
+        }
+
+        stage('Manual UI Acceptance Tests') {
+            options {
+                timeout(time: 1, unit: 'HOURS')
+            }
+            steps {
+
+                emailext body: '''Please do some testing and approve the build on jenkins
+
+CHOP CHOP! Get to work!''', recipientProviders: [developers(), culprits()], subject: 'Manual Tests', to: '1141233@isep.ipp.pt'
+
+                input 'Please Approve or fail the build after UI Acceptance Tests'
+            }
+        }
+
+        stage('Continuous Integration Feedback') {
+            steps {
+                withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                    credentialsId: 'a1e7ee23-40f2-46fe-82d5-048f0790e80e',
+                    usernameVariable: 'GIT_USERNAME', 
+                    passwordVariable: 'GIT_PASSWORD']]) {
+
+                    script {
+                        if (isUnix()) {
+                            dir('odsoft/exercise2/component2/cms') {
+                                sh "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
+                                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git --tags"
+                            }
+                        } else {
+                            dir('odsoft/exercise2/component2/cms') {
+                                bat "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
+                                bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git --tags"
+                            }
+                        }
+                    }
+                }
             }
         }
 
