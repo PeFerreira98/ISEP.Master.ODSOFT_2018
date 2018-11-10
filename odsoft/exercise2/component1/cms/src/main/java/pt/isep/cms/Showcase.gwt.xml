@@ -1,7 +1,8 @@
 <module rename-to="showcase">
+
   <!-- Inherit the core Web Toolkit stuff. -->
-  <inherits name='com.google.gwt.core.Core'/>
-  <inherits name='com.google.gwt.user.User'/>
+  <inherits name="com.google.gwt.user.User" /><inherits name="com.google.gwt.core.Core"/>
+  
   <inherits name="com.google.gwt.i18n.I18N"/>
   <inherits name="com.google.gwt.i18n.CldrLocales"/>
   <inherits name="com.google.gwt.user.theme.clean.CleanResources"/>
@@ -52,5 +53,9 @@
   <!-- Specify the paths for translatable code source for Contacts  -->
   <source path="contacts/client" />
   <source path="contacts/shared" />
+
+    <!-- Specify the paths for translatable code source for Students  -->
+  <source path="students/client" />
+  <source path="students/shared" />
   
 </module>

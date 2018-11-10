@@ -1,14 +1,14 @@
-package pt.isep.cms.contacts;
+package pt.isep.cms.students;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import pt.isep.cms.contacts.client.ExampleGWTTest;
+import pt.isep.cms.students.client.ExampleGWTTest;
 
 public class ExampleGWTTestSuit extends GWTTestSuite {
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for the Contacts Application");
+		TestSuite suite = new TestSuite("Test for the Students Application");
 		suite.addTestSuite(ExampleGWTTest.class);
 		return suite;
 	}

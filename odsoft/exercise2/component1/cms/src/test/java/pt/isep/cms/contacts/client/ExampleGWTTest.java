@@ -76,4 +76,49 @@ public class ExampleGWTTest extends GWTTestCase {
 			}
 		});
 	}
+
+	public void testUpdateContactToService() {
+		// Create the service that we will test.
+		ContactsServiceAsync contactsService = GWT.create(ContactsService.class);
+		ServiceDefTarget target = (ServiceDefTarget) contactsService;
+		target.setServiceEntryPoint(GWT.getModuleBaseURL() + "contacts/contactsService");
+
+		// Since RPC calls are asynchronous, we will need to wait for a response
+		// after this test method returns. This line tells the test runner to wait
+		// up to 10 seconds before timing out.
+		delayTestFinish(10000);
+
+		// Send a request to the server.
+		contactsService.getContact("2", new AsyncCallback<Contact>() {
+			public void onFailure(Throwable caught) {
+				// The request resulted in an unexpected error.
+				fail("Request failure: " + caught.getMessage());
+			}
+
+			public void onSuccess(Contact result) {
+				// Verify that the response is correct.
+				assertTrue(result != null);
+
+				Contact changed = new Contact(result.getId(), "Timothy", "Bananas", "TimoB@b.com");
+
+				contactsService.updateContact(changed, new AsyncCallback<Contact>() {
+					public void onFailure(Throwable caught) {
+						// The request resulted in an unexpected error.
+						fail("Update failure: " + caught.getMessage());
+					}
+		
+					public void onSuccess(Contact result) {
+						// Verify that the response is correct.
+						assertTrue(result != null);
+						//assertTrue(changed.getId() == result.getId());
+						//assertTrue(changed.getFirstName() == result.getFirstName());
+						//assertTrue(changed.getLastName() == result.getLastName());
+						//assertTrue(changed.getEmailAddress() == result.getEmailAddress());
+					
+						finishTest();
+					}
+				});
+			}
+		});
+	}
 }

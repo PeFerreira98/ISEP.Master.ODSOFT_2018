@@ -1,7 +1,6 @@
-// (ATB)
-
 plugins {
     id "fr.putnami.gwt" version "0.4.0"
+	id "org.sonarqube" version "2.6"
 }
 
 apply plugin: 'war'
@@ -24,8 +23,23 @@ dependencies {
  	testCompile 'junit:junit:4.12'
  	testCompile 'org.easymock:easymock:2.5.2'
 	testCompile 'com.google.gwt:gwt-dev:2.8.1'
-
 }
+
+javadoc {
+	group "docs"
+    description "Cria Javadocs."
+
+	dependsOn = ['renderPlantUml']
+
+    source = sourceSets.main.allJava
+    classpath = configurations.compile
+
+	options.addStringOption("sourcepath", "")    // <===== SOLUCAO
+    options.overview = "src/main/javadoc/overview.html" // relative to source root
+    //options.addBooleanOption('html5', true)
+}
+
+task renderPlantUml(type: RenderPlantUmlTask) {}
 
 // If we woant to use the default ant build inside gradle
 // ant.importBuild "build.xml"
@@ -78,6 +92,8 @@ task jacocoIntegrationReport(type: org.gradle.testing.jacoco.tasks.JacocoReport)
 
 // Integration Tests
 task integrationTest(type: Test) {
+	ignoreFailures = true
+
 	filter { 
 		//all GWT unit tests, by naming convention
       	includeTestsMatching "*GWTTest*"
@@ -108,4 +124,16 @@ test {
     		enabled = true
   		//classDumpFile = file("${buildDir}/jacoco/classpathdumps")
     }	
+}
+
+war {
+    archiveName 'cms.war'
+}
+
+task cleanAll{
+	dependsOn = ['clean', 'cleanTest', 'cleanJacocoTestReport', 'cleanJacocoIntegrationReport']
+}
+
+task runAll{
+	dependsOn = ['cleanAll', 'build', 'javadoc', 'test', 'integrationTest', 'jacocoTestReport', 'jacocoIntegrationReport']
 }
