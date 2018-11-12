@@ -143,9 +143,17 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        dir("${projectDir}") {sh './gradlew deploy'}
+                        dir("${projectDir}") {
+                            sh './gradlew deploy'
+                            sh 'startup.sh'
+                            sleep(3)
+                        }
                     } else {
-                        dir("${projectDir}") {bat 'gradlew.bat deploy'}
+                        dir("${projectDir}") {
+                            bat 'gradlew.bat deploy'
+                            bat 'startup.bat'
+                            sleep(3)
+                        }
                     }
                 }
             }
@@ -156,11 +164,13 @@ pipeline {
                 retry(5)
             }
             steps {
+                // to allow Tomcat to deploy the app
+                sleep(3)
                 script {
                     if (isUnix()) {
-                        dir("${projectDir}") {sh 'curl http://localhost:8080/#!CwStudents'}
+                        dir("${projectDir}") {sh 'curl http://localhost:8080/cms-1.0/#!CwContacts'}
                     } else {
-                        dir("${projectDir}") {bat 'curl http://localhost:8080/#!CwStudents'}
+                        dir("${projectDir}") {bat 'curl http://localhost:8080/cms-1.0/#!CwContacts'}
                     }
                 }
             }

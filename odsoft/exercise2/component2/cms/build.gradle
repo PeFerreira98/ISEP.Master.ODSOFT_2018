@@ -143,5 +143,5 @@ task renderPlantUml(type: RenderPlantUmlTask) {
 
 task deploy(type: Copy) {
 	from "build/libs"
-	into "%CATALINA_HOME%/webapps"
+	into "${System.env.CATALINA_HOME}/webapps"
 }
