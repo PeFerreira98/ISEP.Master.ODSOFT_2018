@@ -1,11 +1,18 @@
 pipeline {
+
+    environment {
+        projectDir = 'odsoft/exercise2/component2/cms'
+        repository = 'bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git'
+        credentials = 'a1e7ee23-40f2-46fe-82d5-048f0790e80e'
+    }
+
     agent any
 
     stages {
         
     	stage('Checkout') {
             steps {
-           		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a1e7ee23-40f2-46fe-82d5-048f0790e80e', url: 'https://rafael95@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git']]])
+           		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "https://rafael95@${repository}"]]])
             }
     	}
     
@@ -13,9 +20,9 @@ pipeline {
     	    steps {
                 script {
                     if (isUnix()) {
-                        dir('odsoft/exercise2/component2/cms') {sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport'}
+                        dir("${projectDir}") {sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport'}
                     } else {
-                        dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport'}
+                        dir("${projectDir}") {bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport'}
                     }
                 }
     	    }
@@ -25,20 +32,20 @@ pipeline {
             steps {
                 script{
                     if (isUnix()) {
-                    	dir('odsoft/exercise2/component2/cms') {sh './gradlew build'}
+                    	dir("${projectDir}") {sh './gradlew build'}
                     } else {
-                    	dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat build'}
+                    	dir("${projectDir}") {bat 'gradlew.bat build'}
                     }
                 }
             }
     	}
-    
+
         stage("Archive War, Generate/Publish Javadoc and Run Tests") {
             parallel {
                 
                 stage('Archive war file') {
                     steps {
-                        archiveArtifacts allowEmptyArchive: true, artifacts: 'odsoft/exercise2/component2/cms/build/libs/*.war', fingerprint: true, onlyIfSuccessful: true
+                        archiveArtifacts allowEmptyArchive: true, artifacts: "${projectDir}/build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
                     }
                 }
     
@@ -46,13 +53,13 @@ pipeline {
                     steps {
                         script {
                             if (isUnix()) {
-                                dir('odsoft/exercise2/component2/cms') {sh './gradlew javadoc'}
+                                dir("${projectDir}") {sh './gradlew javadoc'}
                             } else {
-                                dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat javadoc'}
+                                dir("${projectDir}") {bat 'gradlew.bat javadoc'}
                             }
                         }
                 
-                        step([$class: 'JavadocArchiver', javadocDir: 'odsoft/exercise2/component2/cms/build/docs/javadoc', keepAll: false])
+                        step([$class: 'JavadocArchiver', javadocDir: "${projectDir}/build/docs/javadoc", keepAll: false])
                     }
                 }
     
@@ -60,9 +67,9 @@ pipeline {
                     steps {
                         script {
                             if (isUnix()) {
-                                dir('odsoft/exercise2/component2/cms') {sh './gradlew test'}
+                                dir("${projectDir}") {sh './gradlew test'}
                             } else {
-                                dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat test'}
+                                dir("${projectDir}") {bat 'gradlew.bat test'}
                             }
                         }
                     }
@@ -72,13 +79,12 @@ pipeline {
                     steps {
                         script {
                             if (isUnix()) {
-                                dir('odsoft/exercise2/component2/cms') {sh './gradlew integrationTest'}
+                                dir("${projectDir}") {sh './gradlew integrationTest'}
                             } else {
-                                dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat integrationTest'}
+                                dir("${projectDir}") {bat 'gradlew.bat integrationTest'}
                             }
                         }
                     }
-
                 }
 
                 stage('Mutation Tests') {
@@ -86,9 +92,9 @@ pipeline {
                         /*
                         script {
                             if (isUnix()) {
-                                dir('odsoft/exercise2/component2/cms') {sh './gradlew mutationTest'}
+                                dir("${projectDir}") {sh './gradlew mutationTest'}
                             } else {
-                                dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat mutationTest'}
+                                dir("${projectDir}") {bat 'gradlew.bat mutationTest'}
                             }
                         }
                         */
@@ -102,13 +108,13 @@ pipeline {
                         /*
                         script {
                             if (isUnix()) {
-                                dir('odsoft/exercise2/component2/cms') {sh './gradlew systemTest'}
+                                dir("${projectDir}") {sh './gradlew systemTest'}
                             } else {
-                                dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat systemTest'}
+                                dir("${projectDir}") {bat 'gradlew.bat systemTest'}
                             }
                         }
                         */
-                        
+
                         echo "system tests under construction"
                     }
                 }
@@ -117,43 +123,46 @@ pipeline {
 
         stage('Publish Tests Report') {
             steps {
-                junit allowEmptyResults: true, testResults: 'odsoft/exercise2/component2/cms/build/test-results/test/*.xml'
+                junit allowEmptyResults: true, testResults: "${projectDir}/build/test-results/test/*.xml"
+            }
+        }
+
+        stage('Publish Integration Tests Report') {
+            steps {
+                junit allowEmptyResults: true, testResults: "${projectDir}/build/test-results/integrationTest/*.xml"
             }
         }
 
         stage('Publish Coverage Report') {
             steps {
-                jacoco classPattern: 'odsoft/exercise2/component2/cms/build/classes', exclusionPattern: '**/*Test*.class', execPattern: 'odsoft/exercise2/component2/cms/build/jacoco/*.exec', sourceExclusionPattern: '**/*Test*.java', sourcePattern: 'odsoft/exercise2/component2/cms/src/main/java'
+                jacoco classPattern: "${projectDir}/build/classes", exclusionPattern: '**/*Test*.class', execPattern: "${projectDir}/build/jacoco/*.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "${projectDir}/src/main/java"
             }
         }
     
         stage('Deploy'){
             steps {
-                /*
                 script {
                     if (isUnix()) {
-                        dir('odsoft/exercise2/component2/cms') {sh './gradlew deploy'}
+                        dir("${projectDir}") {sh './gradlew deploy'}
                     } else {
-                        dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat deploy'}
+                        dir("${projectDir}") {bat 'gradlew.bat deploy'}
                     }
                 }
-                */
-                echo "Deploy under construction"
             }
         }
     
         stage('Smoke Tests') {
+            options {
+                retry(5)
+            }
             steps {
-                /*
                 script {
                     if (isUnix()) {
-                        dir('odsoft/exercise2/component2/cms') {sh './gradlew smokeTest'}
+                        dir("${projectDir}") {sh 'curl http://localhost:8080/#!CwStudents'}
                     } else {
-                        dir('odsoft/exercise2/component2/cms') {bat 'gradlew.bat smokeTest'}
+                        dir("${projectDir}") {bat 'curl http://localhost:8080/#!CwStudents'}
                     }
                 }
-                */
-                echo "Smoke tests under construction"
             }
         }
 
@@ -162,10 +171,11 @@ pipeline {
                 timeout(time: 1, unit: 'HOURS')
             }
             steps {
-
+                /*
                 emailext body: '''Please do some testing and approve the build on jenkins
 
 CHOP CHOP! Get to work!''', recipientProviders: [developers(), culprits()], subject: 'Manual Tests', to: '1141233@isep.ipp.pt'
+                */
 
                 input 'Please Approve or fail the build after UI Acceptance Tests'
             }
@@ -174,24 +184,30 @@ CHOP CHOP! Get to work!''', recipientProviders: [developers(), culprits()], subj
         stage('Continuous Integration Feedback') {
             steps {
                 withCredentials([[$class: 'UsernamePasswordMultiBinding',
-                    credentialsId: 'a1e7ee23-40f2-46fe-82d5-048f0790e80e',
+                    credentialsId: "${credentials}",
                     usernameVariable: 'GIT_USERNAME', 
                     passwordVariable: 'GIT_PASSWORD']]) {
 
                     script {
                         if (isUnix()) {
-                            dir('odsoft/exercise2/component2/cms') {
+                            dir("${projectDir}") {
                                 sh "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
-                                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git --tags"
+                                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
                             }
                         } else {
-                            dir('odsoft/exercise2/component2/cms') {
+                            dir("${projectDir}") {
                                 bat "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
-                                bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git --tags"
+                                bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
                             }
                         }
                     }
                 }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                cleanWs notFailBuild: true
             }
         }
 

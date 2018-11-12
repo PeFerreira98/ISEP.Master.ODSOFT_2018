@@ -26,7 +26,7 @@ dependencies {
 	testCompile 'com.google.gwt:gwt-dev:2.8.2'
 }
 
-// If we woant to use the default ant build inside gradle
+// If we want to use the default ant build inside gradle
 // ant.importBuild "build.xml"
 
 putnami{
@@ -75,25 +75,6 @@ task jacocoIntegrationReport(type: org.gradle.testing.jacoco.tasks.JacocoReport)
     }
 }
 
-// Integration Tests
-task integrationTest(type: Test) {
-    ignoreFailures = true
-
-	filter { 
-		//all GWT unit tests, by naming convention
-      	includeTestsMatching "*GWTTest*"
-	}    
-    jacoco { 
-    		append = true
-    		enabled = true
-    		//classDumpFile = file("${buildDir}/jacoco/classpathdumps")
-    		
-    		excludes = ["com/steadystate/**"] 
-    }
-    // These Properties are required to run gwt integration tests
-    systemProperties['gwt.args'] = "-devMode -logLevel WARN -war www-test"
-}
-
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
 }
@@ -107,18 +88,38 @@ test {
       	includeTestsMatching "*JRETest*"
 	}
     jacoco { 
-    		append = true
-    		enabled = true
+		append = true
+		enabled = true
   		//classDumpFile = file("${buildDir}/jacoco/classpathdumps")
     }	
 }
 
-task systemTest(type: Test) {
+// Integration Tests
+task integrationTest(type: Test) {
     ignoreFailures = true
 
 	filter { 
 		//all GWT unit tests, by naming convention
-      	includeTestsMatching "*SysTest*"
+      	includeTestsMatching "*GWTTest*"
+	}    
+    jacoco { 
+		append = true
+		enabled = true
+		//classDumpFile = file("${buildDir}/jacoco/classpathdumps")
+		
+		excludes = ["com/steadystate/**"] 
+    }
+    // These Properties are required to run gwt integration tests
+    systemProperties['gwt.args'] = "-devMode -logLevel WARN -war www-test"
+}
+
+// System Tests
+task systemTest(type: Test) {
+    ignoreFailures = true
+
+	filter { 
+		//all system tests, by naming convention
+      	includeTestsMatching "*SYSTest*"
 	}    
     jacoco { 
     		append = true
@@ -140,6 +141,7 @@ javadoc {
 task renderPlantUml(type: RenderPlantUmlTask) {
 }
 
-task runTestsAndGenerateReport {
-    dependsOn = ['test', 'integrationTest', 'jacocoTestReport', 'jacocoIntegrationReport']
+task deploy(type: Copy) {
+	from "build/libs"
+	into "%CATALINA_HOME%/webapps"
 }
