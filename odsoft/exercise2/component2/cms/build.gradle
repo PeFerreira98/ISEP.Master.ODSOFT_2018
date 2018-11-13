@@ -113,23 +113,6 @@ task integrationTest(type: Test) {
     systemProperties['gwt.args'] = "-devMode -logLevel WARN -war www-test"
 }
 
-// System Tests
-task systemTest(type: Test) {
-    ignoreFailures = true
-
-	filter { 
-		//all system tests, by naming convention
-      	includeTestsMatching "*SYSTest*"
-	}    
-    jacoco { 
-    		append = true
-    		enabled = true
-    		//classDumpFile = file("${buildDir}/jacoco/classpathdumps")
-    		
-    		excludes = ["com/steadystate/**"] 
-    }
-}
-
 javadoc {
     dependsOn = ['renderPlantUml']
 
