@@ -62,11 +62,24 @@ jacocoTestReport {
 }
 
 // This task generates the coverage report for the integration tests.
-// Notice that it only includes data about the server code sice Jaccoco is not able to get data about cliente code that is transpiled to javascript
+// Notice that it only includes data about the server code since Jaccoco is not able to get data about cliente code that is transpiled to javascript
 task jacocoIntegrationReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
 	sourceSets sourceSets.main
 	
     executionData = files("${buildDir}/jacoco/integrationTest.exec")
+    
+    reports {
+        html.enabled = true
+        xml.enabled = false
+        csv.enabled = false
+    }
+}
+
+// JaCoCo Mutation Test Report 
+task jacocoMutationReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+	sourceSets sourceSets.main
+	
+    executionData = files("${buildDir}/jacoco/mutationTest.exec")
     
     reports {
         html.enabled = true
@@ -111,6 +124,23 @@ task integrationTest(type: Test) {
     }
     // These Properties are required to run gwt integration tests
     systemProperties['gwt.args'] = "-devMode -logLevel WARN -war www-test"
+}
+
+// Mutation Tests
+task mutationTest(type: Test) {
+    ignoreFailures = true
+
+	filter { 
+		//all GWT unit tests, by naming convention
+      	includeTestsMatching "*MUTTest*"
+	}    
+    jacoco { 
+		append = true
+		enabled = true
+		//classDumpFile = file("${buildDir}/jacoco/classpathdumps")
+		
+		excludes = ["com/steadystate/**"] 
+    }
 }
 
 javadoc {

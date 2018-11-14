@@ -2,7 +2,7 @@ pipeline
 {
     environment 
     {
-        projectDir = 'odsoft/exercise2/component2/cms'
+        projectDir = 'odsoft/exercise2/component4/cms'
         repository = 'bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git'
         credentials = 'a1e7ee23-40f2-46fe-82d5-048f0790e80e'
     }
@@ -94,11 +94,11 @@ pipeline
                         {
                             if (isUnix()) 
                             {
-                                dir("${projectDir}") {sh './gradlew test'}
+                                dir("${projectDir}") {sh './gradlew test jacocoTestReport'}
                             } 
                             else 
                             {
-                                dir("${projectDir}") {bat 'gradlew.bat test'}
+                                dir("${projectDir}") {bat 'gradlew.bat test jacocoTestReport'}
                             }
                         }
 
@@ -116,11 +116,11 @@ pipeline
                         {
                             if (isUnix()) 
                             {
-                                dir("${projectDir}") {sh './gradlew integrationTest'}
+                                dir("${projectDir}") {sh './gradlew integrationTest jacocoIntegrationReport'}
                             } 
                             else 
                             {
-                                dir("${projectDir}") {bat 'gradlew.bat integrationTest'}
+                                dir("${projectDir}") {bat 'gradlew.bat integrationTest jacocoIntegrationReport'}
                             }
                         }
 
@@ -139,11 +139,11 @@ pipeline
                         {
                             if (isUnix()) 
                             {
-                                dir("${projectDir}") {sh './gradlew mutationTest'}
+                                dir("${projectDir}") {sh './gradlew mutationTest jacocoMutationReport'}
                             } 
                             else 
                             {
-                                dir("${projectDir}") {bat 'gradlew.bat mutationTest'}
+                                dir("${projectDir}") {bat 'gradlew.bat mutationTest jacocoMutationReport'}
                             }
                         }
 
@@ -169,7 +169,6 @@ pipeline
                         {
                             sh './gradlew deploy'
                             sh 'startup.sh'
-                            sleep(3)
                         }
                     } 
                     else 
@@ -178,7 +177,6 @@ pipeline
                         {
                             bat 'gradlew.bat deploy'
                             bat 'startup.bat'
-                            sleep(3)
                         }
                     }
                 }
@@ -194,7 +192,7 @@ pipeline
 
             steps 
             {
-                // to allow Tomcat to deploy the app
+                // to allow Tomcat to finish deploying the app
                 sleep(3)
                 script 
                 {
@@ -260,16 +258,10 @@ CHOP CHOP! Get to work!''', recipientProviders: [developers(), culprits()], subj
                 }
             }
         }
-
-        success 
-        {
-            //Performance report
-            echo "Performance report under construction"
-        }
         
         cleanup 
         {
-            cleanWs notFailBuild: true
+            //cleanWs notFailBuild: true
         }
     }
 }
