@@ -6,13 +6,13 @@ pipeline{
         repoUrl = 'https://PeFerreira98@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git'
 
         //service (personal)
-        //credentials = '478a9f2c-5b0a-4b9f-a7ee-4d306dc84a8c'
+        credentials = '478a9f2c-5b0a-4b9f-a7ee-4d306dc84a8c'
 
         //docker container (personal)
         //credentials = '2bbcefc9-6456-457f-89c7-5737e29a309c'
         
         //docker container (work)
-        credentials = 'bitB'
+        //credentials = 'bitB'
     }
 
     agent any
@@ -55,8 +55,8 @@ pipeline{
                 echo 'Unit Testing..'
                 dir('odsoft/exercise2/component1/cms/'){
                     script{
-                        if (isUnix()) sh './gradlew cleanTest test --info'
-                        else bat 'gradlew cleanTest test --info'
+                        if (isUnix()) sh './gradlew test --info'
+                        else bat 'gradlew test --info'
                     }
                 }
             }	
@@ -71,6 +71,18 @@ pipeline{
                         else bat 'gradlew integrationTest --info'
                     }
                 }
+            }	
+        }
+
+        stage('Mutation Tests'){
+            steps{
+                echo 'Mutation Testing..'
+                //dir('odsoft/exercise2/component1/cms/'){
+                //    script{
+                //        if (isUnix()) sh './gradlew pitTest --info'
+                //        else bat 'gradlew pitTest --info'
+                //    }
+                //}
             }	
         }
         
@@ -89,36 +101,72 @@ pipeline{
         stage('Archiving Artifacts'){
             steps{
                 echo 'Archiving Artefacts..'
-            }
-        }
-
-        stage('Test Publish'){
-            steps{
-                echo 'Publishing Tests..'
+                dir('odsoft/exercise2/component1/cms/'){
+                    archiveArtifacts allowEmptyArchive: true, artifacts: "build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
+                }
             }
         }
 
         stage('Javadoc Publish'){
             steps{
                 echo 'Publishing Javadoc..'
+                dir('odsoft/exercise2/component1/cms/'){
+                    step([$class: 'JavadocArchiver', javadocDir: "build/docs/javadoc", keepAll: false])
+                }
             }
         }
 
-        stage('Jacoco Publish'){
+        stage('Test Publish'){
+            steps{
+                echo 'Publishing Tests..'
+                dir('odsoft/exercise2/component1/cms/'){
+                    script{
+                        if (isUnix()) sh './gradlew jacocoTestReport --info'
+                        else bat 'gradlew jacocoTestReport --info'
+                    }
+                    junit allowEmptyResults: true, testResults: "build/test-results/test/*.xml"
+                    jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/test.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
+                }
+            }
+        }
+
+        stage('Integration Test Publish'){
             steps{
                 echo 'Publishing Jacoco test coverage..'
+                dir('odsoft/exercise2/component1/cms/'){
+                    script{
+                        if (isUnix()) sh './gradlew jacocoIntegrationReport --info'
+                        else bat 'gradlew jacocoIntegrationReport --info'
+                    }
+                    junit allowEmptyResults: true, testResults: "build/test-results/integrationTest/*.xml"
+                    jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/integrationTest.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
+                }
             }
         }
 
         stage('Deploy'){
             steps{
                 echo 'Deploy App..'
-                //dir('odsoft/exercise2/component1/cms/'){
-                //    script{
-                //        
-                //    }
-                //}
+                dir('odsoft/exercise2/component1/cms/'){
+                    script{
+                        if (isUnix()) sh './gradlew deploy --info && %CATALINA_HOME%/bin/startup.sh' //check if works. ex -> echo $TEST_VAR
+                        else bat 'gradlew deploy --info && %CATALINA_HOME%/bin/startup.bat'
+                    }
+                }
+                sleep(3)
             }
         }
+
+        stage('System Tests'){
+            steps{
+                dir('odsoft/exercise2/component1/cms/'){
+                    script{
+                        if (isUnix()) sh 'curl http://localhost:8080/cms'
+                        else powershell 'Invoke-RestMethod -Uri http://localhost:8080/cms'
+                    }
+                }                
+            }
+        }
+
     }
 }

@@ -130,10 +130,8 @@ war {
     archiveName 'cms.war'
 }
 
-task cleanAll{
-	dependsOn = ['clean', 'cleanTest', 'cleanJacocoTestReport', 'cleanJacocoIntegrationReport']
-}
-
-task runAll{
-	dependsOn = ['cleanAll', 'build', 'javadoc', 'test', 'integrationTest', 'jacocoTestReport', 'jacocoIntegrationReport']
+task deploy(type: Copy) {
+	dependsOn = ['war']
+	from "build/libs"
+	into "${System.env.CATALINA_HOME}/webapps"
 }
