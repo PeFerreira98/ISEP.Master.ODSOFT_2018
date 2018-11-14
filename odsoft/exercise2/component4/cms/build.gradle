@@ -1,7 +1,8 @@
 // (ATB)
 
 plugins {
-    id "fr.putnami.gwt" version "0.4.0"
+    id "fr.putnami.gwt" version "0.4.0" 
+    id "info.solidsoft.pitest" version "1.3.0"
 }
 
 apply plugin: 'war'
@@ -127,20 +128,16 @@ task integrationTest(type: Test) {
 }
 
 // Mutation Tests
-task mutationTest(type: Test) {
-    ignoreFailures = true
-
-	filter { 
-		//all GWT unit tests, by naming convention
-      	includeTestsMatching "*MUTTest*"
-	}    
-    jacoco { 
-		append = true
-		enabled = true
-		//classDumpFile = file("${buildDir}/jacoco/classpathdumps")
-		
-		excludes = ["com/steadystate/**"] 
-    }
+pitest {
+    pitestVersion = "1.3.0"
+    targetClasses = ["pt.isep.cms.contacts.*","pt.isep.cms.students.*"] 
+    excludedClasses =["pt.isep.cms.contacts.client.*", "pt.isep.cms.students.client.*"] 
+    outputFormats=['HTML']
+    testSourceSets = [sourceSets.test]
+    mainSourceSets = [sourceSets.main]
+    jvmArgs = ['-Xmx1024m']
+    useClasspathFile = true    
+    timestampedReports = false
 }
 
 javadoc {
@@ -155,6 +152,8 @@ task renderPlantUml(type: RenderPlantUmlTask) {
 }
 
 task deploy(type: Copy) {
+    dependsOn = ['war']
+    
 	from "build/libs"
 	into "${System.env.CATALINA_HOME}/webapps"
 }

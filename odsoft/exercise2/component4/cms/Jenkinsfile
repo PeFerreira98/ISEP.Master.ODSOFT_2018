@@ -134,22 +134,19 @@ pipeline
                 {
                     steps 
                     {
-                        /*
                         script 
                         {
                             if (isUnix()) 
                             {
-                                dir("${projectDir}") {sh './gradlew mutationTest jacocoMutationReport'}
+                                dir("${projectDir}") {sh './gradlew pitest'}
                             } 
                             else 
                             {
-                                dir("${projectDir}") {bat 'gradlew.bat mutationTest jacocoMutationReport'}
+                                dir("${projectDir}") {bat 'gradlew.bat pitest'}
                             }
                         }
 
-                        junit allowEmptyResults: true, testResults: "${projectDir}/build/test-results/mutationTest/*.xml"
-                        */
-                        //jacoco classPattern: "${projectDir}/build/classes", exclusionPattern: '**/*Test*.class', execPattern: "${projectDir}/build/jacoco/mutationTest.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "${projectDir}/src/main/java"
+                        step([$class: 'PitPublisher', killRatioMustImprove: false, minimumKillRatio: 0.0, mutationStatsFile: "${projectDir}/build/reports/pitest/*.html"])
 
                         echo "mutation tests under construction"
                     }
@@ -262,6 +259,7 @@ CHOP CHOP! Get to work!''', recipientProviders: [developers(), culprits()], subj
         cleanup 
         {
             //cleanWs notFailBuild: true
+            echo "Cleaning"
         }
     }
 }
