@@ -76,19 +76,6 @@ task jacocoIntegrationReport(type: org.gradle.testing.jacoco.tasks.JacocoReport)
     }
 }
 
-// JaCoCo Mutation Test Report 
-task jacocoMutationReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
-	sourceSets sourceSets.main
-	
-    executionData = files("${buildDir}/jacoco/mutationTest.exec")
-    
-    reports {
-        html.enabled = true
-        xml.enabled = false
-        csv.enabled = false
-    }
-}
-
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
 }

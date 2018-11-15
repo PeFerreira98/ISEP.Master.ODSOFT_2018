@@ -9,4 +9,4 @@ just literally right here
 
 Add more stuff
 
-**Note:** If for some reason you need more stuff add this here.
+**Note:** If for some reason you need more stuff add it here.

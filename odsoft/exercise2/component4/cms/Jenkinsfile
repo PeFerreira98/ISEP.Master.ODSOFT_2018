@@ -27,11 +27,11 @@ pipeline
                 {
                     if (isUnix()) 
                     {
-                        dir("${projectDir}") {sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport'}
+                        dir("${projectDir}") {sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'}
                     } 
                     else 
                     {
-                        dir("${projectDir}") {bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport'}
+                        dir("${projectDir}") {bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'}
                     }
                 }
     	    }
@@ -146,14 +146,12 @@ pipeline
                             }
                         }
 
-                        step([$class: 'PitPublisher', killRatioMustImprove: false, minimumKillRatio: 0.0, mutationStatsFile: "${projectDir}/build/reports/pitest/*.html"])
-
-                        echo "mutation tests under construction"
+                        step([$class: 'PitPublisher', killRatioMustImprove: false, minimumKillRatio: 0.0, mutationStatsFile: "${projectDir}/build/reports/pitest/**/*.html"])
                     }
-                } 
+                }
             }
         }
-    
+
         stage('Deploy')
         {
             steps 
