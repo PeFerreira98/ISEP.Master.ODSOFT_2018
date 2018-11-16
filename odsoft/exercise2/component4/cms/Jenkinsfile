@@ -146,7 +146,7 @@ pipeline
                             }
                         }
 
-                        step([$class: 'PitPublisher', killRatioMustImprove: false, minimumKillRatio: 0.0, mutationStatsFile: "${projectDir}/build/reports/pitest/**/*.html"])
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "${projectDir}/build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
                     }
                 }
             }
