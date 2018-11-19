@@ -79,8 +79,8 @@ pipeline{
                 echo 'Mutation Testing..'
                 dir('odsoft/exercise2/component3/cms/'){
                     script{
-                        if (isUnix()) sh './gradlew pitTest --info'
-                        else bat 'gradlew pitTest --info'
+                        if (isUnix()) sh './gradlew pitest --info'
+                        else bat 'gradlew pitest --info'
                     }
                 }
             }	
@@ -148,12 +148,13 @@ pipeline{
             steps{
                 echo 'Publishing Mutation test coverage..'
                 dir('odsoft/exercise2/component3/cms/'){
-                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "/build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
                 }
             }
         }
 
         stage('Deploy'){
+            //when { tag "release-*" }
             steps{
                 echo 'Deploy App..'
                 dir('odsoft/exercise2/component3/cms/'){
@@ -167,6 +168,7 @@ pipeline{
         }
 
         stage('System Tests'){
+            //when { tag "release-*" }
             steps{
                 dir('odsoft/exercise2/component3/cms/'){
                     script{
@@ -177,5 +179,15 @@ pipeline{
             }
         }
 
+    }
+
+    post {
+        success{
+            bitbucketStatusNotify(buildState: 'SUCCESSFUL')
+        }
+
+        failure{
+            bitbucketStatusNotify(buildState: 'FAILED')
+        }
     }
 }
