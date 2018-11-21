@@ -4,7 +4,7 @@
 
 ## Sequential Sketch
 
-![Sequential Diagram][sequential.png]
+![Pipeline Diagram][./pipeline.png]
 
 ## Stages
 

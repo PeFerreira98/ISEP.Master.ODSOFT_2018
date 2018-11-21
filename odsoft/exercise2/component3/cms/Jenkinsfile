@@ -177,13 +177,14 @@ pipeline{
     post {
         success{
             bitbucketStatusNotify(buildState: 'SUCCESSFUL')
-            discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3', result: 'GOD-LIKE!', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
+            discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/fQogXfHt0uIgyOCXDo/giphy.gif', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
         }
 
         failure{
             bitbucketStatusNotify(buildState: 'FAILED')
-            discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3', result: 'GAME-OVER!', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
+            discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
         }
+
 /*
         always 
         {
