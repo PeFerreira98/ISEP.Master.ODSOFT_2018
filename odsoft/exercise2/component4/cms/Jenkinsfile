@@ -104,7 +104,7 @@ pipeline
 
                         junit allowEmptyResults: true, testResults: "${projectDir}/build/test-results/test/*.xml"
 
-                        jacoco classPattern: "${projectDir}/build/classes", exclusionPattern: '**/*Test*.class', execPattern: "${projectDir}/build/jacoco/test.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "${projectDir}/src/main/java"
+                        jacoco classPattern: "${projectDir}/build/classes", exclusionPattern: '**/client/*.class, **/*Test*.class', execPattern: "${projectDir}/build/jacoco/test.exec", sourceExclusionPattern: '**/client/*.java, **/*Test*.java', sourcePattern: "${projectDir}/src/main/java"
                     }
                 }
     
@@ -126,7 +126,7 @@ pipeline
 
                         junit allowEmptyResults: true, testResults: "${projectDir}/build/test-results/integrationTest/*.xml"
 
-                        jacoco classPattern: "${projectDir}/build/classes", exclusionPattern: '**/*Test*.class', execPattern: "${projectDir}/build/jacoco/integrationTest.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "${projectDir}/src/main/java"
+                        jacoco classPattern: "${projectDir}/build/classes", exclusionPattern: '**/client/*.class, **/*Test*.class', execPattern: "${projectDir}/build/jacoco/integrationTest.exec", sourceExclusionPattern: '**/client/*.java, **/*Test*.java', sourcePattern: "${projectDir}/src/main/java"
                     }
                 }
 
