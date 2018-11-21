@@ -54,60 +54,6 @@ pipeline{
                 }
             }	
         }
-        
-        stage('Integration Tests'){
-            steps{
-                echo 'Integration Testing..'
-                dir("${workPath}"){
-                    script{
-                        if (isUnix()) sh './gradlew integrationTest --info'
-                        else bat 'gradlew integrationTest --info'
-                    }
-                }
-            }	
-        }
-
-        stage('Mutation Tests'){
-            steps{
-                echo 'Mutation Testing..'
-                dir("${workPath}"){
-                    script{
-                        if (isUnix()) sh './gradlew pitest --info'
-                        else bat 'gradlew pitest --info'
-                    }
-                }
-            }	
-        }
-        
-        stage('Javadoc Generation'){
-            steps{
-                echo 'Generating Javadoc..'
-                dir("${workPath}"){
-                    script{
-                        if (isUnix()) sh './gradlew javadoc --info'
-                        else bat 'gradlew javadoc --info'
-                    }
-                }
-            }	
-        }
-        
-        stage('Archiving Artifacts'){
-            steps{
-                echo 'Archiving Artefacts..'
-                dir("${workPath}"){
-                    archiveArtifacts allowEmptyArchive: true, artifacts: "build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
-                }
-            }
-        }
-
-        stage('Javadoc Publish'){
-            steps{
-                echo 'Publishing Javadoc..'
-                dir("${workPath}"){
-                    step([$class: 'JavadocArchiver', javadocDir: "build/docs/javadoc", keepAll: false])
-                }
-            }
-        }
 
         stage('Test Publish'){
             steps{
@@ -121,6 +67,18 @@ pipeline{
                     jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/test.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
                 }
             }
+        }
+        
+        stage('Integration Tests'){
+            steps{
+                echo 'Integration Testing..'
+                dir("${workPath}"){
+                    script{
+                        if (isUnix()) sh './gradlew integrationTest --info'
+                        else bat 'gradlew integrationTest --info'
+                    }
+                }
+            }	
         }
 
         stage('Integration Test Publish'){
@@ -137,11 +95,53 @@ pipeline{
             }
         }
 
+        stage('Mutation Tests'){
+            steps{
+                echo 'Mutation Testing..'
+                dir("${workPath}"){
+                    script{
+                        if (isUnix()) sh './gradlew pitest --info'
+                        else bat 'gradlew pitest --info'
+                    }
+                }
+            }	
+        }
+
         stage('Mutation Test Publish'){
             steps{
                 echo 'Publishing Mutation test coverage..'
                 dir("${workPath}"){
                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
+                }
+            }
+        }
+        
+        stage('Javadoc Generation'){
+            steps{
+                echo 'Generating Javadoc..'
+                dir("${workPath}"){
+                    script{
+                        if (isUnix()) sh './gradlew javadoc --info'
+                        else bat 'gradlew javadoc --info'
+                    }
+                }
+            }	
+        }
+
+        stage('Javadoc Publish'){
+            steps{
+                echo 'Publishing Javadoc..'
+                dir("${workPath}"){
+                    step([$class: 'JavadocArchiver', javadocDir: "build/docs/javadoc", keepAll: false])
+                }
+            }
+        }
+        
+        stage('Archiving Artifacts'){
+            steps{
+                echo 'Archiving Artefacts..'
+                dir("${workPath}"){
+                    archiveArtifacts allowEmptyArchive: true, artifacts: "build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
                 }
             }
         }
@@ -172,22 +172,33 @@ pipeline{
             }
         }
 
+        stage('Manual UI Acceptance Tests'){
+            options{
+                timeout(time: 1, unit: 'HOURS')
+            }
+
+            steps{
+                mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', subject: "Manual Tests", body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
+                //input 'Please Approve or fail the build after UI Acceptance Tests'
+            }
+        }
+
     }
 
     post {
         success{
             bitbucketStatusNotify(buildState: 'SUCCESSFUL')
-            discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/fQogXfHt0uIgyOCXDo/giphy.gif', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
+            discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3 - SUCCESS', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/fQogXfHt0uIgyOCXDo/giphy.gif', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
         }
 
         failure{
             bitbucketStatusNotify(buildState: 'FAILED')
-            discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
+            discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3 - FAILURE', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
         }
 
+        always{
+            mail (to: '1140953@isep.ipp.pt', subject: "Job exe2 comp3 build is finished", body: "Please go to Jenkins 2 see")
 /*
-        always 
-        {
             withCredentials([[$class: 'UsernamePasswordMultiBinding',
                 credentialsId: "${credentials}",
                 usernameVariable: 'GIT_USERNAME', 
@@ -199,18 +210,19 @@ pipeline{
                         if (isUnix()) 
                         {
                             sh "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
-                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
+                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
                         } 
                         else 
                         {
                             powershell "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
-                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
+                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
                         }
                     }
                     
                 }
             }
+            */
         }
-*/
+
     }
 }
