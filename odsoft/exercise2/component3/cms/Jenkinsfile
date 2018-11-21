@@ -15,7 +15,8 @@ pipeline{
         stage("GitCheckout"){
             steps{
                 echo 'Checkout..'
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])  
+                //checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])  
+                checkout scm
             }
         }
         
@@ -179,8 +180,7 @@ pipeline{
 
             steps{
                 mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', subject: "Manual Tests", body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
-                
-                input 'Please Approve or fail the build after UI Acceptance Tests'
+                //input 'Please Approve or fail the build after UI Acceptance Tests'
             }
         }
 
@@ -199,7 +199,7 @@ pipeline{
 
         always{
             mail (to: '1140953@isep.ipp.pt', subject: "Job exe2 comp3 build is finished", body: "Please go to Jenkins 2 see")
-/*
+            /*
             withCredentials([[$class: 'UsernamePasswordMultiBinding',
                 credentialsId: "${credentials}",
                 usernameVariable: 'GIT_USERNAME', 
