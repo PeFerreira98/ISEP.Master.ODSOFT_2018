@@ -179,7 +179,8 @@ pipeline{
 
             steps{
                 mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', subject: "Manual Tests", body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
-                //input 'Please Approve or fail the build after UI Acceptance Tests'
+                
+                input 'Please Approve or fail the build after UI Acceptance Tests'
             }
         }
 
