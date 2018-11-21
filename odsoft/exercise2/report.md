@@ -14,7 +14,7 @@ Based on this environment all the obtained values are valid for comparing the pe
 
 ### Pipeline Sequencial Sketch
 
-![Pipeline Diagram][./component3/pipeline.png]
+![Pipeline Diagram](component3/pipeline.png)
 
 ### Sucessful Build Average Time
 
@@ -29,7 +29,7 @@ build.
 
 ### Pipeline Parallel Sketch
 
-![Pipeline Diagram][component4/pipeline.png]
+![Pipeline Diagram](component4/pipeline.png)
 
 ### Sucessful Build Average Time
 

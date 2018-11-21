@@ -5,7 +5,7 @@ build.
 
 ## Pipeline Sketch
 
-![Pipeline Diagram][pipeline.png]
+![Pipeline Diagram](pipeline.png)
 
 ## Stages
 
