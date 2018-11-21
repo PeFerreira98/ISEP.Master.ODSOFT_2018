@@ -4,15 +4,8 @@ pipeline{
 
     environment{
         repoUrl = 'https://PeFerreira98@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git'
-
-        //service (personal)
-        //credentials = '478a9f2c-5b0a-4b9f-a7ee-4d306dc84a8c'
-
-        //docker container (personal)
-        //credentials = '2bbcefc9-6456-457f-89c7-5737e29a309c'
-        
-        //docker container (work)
-        credentials = 'bitB'
+        workPath = 'odsoft/exercise2/component3/cms/'
+        credentials = 'BitbucketAuth'
     }
 
     agent any
@@ -29,7 +22,7 @@ pipeline{
         stage('Clean'){
             steps{
                 echo 'Cleaning..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     script{
                         if (isUnix()) sh './gradlew clean --info'
                         else bat 'gradlew clean --info'                        
@@ -41,7 +34,7 @@ pipeline{
         stage('Build'){
             steps{
                 echo 'Building..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     script{
                         if (isUnix()) sh './gradlew build --info'
                         else bat 'gradlew build --info'
@@ -53,7 +46,7 @@ pipeline{
         stage('Unit Tests'){
             steps{
                 echo 'Unit Testing..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     script{
                         if (isUnix()) sh './gradlew test --info'
                         else bat 'gradlew test --info'
@@ -65,7 +58,7 @@ pipeline{
         stage('Integration Tests'){
             steps{
                 echo 'Integration Testing..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     script{
                         if (isUnix()) sh './gradlew integrationTest --info'
                         else bat 'gradlew integrationTest --info'
@@ -77,7 +70,7 @@ pipeline{
         stage('Mutation Tests'){
             steps{
                 echo 'Mutation Testing..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     script{
                         if (isUnix()) sh './gradlew pitest --info'
                         else bat 'gradlew pitest --info'
@@ -89,7 +82,7 @@ pipeline{
         stage('Javadoc Generation'){
             steps{
                 echo 'Generating Javadoc..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     script{
                         if (isUnix()) sh './gradlew javadoc --info'
                         else bat 'gradlew javadoc --info'
@@ -101,7 +94,7 @@ pipeline{
         stage('Archiving Artifacts'){
             steps{
                 echo 'Archiving Artefacts..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     archiveArtifacts allowEmptyArchive: true, artifacts: "build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
                 }
             }
@@ -110,7 +103,7 @@ pipeline{
         stage('Javadoc Publish'){
             steps{
                 echo 'Publishing Javadoc..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     step([$class: 'JavadocArchiver', javadocDir: "build/docs/javadoc", keepAll: false])
                 }
             }
@@ -119,7 +112,7 @@ pipeline{
         stage('Test Publish'){
             steps{
                 echo 'Publishing Tests..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     script{
                         if (isUnix()) sh './gradlew jacocoTestReport --info'
                         else bat 'gradlew jacocoTestReport --info'
@@ -133,7 +126,7 @@ pipeline{
         stage('Integration Test Publish'){
             steps{
                 echo 'Publishing Jacoco test coverage..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     script{
                         if (isUnix()) sh './gradlew jacocoIntegrationReport --info'
                         else bat 'gradlew jacocoIntegrationReport --info'
@@ -147,7 +140,7 @@ pipeline{
         stage('Mutation Test Publish'){
             steps{
                 echo 'Publishing Mutation test coverage..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
                 }
             }
@@ -157,7 +150,7 @@ pipeline{
             //when { tag "release-*" }
             steps{
                 echo 'Deploy App..'
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     script{
                         if (isUnix()) sh './gradlew deploy --info && %CATALINA_HOME%/bin/startup.sh' //check if works. ex -> echo $TEST_VAR
                         else bat 'gradlew deploy --info && %CATALINA_HOME%/bin/startup.bat'
@@ -170,7 +163,7 @@ pipeline{
         stage('System Tests'){
             //when { tag "release-*" }
             steps{
-                dir('odsoft/exercise2/component3/cms/'){
+                dir("${workPath}"){
                     script{
                         if (isUnix()) sh 'curl http://localhost:8080/cms'
                         else powershell 'Invoke-RestMethod -Uri http://localhost:8080/cms'
@@ -184,10 +177,39 @@ pipeline{
     post {
         success{
             bitbucketStatusNotify(buildState: 'SUCCESSFUL')
+            discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3', result: 'GOD-LIKE!', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
         }
 
         failure{
             bitbucketStatusNotify(buildState: 'FAILED')
+            discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3', result: 'GAME-OVER!', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
         }
+/*
+        always 
+        {
+            withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                credentialsId: "${credentials}",
+                usernameVariable: 'GIT_USERNAME', 
+                passwordVariable: 'GIT_PASSWORD']]) {
+
+                script 
+                {
+                    dir("${workPath}"){
+                        if (isUnix()) 
+                        {
+                            sh "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
+                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
+                        } 
+                        else 
+                        {
+                            powershell "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
+                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
+                        }
+                    }
+                    
+                }
+            }
+        }
+*/
     }
 }
