@@ -197,9 +197,9 @@ pipeline{
             discordSend description: 'Jenkins Pipeline Build Exercise 2 Component 3 - FAILURE', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif', webhookURL: 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
         }
 
+        /*
         always{
-            mail (to: '1140953@isep.ipp.pt', subject: "Job exe2 comp3 build is finished", body: "Please go to Jenkins 2 see")
-            /*
+
             withCredentials([[$class: 'UsernamePasswordMultiBinding',
                 credentialsId: "${credentials}",
                 usernameVariable: 'GIT_USERNAME', 
@@ -222,8 +222,9 @@ pipeline{
                     
                 }
             }
-            */
+            
         }
+        */
 
     }
 }
