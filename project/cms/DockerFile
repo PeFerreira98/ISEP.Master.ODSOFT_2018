@@ -1,0 +1,4 @@
+FROM java:8
+EXPOSE 8888
+ADD /build/libs/cmsProject.war cmsproject.war
+ENTRYPOINT ["java","-jar","cmsproject.war"]
