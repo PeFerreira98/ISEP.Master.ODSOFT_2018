@@ -4,17 +4,16 @@ pipeline
 {
     environment
     {
-        repoUser = 'PeFerreira98'
-        //repoUser = 'rafael95'
-
+        // Repository
         credentials = 'BitbucketAuth'
-        //credentials = 'a1e7ee23-40f2-46fe-82d5-048f0790e80e'
-
         repoUrl = "https://${repoUser}@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git"
+
         workPath = 'project/cms/'
+
+        // Discord Webhook for some fancy stuff
         discordWebHook = 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
     }
-
+    
     agent any
 
     stages
