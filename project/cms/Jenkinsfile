@@ -172,6 +172,9 @@ pipeline
                     
                         //if (isUnix()) sh './gradlew deploy --info && startup.sh'
                         //else bat 'gradlew deploy --info && startup.bat'
+
+                        //bat 'docker build -f Dockerfile -t cmsproject .'
+                        //bat 'docker run -p 8888:8080 -t cmsproject'
                     }
                 }
             }
