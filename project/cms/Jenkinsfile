@@ -24,8 +24,8 @@ pipeline
             steps
             {
                 echo 'Checkout..'
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])  
-                //checkout scm
+                //checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])  
+                checkout scm
             }
         }
         
@@ -37,11 +37,11 @@ pipeline
                 {
                     script
                     {
-                        //if (isUnix()) sh './gradlew clean --info'
-                        //else bat 'gradlew clean --info'  
+                        if (isUnix()) sh './gradlew clean --info'
+                        else bat 'gradlew clean --info'  
 
-                        if (isUnix()) sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'
-                        else bat 'gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'                        
+                        //if (isUnix()) sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'
+                        //else bat 'gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'                        
                     }
                 }                
             }
