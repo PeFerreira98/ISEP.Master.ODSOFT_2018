@@ -36,11 +36,11 @@ pipeline
                 {
                     script
                     {
-                        if (isUnix()) sh './gradlew clean --info'
-                        else bat 'gradlew clean --info'  
+                        // if (isUnix()) sh './gradlew clean --info'
+                        // else bat 'gradlew clean --info'  
 
-                        //if (isUnix()) sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'
-                        //else bat 'gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'                        
+                        if (isUnix()) sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'
+                        else bat 'gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'                        
                     }
                 }                
             }
@@ -66,7 +66,37 @@ pipeline
         {
             parallel
             {
-                stage('Unit Tests + Publish')
+                stage('Javadoc Generation + Publish')
+                {
+                    steps
+                    {
+                        echo 'Generating Javadoc..'
+                        dir("${workPath}")
+                        {
+                            script
+                            {
+                                if (isUnix()) sh './gradlew javadoc --info'
+                                else bat 'gradlew javadoc --info'
+                            }
+
+                            step([$class: 'JavadocArchiver', javadocDir: "build/docs/javadoc", keepAll: false])
+                        }
+                    }	
+                }
+                
+                stage('Archiving Artifacts')
+                {
+                    steps
+                    {
+                        echo 'Archiving Artefacts..'
+                        dir("${workPath}")
+                        {
+                            archiveArtifacts artifacts: "build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
+                        }
+                    }
+                }
+
+                stage('Unit Tests')
                 {
                     steps
                     {
@@ -84,7 +114,7 @@ pipeline
                     }	
                 }
                 
-                stage('Integration Tests + Publish')
+                stage('Integration Tests')
                 {
                     steps
                     {
@@ -103,7 +133,7 @@ pipeline
                     }	
                 }
 
-                stage('Mutation Tests + Publish')
+                stage('Mutation Tests')
                 {
                     steps
                     {
@@ -120,44 +150,11 @@ pipeline
                         }
                     }	
                 }
-                
-                stage('Javadoc Generation + Publish')
-                {
-                    steps
-                    {
-                        echo 'Generating Javadoc..'
-                        dir("${workPath}")
-                        {
-                            script
-                            {
-                                if (isUnix()) sh './gradlew javadoc --info'
-                                else bat 'gradlew javadoc --info'
-                            }
-
-                            step([$class: 'JavadocArchiver', javadocDir: "build/docs/javadoc", keepAll: false])
-                        }
-
-                    }	
-                }
-                
-                stage('Archiving Artifacts')
-                {
-                    steps
-                    {
-                        echo 'Archiving Artefacts..'
-                        dir("${workPath}")
-                        {
-                            archiveArtifacts allowEmptyArchive: true, artifacts: "build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
-                        }
-                    }
-                }
-
             }
         }
 
-        stage('Deploy')
+        stage('Deploy for Testing')
         {
-            //when { tag "release-*" }
             steps
             {
                 echo 'Deploy App..'
@@ -179,9 +176,8 @@ pipeline
             }
         }
 
-        stage('System Tests')
+        stage('System Smoke Tests')
         {
-            //when { tag "release-*" }
             options{ retry(5) }
             
             steps
@@ -207,6 +203,57 @@ pipeline
             {
                 mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', subject: "Manual Tests", body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
                 //input 'Please Approve or fail the build after UI Acceptance Tests'
+
+                withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                credentialsId: "${credentials}",
+                usernameVariable: 'GIT_USERNAME', 
+                passwordVariable: 'GIT_PASSWORD']]) {
+
+                    script 
+                    {
+                        dir("${workPath}"){
+                            if (isUnix()) 
+                            {
+                                sh "git tag release"
+                                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
+                            } 
+                            else 
+                            {
+                                powershell "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
+                                powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Release')
+        {
+            when
+            { 
+                tag "release-*"
+            }
+
+            steps
+            {
+                echo 'Deploy App..'
+                dir("${workPath}")
+                {
+                    script
+                    {
+                        //bound 2 change
+                        if (isUnix()) sh './gradlew deploy --info && %CATALINA_HOME%/bin/startup.sh' //check if works. ex -> echo $TEST_VAR
+                        else bat 'gradlew deploy --info && %CATALINA_HOME%/bin/startup.bat'
+                    
+                        //if (isUnix()) sh './gradlew deploy --info && startup.sh'
+                        //else bat 'gradlew deploy --info && startup.bat'
+
+                        //bat 'docker build -f Dockerfile -t cmsproject .'
+                        //bat 'docker run -p 8888:8080 -t cmsproject'
+                    }
+                }
             }
         }
 
@@ -214,17 +261,15 @@ pipeline
 
     post
     {
+        /*
         success { discordSend description: 'Jenkins Pipeline Project Build - SUCCESS', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/fQogXfHt0uIgyOCXDo/giphy.gif', webhookURL: "${discordWebHook}" }
 
         failure { discordSend description: 'Jenkins Pipeline Project Build - FAILURE', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif', webhookURL: "${discordWebHook}" }
-
+*/
         always
         {
             bitbucketStatusNotify(buildState: currentBuild.currentResult)
             
-            /*
-            Too specific - Change this to be team general and used independent of Server
-
             withCredentials([[$class: 'UsernamePasswordMultiBinding',
                 credentialsId: "${credentials}",
                 usernameVariable: 'GIT_USERNAME', 
@@ -244,10 +289,8 @@ pipeline
                             powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
                         }
                     }
-                    
                 }
             }
-            */
         }
 
     }
