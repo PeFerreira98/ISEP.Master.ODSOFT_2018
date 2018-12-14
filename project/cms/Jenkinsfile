@@ -8,7 +8,7 @@ pipeline
         credentials = 'BitbucketAuth'
         repoUrl = "https://${repoUser}@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git"
 
-        projectDir = 'odsoft/exercise2/component4/cms'
+        projectDir = 'odsoft/project/cms'
 
         // Discord Webhook for some fancy stuff
         discordWebHook = 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
@@ -22,9 +22,9 @@ pipeline
         {
             steps 
             {
-           		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "https://rafael95@${repository}"]]])
-            
                 checkout scm
+                // keep this commented in source control for Jenkins Automatic Jobs to succeed. 
+           		//checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "https://rafael95@${repository}"]]])
             }
     	}
     
