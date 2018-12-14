@@ -1,154 +1,208 @@
 #!/usr/bin/env groovy
 
-pipeline
+pipeline 
 {
-    environment
+    environment 
     {
         // Repository
         credentials = 'BitbucketAuth'
         repoUrl = "https://${repoUser}@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git"
 
-        workPath = 'project/cms/'
+        projectDir = 'odsoft/exercise2/component4/cms'
 
         // Discord Webhook for some fancy stuff
         discordWebHook = 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
     }
-    
+
     agent any
 
-    stages
+    stages 
     {
-        stage("GitCheckout")
+    	stage('Checkout') 
         {
-            steps
+            steps 
             {
-                echo 'Checkout..'
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])  
-                //checkout scm
-            }
-        }
-        
-        stage('Clean')
-        {
-            steps{
-                echo 'Cleaning..'
-                dir("${workPath}")
-                {
-                    script
-                    {
-                        // if (isUnix()) sh './gradlew clean --info'
-                        // else bat 'gradlew clean --info'  
-
-                        if (isUnix()) sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'
-                        else bat 'gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'                        
-                    }
-                }                
-            }
-        }
+           		checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'AuthorInChangelog']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "https://rafael95@${repository}"]]])
             
-        stage('Build')
+                checkout scm
+            }
+    	}
+    
+    	stage('Preparation') 
         {
-            steps
+    	    steps 
             {
-                echo 'Building..'
-                dir("${workPath}")
+                discordSend description: "Jenkins CMS Pipeline - Started Build #${BUILD_NUMBER}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
+            
+                dir("${projectDir}") 
                 {
-                    script
+                    script 
                     {
-                        if (isUnix()) sh './gradlew build --info'
-                        else bat 'gradlew build --info'
+                        if (isUnix()) 
+                        {
+                            sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'
+                        } 
+                        else 
+                        {
+                            bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'
+                        }
                     }
                 }
-            }			
+                
+    	    }
         }
-        
-        stage("Archive Artifacts + Javadoc + Tests")
+    
+    	stage('Build') 
         {
-            parallel
+            steps 
             {
-                stage('Javadoc Generation + Publish')
+                dir("${projectDir}") 
                 {
-                    steps
+                    script
                     {
-                        echo 'Generating Javadoc..'
-                        dir("${workPath}")
+                        if (isUnix()) 
+                        {
+                            sh './gradlew build'
+                        } else {
+                            bat 'gradlew.bat build'
+                        }
+                    }
+                }
+            }
+    	}
+
+        stage("Archive War, Generate/Publish Javadoc, Run Tests/Publish Reports and Code Quality Analysis") 
+        {
+            parallel 
+            {
+                stage('Archive war file') 
+                {
+                    steps 
+                    {
+                        archiveArtifacts allowEmptyArchive: true, artifacts: "${projectDir}/build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
+                    }
+                }
+    
+                stage('Javadoc')
+                {
+                    steps 
+                    {
+                        dir("${projectDir}") 
                         {
                             script
                             {
-                                if (isUnix()) sh './gradlew javadoc --info'
-                                else bat 'gradlew javadoc --info'
+                                if (isUnix()) 
+                                {
+                                    sh './gradlew javadoc'
+                                } 
+                                else 
+                                {
+                                    bat 'gradlew.bat javadoc'
+                                }
                             }
-
-                            step([$class: 'JavadocArchiver', javadocDir: "build/docs/javadoc", keepAll: false])
                         }
-                    }	
-                }
                 
-                stage('Archiving Artifacts')
-                {
-                    steps
-                    {
-                        echo 'Archiving Artefacts..'
-                        dir("${workPath}")
-                        {
-                            archiveArtifacts artifacts: "build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
-                        }
+                        step([$class: 'JavadocArchiver', javadocDir: "${projectDir}/build/docs/javadoc", keepAll: false])
                     }
                 }
-
-                stage('Unit Tests')
+    
+                stage('Unit Tests') 
                 {
-                    steps
+                    steps 
                     {
-                        echo 'Unit Testing..'
-                        dir("${workPath}")
+                        dir("${projectDir}") 
                         {
-                            script{
-                                if (isUnix()) sh './gradlew test jacocoTestReport --info'
-                                else bat 'gradlew test jacocoTestReport --info'
-                            }
-
-                            junit allowEmptyResults: true, testResults: "build/test-results/test/*.xml"
-                            jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/test.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
+                            script 
+                            {
+                                if (isUnix()) 
+                                {
+                                    sh './gradlew test jacocoTestReport'
+                                } 
+                                else 
+                                {
+                                    bat 'gradlew.bat test jacocoTestReport'
+                                }
+                            }   
                         }
-                    }	
+
+                        junit allowEmptyResults: true, testResults: "${projectDir}/build/test-results/test/*.xml"
+
+                        jacoco classPattern: "${projectDir}/build/classes", exclusionPattern: '**/client/*.class, **/*Test*.class', execPattern: "${projectDir}/build/jacoco/test.exec", sourceExclusionPattern: '**/client/*.java, **/*Test*.java', sourcePattern: "${projectDir}/src/main/java"
+                    }
                 }
-                
+    
                 stage('Integration Tests')
                 {
-                    steps
+                    steps 
                     {
-                        echo 'Integration Testing..'
-                        dir("${workPath}")
+                        dir("${projectDir}") 
                         {
-                            script
+                            script 
                             {
-                                if (isUnix()) sh './gradlew integrationTest jacocoIntegrationReport --info'
-                                else bat 'gradlew integrationTest jacocoIntegrationReport --info'
+                                if (isUnix()) 
+                                {
+                                    sh './gradlew integrationTest jacocoIntegrationReport'
+                                } 
+                                else 
+                                {
+                                    bat 'gradlew.bat integrationTest jacocoIntegrationReport'
+                                }
                             }
-
-                            junit allowEmptyResults: true, testResults: "build/test-results/integrationTest/*.xml"
-                            jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/integrationTest.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
                         }
-                    }	
+
+                        junit allowEmptyResults: true, testResults: "${projectDir}/build/test-results/integrationTest/*.xml"
+
+                        jacoco classPattern: "${projectDir}/build/classes", exclusionPattern: '**/client/*.class, **/*Test*.class', execPattern: "${projectDir}/build/jacoco/integrationTest.exec", sourceExclusionPattern: '**/client/*.java, **/*Test*.java', sourcePattern: "${projectDir}/src/main/java"
+                    }
                 }
 
-                stage('Mutation Tests')
+                stage('Mutation Tests') 
                 {
-                    steps
+                    steps 
                     {
-                        echo 'Mutation Testing..'
-                        dir("${workPath}")
+                        dir("${projectDir}") 
                         {
-                            script
+                            script 
                             {
-                                if (isUnix()) sh './gradlew pitest --info'
-                                else bat 'gradlew pitest --info'
+                                if (isUnix()) 
+                                {
+                                    sh './gradlew pitest'
+                                } 
+                                else 
+                                {
+                                    bat 'gradlew.bat pitest'
+                                }
                             }
-
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
                         }
-                    }	
+
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "${projectDir}/build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
+                    }
+                }
+            }
+        }
+
+        stage('Deploy')
+        {
+            steps 
+            {
+                dir("${projectDir}") 
+                {
+                    script 
+                    {
+                        if (isUnix()) 
+                        {
+                            sh './gradlew deploy'
+                            sh '%CATALINA_HOME%/bin/startup.sh'
+                        } 
+                        else 
+                        {
+                            bat 'gradlew.bat deploy'
+                            bat '%CATALINA_HOME%/bin/startup.bat'
+                        }
+
+                        //bat 'docker build -f Dockerfile -t cmsproject .'
+                        //bat 'docker run -p 8888:8080 -t cmsproject'
+                    }
                 }
             }
         }
@@ -176,33 +230,47 @@ pipeline
             }
         }
 
-        stage('System Smoke Tests')
+        stage('System Tests') 
         {
-            options{ retry(5) }
-            
-            steps
+            options 
             {
-                echo 'System Testing..'
+                retry(5)
+            }
+
+            steps 
+            {
+                // to allow Tomcat to finish deploying the app
                 sleep(3)
 
-                dir("${workPath}")
+                dir("${projectDir}") 
                 {
-                    script
+                    script 
                     {
-                        if (isUnix()) sh 'curl http://localhost:8080/cmsProject'
-                        else powershell 'Invoke-RestMethod -Uri http://localhost:8080/cmsProject'
+                        if (isUnix()) 
+                        {
+                            sh 'curl http://localhost:8080/cms'
+                        } 
+                        else 
+                        {
+                            powershell 'Invoke-RestMethod -Uri http://localhost:8080/cms'
+                        }
                     }
-                }                
+                }
             }
         }
 
-        stage('Manual UI Acceptance Tests')
+        stage('Manual UI Acceptance Tests') 
         {
-            options{ timeout(time: 1, unit: 'HOURS') }
-            steps
+            options 
+            {
+                timeout(time: 1, unit: 'HOURS')
+            }
+
+            steps 
             {
                 mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', subject: "Manual Tests", body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
-                //input 'Please Approve or fail the build after UI Acceptance Tests'
+
+                // input 'Please Approve or fail the build after UI Acceptance Tests'
 
                 withCredentials([[$class: 'UsernamePasswordMultiBinding',
                 credentialsId: "${credentials}",
@@ -256,19 +324,15 @@ pipeline
                 }
             }
         }
-
     }
 
     post
     {
-        /*
-        success { discordSend description: 'Jenkins Pipeline Project Build - SUCCESS', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/fQogXfHt0uIgyOCXDo/giphy.gif', webhookURL: "${discordWebHook}" }
-
-        failure { discordSend description: 'Jenkins Pipeline Project Build - FAILURE', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif', webhookURL: "${discordWebHook}" }
-*/
-        always
+        always 
         {
-            bitbucketStatusNotify(buildState: currentBuild.currentResult)
+            discordSend description: "Jenkins CMS Pipeline - Finished Build #${BUILD_NUMBER}\nBuild Status: ${currentBuild.currentResult}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
+            
+            //bitbucketStatusNotify(buildState: currentBuild.currentResult)
             
             withCredentials([[$class: 'UsernamePasswordMultiBinding',
                 credentialsId: "${credentials}",
@@ -277,21 +341,21 @@ pipeline
 
                 script 
                 {
-                    dir("${workPath}"){
+                    dir("${projectDir}") 
+                    {
                         if (isUnix()) 
                         {
                             sh "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
-                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
+                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
                         } 
                         else 
                         {
                             powershell "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
-                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
-                        }
+                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
+                        }  
                     }
                 }
             }
         }
-
     }
 }
