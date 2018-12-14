@@ -1,10 +1,3 @@
-# FROM java:8
-# EXPOSE 8888
-# ADD /build/libs/cmsProject.war cmsproject.war
-# ENTRYPOINT ["java","-jar","cmsproject.war"]
-
-# new dockerfile using tomcat as base image (need test)
-
 # FROM tomcat:8-alpine
 # FROM tomcat:8-slim
 FROM tomcat:8
