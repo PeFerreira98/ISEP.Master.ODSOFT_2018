@@ -185,5 +185,6 @@ findbugsMain {
 }
 
 findbugsTest {
+    dependsOn = ['build']
     source ='src/test/java'
 }
