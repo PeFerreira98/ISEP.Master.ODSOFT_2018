@@ -6,12 +6,15 @@ pipeline
     {
         // Repository
         credentials = 'BitbucketAuth'
-        repoUrl = "https://${repoUser}@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git"
+        repository = 'bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git'
+        repoUrl = "https://${repoUser}@${repository}"
 
         projectDir = 'project/cms/'
 
         // Discord Webhook for some fancy stuff
         discordWebHook = 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
+        startTime = new Date().format('dd/MM/yyyy HH:mm:ss')
+
     }
     
     agent any
@@ -39,7 +42,7 @@ pipeline
                 {
                     script
                     {
-                        if (isUnix()) sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest '
+                        if (isUnix()) sh './gradlew.sh cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest '
                         else bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'                        
                     }
                 }                
@@ -66,7 +69,7 @@ pipeline
         {
             parallel
             {
-                stage('Javadoc Generation + Publish')
+                stage('Javadoc Generation')
                 {
                     steps
                     {
@@ -93,6 +96,20 @@ pipeline
                         {
                             archiveArtifacts artifacts: "build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
                         }
+                    }
+                }
+
+                stage('Code Quality Report - Checkstyle')
+                {
+                    steps{
+                        checkstyle canComputeNew: false, defaultEncoding: '', healthy: '5', pattern: "${projectDir}/build/reports/checkstyle/*.xml", unHealthy: '1'
+                    }
+                }
+
+                stage('Code Quality Report - Findbugs')
+                {
+                    steps{
+                        findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '5', includePattern: '', pattern: "${projectDir}/build/reports/findbugs/*.xml", unHealthy: '1'
                     }
                 }
 
@@ -222,15 +239,14 @@ pipeline
                             if (isUnix()) 
                             {
                                 sh "git tag release"
-                                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
+                                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
                             } 
                             else 
                             {
                                 powershell "git tag ${BUILD_TAG}-${currentBuild.currentResult}"
-                                powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
+                                powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
                             }
                         }
-                        
                     }
                 }
 */
@@ -279,14 +295,11 @@ pipeline
 
     post
     {
-        //success { discordSend description: 'Jenkins Pipeline Project Build - SUCCESS', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/fQogXfHt0uIgyOCXDo/giphy.gif', webhookURL: "${discordWebHook}" }
-        //failure { discordSend description: 'Jenkins Pipeline Project Build - FAILURE', result: currentBuild.currentResult, image: 'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif', webhookURL: "${discordWebHook}" }
-
         always
         {
             bitbucketStatusNotify(buildState: currentBuild.currentResult)
 
-            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
+            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
             
 /*
             withCredentials([[$class: 'UsernamePasswordMultiBinding',
@@ -300,12 +313,12 @@ pipeline
                         if (isUnix()) 
                         {
                             sh "git tag ${BUILD_TAG}-${currentBuild.currentResult}"
-                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
+                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
                         } 
                         else 
                         {
                             powershell "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
-                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
+                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
                         }
                     }
                 }
