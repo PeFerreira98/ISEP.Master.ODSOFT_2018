@@ -1,0 +1,13 @@
+version '3.7'
+
+services:
+  h2.data:
+    image: oscarfonts/h2-latest
+
+  cms.project:
+    image: tomcat:8
+    build:
+      context: .
+      dockerfile: cms/Dockerfile
+    depends-on:
+      - h2.data
