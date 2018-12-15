@@ -2,17 +2,8 @@
 <!--
     # Copyright 2015 WSO2 Inc. (http://wso2.org)
     #
-    # Licensed under the Apache License, Version 2.0 (the "License");
-    # you may not use this file except in compliance with the License.
-    # You may obtain a copy of the License at
-    #
     # http://www.apache.org/licenses/LICENSE-2.0
-    #
-    # Unless required by applicable law or agreed to in writing, software
-    # distributed under the License is distributed on an "AS IS" BASIS,
-    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    # See the License for the specific language governing permissions and
-    # limitations under the License.
+
 -->
 
 <!DOCTYPE module PUBLIC
@@ -37,14 +28,9 @@ page at http://checkstyle.sourceforge.net/config.html -->
 
     -->
 
-    <module name="FileLength">
-        <property name="max" value="10000" />
-        <property name="severity" value="warning" />
-    </module>
-
-
     <module name="NewlineAtEndOfFile">
         <property name="lineSeparator" value="lf" />
+        <property name="severity" value="warning" />
     </module>
 
     <module name="RegexpSingleline">
@@ -52,6 +38,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
         -->
         <property name="format" value="((//.*)|(\*.*))FIXME" />
         <property name="message" value='TODO is preferred to FIXME.  e.g. "TODO: (ENG-123) -  Refactor when v2 is released."' />
+        <property name="severity" value="warning" />
     </module>
 
     <module name="RegexpSingleline">
@@ -59,6 +46,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
         -->
         <property name="format" value="((//.*)|(\*.*))TODO[^: (]" />
         <property name="message" value='All TODOs should be named.  e.g. "TODO: (ENG-123) - Refactor when v2 is released."' />
+        <property name="severity" value="warning" />
     </module>
 
     <!--<module name="JavadocPackage">-->
@@ -71,7 +59,9 @@ page at http://checkstyle.sourceforge.net/config.html -->
     <module name="TreeWalker">
 
         <!-- required for SupressionCommentFilter and SuppressWithNearbyCommentFilter -->
-        <module name="FileContentsHolder" />
+        <module name="FileContentsHolder">
+            <property name="severity" value="warning" />
+        </module>
 
         <!--
 
@@ -101,9 +91,12 @@ page at http://checkstyle.sourceforge.net/config.html -->
 
         <module name="IllegalImport">
             <property name="illegalPkgs" value="junit.framework" />
+            <property name="severity" value="warning" />
         </module>
 
-        <module name="UnusedImports" />
+        <module name="UnusedImports">
+            <property name="severity" value="warning" />
+        </module>
 
         <!--
 
@@ -240,7 +233,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
 
         -->
 
-        <!-- <module name="LineLength">
+        <module name="LineLength">
             <!-- Checks if a line is too long. -->
             <property name="max" value="120" default="120" />
             <property name="severity" value="warning" />
@@ -253,7 +246,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
 
             <property name="ignorePattern" value="${com.puppycrawl.tools.checkstyle.checks.sizes.LineLength.ignorePattern}"
                 default="^(package .*;\s*)|(import .*;\s*)|( *\* *https?://.*)$" />
-        </module> -->
+        </module>
 
         <module name="LeftCurly">
             <!-- Checks for placement of the left curly brace ('{'). -->
@@ -292,17 +285,6 @@ page at http://checkstyle.sourceforge.net/config.html -->
             <property name="severity" value="warning" />
         </module>
 
-        <module name="FallThrough">
-            <!-- Warn about falling through to the next case statement.  Similar to
-            javac -Xlint:fallthrough, but the check is suppressed if a single-line comment
-            on the last non-blank line preceding the fallen-into case contains 'fall through' (or
-            some other variants which we don't publicized to promote consistency).
-            -->
-            <property name="reliefPattern"
-                value="fall through|Fall through|fallthru|Fallthru|falls through|Falls through|fallthrough|Fallthrough|No break|NO break|no break|continue on" />
-            <property name="severity" value="warning" />
-        </module>
-
 
         <!--
 
@@ -315,7 +297,8 @@ page at http://checkstyle.sourceforge.net/config.html -->
                  8.4.3.  The prescribed order is:
                  public, protected, private, abstract, static, final, transient, volatile,
                  synchronized, native, strictfp
-              -->
+            -->
+            <property name="severity" value="warning" />
         </module>
 
 
@@ -324,7 +307,9 @@ page at http://checkstyle.sourceforge.net/config.html -->
         WHITESPACE CHECKS
 
         -->
-        <module name="GenericWhitespace" />
+        <module name="GenericWhitespace">
+            <property name="severity" value="warning" />
+        </module>
 
         <module name="WhitespaceAround">
             <!-- Checks that various tokens are surrounded by whitespace.
@@ -377,17 +362,6 @@ page at http://checkstyle.sourceforge.net/config.html -->
             -->
             <property name="severity" value="warning" />
         </module>
-    </module>
-
-    <!--module name="SuppressionFilter">
-        <property name="file" value="suppressions.xml"/>
-    </module-->
-
-    <module name="SuppressionCommentFilter">
-        <property name="offCommentFormat" value="CHECKSTYLE OFF: (.+)" />
-        <property name="onCommentFormat" value="CHECKSTYLE ON" />
-        <property name="checkFormat" value="Javadoc.*" />
-        <property name="messageFormat" value="$1" />
     </module>
 
 </module>
