@@ -8,7 +8,7 @@ pipeline
         credentials = 'BitbucketAuth'
         repoUrl = "https://${repoUser}@bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git"
 
-        workPath = 'project/cms/'
+        projectDir = 'project/cms/'
 
         // Discord Webhook for some fancy stuff
         discordWebHook = 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
@@ -35,12 +35,12 @@ pipeline
         {
             steps{
                 echo 'Cleaning..'
-                dir("${workPath}")
+                dir("${projectDir}")
                 {
                     script
                     {
-                        if (isUnix()) sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'
-                        else bat 'gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'                        
+                        if (isUnix()) sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest '
+                        else bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'                        
                     }
                 }                
             }
@@ -51,7 +51,7 @@ pipeline
             steps
             {
                 echo 'Building..'
-                dir("${workPath}")
+                dir("${projectDir}")
                 {
                     script
                     {
@@ -71,7 +71,7 @@ pipeline
                     steps
                     {
                         echo 'Generating Javadoc..'
-                        dir("${workPath}")
+                        dir("${projectDir}")
                         {
                             script
                             {
@@ -89,7 +89,7 @@ pipeline
                     steps
                     {
                         echo 'Archiving Artefacts..'
-                        dir("${workPath}")
+                        dir("${projectDir}")
                         {
                             archiveArtifacts artifacts: "build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
                         }
@@ -101,7 +101,7 @@ pipeline
                     steps
                     {
                         echo 'Unit Testing..'
-                        dir("${workPath}")
+                        dir("${projectDir}")
                         {
                             script{
                                 if (isUnix()) sh './gradlew test jacocoTestReport'
@@ -119,7 +119,7 @@ pipeline
                     steps
                     {
                         echo 'Integration Testing..'
-                        dir("${workPath}")
+                        dir("${projectDir}")
                         {
                             script
                             {
@@ -138,7 +138,7 @@ pipeline
                     steps
                     {
                         echo 'Mutation Testing..'
-                        dir("${workPath}")
+                        dir("${projectDir}")
                         {
                             script
                             {
@@ -158,7 +158,7 @@ pipeline
             steps
             {
                 echo 'Deploy App..'
-                dir("${workPath}")
+                dir("${projectDir}")
                 {
                     script
                     {
@@ -192,7 +192,7 @@ pipeline
                 echo 'System Testing..'
                 sleep(3)
 
-                dir("${workPath}")
+                dir("${projectDir}")
                 {
                     script
                     {
@@ -218,7 +218,7 @@ pipeline
 
                     script 
                     {
-                        dir("${workPath}"){
+                        dir("${projectDir}"){
                             if (isUnix()) 
                             {
                                 sh "git tag release"
@@ -261,7 +261,7 @@ pipeline
             steps
             {
                 echo 'Deploy App in Release Environment..'
-                dir("${workPath}")
+                dir("${projectDir}")
                 {
                     script
                     {
@@ -296,7 +296,7 @@ pipeline
 
                 script 
                 {
-                    dir("${workPath}"){
+                    dir("${projectDir}"){
                         if (isUnix()) 
                         {
                             sh "git tag ${BUILD_TAG}-${currentBuild.currentResult}"
