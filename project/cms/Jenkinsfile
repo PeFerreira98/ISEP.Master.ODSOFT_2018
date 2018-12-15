@@ -39,11 +39,8 @@ pipeline
                 {
                     script
                     {
-                        // if (isUnix()) sh './gradlew clean --info'
-                        // else bat 'gradlew clean --info'  
-
-                        if (isUnix()) sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'
-                        else bat 'gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest --info'                        
+                        if (isUnix()) sh './gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'
+                        else bat 'gradlew cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'                        
                     }
                 }                
             }
@@ -165,14 +162,24 @@ pipeline
                 {
                     script
                     {
-                        //bound 2 change
-                        if (isUnix()) sh './gradlew deploy --info && %CATALINA_HOME%/bin/startup.sh' //check if works. ex -> echo $TEST_VAR
-                        else bat 'gradlew deploy --info && %CATALINA_HOME%/bin/startup.bat'
+                        if (isUnix())
+                        {
+                            sh 'docker build -f Dockerfile -t cmsproject .'
+                            sh 'docker run --name cmsprojectcontainer -d -p 8888:8080 -t cmsproject'      
+                        }
+                        else
+                        {
+                            bat 'docker build -f Dockerfile -t cmsproject .'
+                            bat 'docker run --name cmsprojectcontainer -d -p 8888:8080 -t cmsproject'                            
+                        }
 
-                        //bat 'docker build -f Dockerfile -t cmsproject .'
-                        //bat 'docker run -p 8888:8080 -t cmsproject'
+                        //docker plugin trials
+                        //def dockerCMSImage = docker.build("cmsproject:${BUILD_ID}")
+                        //def dockerCMSContainer = dockerCMSImage.run('-p 8888:8080')
                     }
                 }
+
+
             }
         }
 
@@ -189,8 +196,8 @@ pipeline
                 {
                     script
                     {
-                        if (isUnix()) sh 'curl http://localhost:8080/cmsProject'
-                        else powershell 'Invoke-RestMethod -Uri http://localhost:8080/cmsProject'
+                        if (isUnix()) sh 'curl http://localhost:8888/cmsproject'
+                        else powershell 'Invoke-RestMethod -Uri http://localhost:8888/cmsproject'
                     }
                 }                
             }
@@ -203,7 +210,6 @@ pipeline
             {
                 mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', subject: "Manual Tests", body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
                 //input 'Please Approve or fail the build after UI Acceptance Tests'
-
 /*
                 withCredentials([[$class: 'UsernamePasswordMultiBinding',
                 credentialsId: "${credentials}",
@@ -220,7 +226,7 @@ pipeline
                             } 
                             else 
                             {
-                                powershell "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
+                                powershell "git tag ${BUILD_TAG}-${currentBuild.currentResult}"
                                 powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
                             }
                         }
@@ -228,6 +234,24 @@ pipeline
                     }
                 }
 */
+                script
+                { 
+                    if (isUnix())
+                    {
+                        sh 'docker stop cmsprojectcontainer'
+                        sh 'docker rm -f cmsprojectcontainer'
+                        sh 'docker rmi -f cmsproject'     
+                    }
+                    else
+                    {
+                        bat 'docker stop cmsprojectcontainer'
+                        bat 'docker rm -f cmsprojectcontainer' 
+                        bat 'docker rmi -f cmsproject'                            
+                    }
+
+                    //docker plugin trials
+                    //dockerCMSContainer.stop 
+                }
             }
         }
 
@@ -237,19 +261,17 @@ pipeline
             steps
             {
                 echo 'Deploy App in Release Environment..'
-                //dir("${workPath}")
-                //{
-                    //script
-                    //{
-                        //bound 2 change
-                        
-                        //if (isUnix()) sh './gradlew deploy --info && %CATALINA_HOME%/bin/startup.sh' //check if works. ex -> echo $TEST_VAR
-                        //else bat 'gradlew deploy --info && %CATALINA_HOME%/bin/startup.bat'
+                dir("${workPath}")
+                {
+                    script
+                    {
+                        if (isUnix()) sh './gradlew deploy --info && %CATALINA_HOME%/bin/startup.sh' //check if works. ex -> echo $TEST_VAR
+                        else bat 'gradlew deploy --info && %CATALINA_HOME%/bin/startup.bat'
 
                         //bat 'docker build -f Dockerfile -t cmsproject .'
                         //bat 'docker run -p 8888:8080 -t cmsproject'
-                    //}
-                //}
+                    }
+                }
             }
         }
 
@@ -264,7 +286,7 @@ pipeline
         {
             bitbucketStatusNotify(buildState: currentBuild.currentResult)
 
-            discordSend description: "Jenkins CMS Pipeline - Finished Build #${BUILD_NUMBER}\nBuild Status: ${currentBuild.currentResult}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
+            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
             
 /*
             withCredentials([[$class: 'UsernamePasswordMultiBinding',
@@ -277,7 +299,7 @@ pipeline
                     dir("${workPath}"){
                         if (isUnix()) 
                         {
-                            sh "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
+                            sh "git tag ${BUILD_TAG}-${currentBuild.currentResult}"
                             sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repoUrl} --tags"
                         } 
                         else 
