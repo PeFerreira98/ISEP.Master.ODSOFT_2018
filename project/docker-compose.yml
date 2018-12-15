@@ -1,13 +1,23 @@
-version '3.7'
-
+version: '3.7'
 services:
-  h2.data:
-    image: oscarfonts/h2-latest
 
-  cms.project:
-    image: tomcat:8
-    build:
-      context: .
-      dockerfile: cms/Dockerfile
-    depends-on:
-      - h2.data
+  h2.db:
+    image: oscarfonts/h2
+    ports:
+      - 8889:81
+
+#  sql.db:
+#    image: mcr.microsoft.com/mssql/server
+#    ports:
+#      - 8890:1433
+
+  cms:
+    build: 
+      context: ./cms
+      dockerfile: Dockerfile
+    ports:
+      - 8888:8080
+    depends_on:
+      - h2.db
+
+  
