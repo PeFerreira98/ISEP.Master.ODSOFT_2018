@@ -155,7 +155,7 @@ task deploy(type: Copy) {
 	into "${System.env.CATALINA_HOME}/webapps"
 }
 
-/*
+/**/
 // Code quality
 checkstyle {
     toolVersion '7.8.1'
@@ -186,4 +186,3 @@ findbugsMain {
 findbugsTest {
     source ='src/test/java'
 }
-*/
