@@ -34,51 +34,50 @@ import pt.isep.cms.client.ShowcaseConstants;
  */
 public class CwStudents extends ContentWidget {
 
-	/**
-	 * The constants used in this Content Widget.
-	 */
-	// This is only for generation, so we disable it
-	public static interface CwConstants extends Constants {
+    /**
+     * The constants used in this Content Widget.
+     */
+    // This is only for generation, so we disable it
+    public static interface CwConstants extends Constants {
 
-		String cwStudentsDescription();
+        String cwStudentsDescription();
 
-		String cwStudentsName();
-	}
+        String cwStudentsName();
+    }
 
-	/**
-	 * An instance of the constants.
-	 */
-	private final CwConstants constants;
-	private final ShowcaseConstants globalConstants;
+    /**
+     * An instance of the constants.
+     */
+    private final CwConstants constants;
+    private final ShowcaseConstants globalConstants;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param constants
-	 *            the constants
-	 */
-	public CwStudents(ShowcaseConstants constants) {
-		super(constants.cwStudentsName(), constants.cwStudentsDescription());
-		this.globalConstants = constants;
-		this.constants = constants;
-	}
+    /**
+     * Constructor.
+     *
+     * @param constants the constants
+     */
+    public CwStudents(ShowcaseConstants constants) {
+        super(constants.cwStudentsName(), constants.cwStudentsDescription());
+        this.globalConstants = constants;
+        this.constants = constants;
+    }
 
-	/**
-	 * Initialize this example.
-	 */
-	@Override
-	public Widget onInitialize() {
-		// The service should be created on GWT module loading
-		StudentsServiceAsync rpcService = GWT.create(StudentsService.class);
+    /**
+     * Initialize this example.
+     */
+    @Override
+    public Widget onInitialize() {
+        // The service should be created on GWT module loading
+        StudentsServiceAsync rpcService = GWT.create(StudentsService.class);
 
-		// Should setup the Presenter Panel for the Students....
-		VerticalPanel vPanel = new VerticalPanel();
+        // Should setup the Presenter Panel for the Students....
+        VerticalPanel vPanel = new VerticalPanel();
 
-		HandlerManager eventBus = new HandlerManager(null);
-		StudentsController appViewer = new StudentsController(rpcService, eventBus, this.globalConstants);
-		appViewer.go(vPanel);
+        HandlerManager eventBus = new HandlerManager(null);
+        StudentsController appViewer = new StudentsController(rpcService, eventBus, this.globalConstants);
+        appViewer.go(vPanel);
 
-		// Return the panel
-		return vPanel;
-	}
+        // Return the panel
+        return vPanel;
+    }
 }

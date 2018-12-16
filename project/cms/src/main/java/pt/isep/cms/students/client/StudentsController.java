@@ -21,84 +21,86 @@ import com.google.gwt.user.client.ui.HasWidgets;
 import pt.isep.cms.students.client.view.StudentsDialog;
 
 public class StudentsController implements Presenter { // (ATB) No history at this level, ValueChangeHandler<String> {
-	private final HandlerManager eventBus;
-	private final StudentsServiceAsync rpcService;
-	private HasWidgets container;
+    private final HandlerManager eventBus;
+    private final StudentsServiceAsync rpcService;
+    private HasWidgets container;
 
-	public static interface CwConstants extends Constants {
-	}
+    public static interface CwConstants extends Constants {
+    }
 
-	/**
-	 * An instance of the constants.
-	 */
-	private final CwConstants constants;
-	private final ShowcaseConstants globalConstants;
+    /**
+     * An instance of the constants.
+     */
+    private final CwConstants constants;
+    private final ShowcaseConstants globalConstants;
 
-	public StudentsController(StudentsServiceAsync rpcService, HandlerManager eventBus, ShowcaseConstants constants) {
-		this.eventBus = eventBus;
-		this.rpcService = rpcService;
-		this.constants = constants;
-		this.globalConstants = constants;
+    public StudentsController(StudentsServiceAsync rpcService, HandlerManager eventBus, ShowcaseConstants constants) {
+        this.eventBus = eventBus;
+        this.rpcService = rpcService;
+        this.constants = constants;
+        this.globalConstants = constants;
 
-		bind();
-	}
+        bind();
+    }
 
-	private void bind() {
-		// (ATB) No History at this level
-		// History.addValueChangeHandler(this);		
+    private void bind() {
+        // (ATB) No History at this level
+        // History.addValueChangeHandler(this);
 
-		eventBus.addHandler(AddStudentEvent.TYPE, new AddStudentEventHandler() {
-			public void onAddStudent(AddStudentEvent event) {
-				doAddNewStudent();
-			}
-		});
-		
-		eventBus.addHandler(EditStudentEvent.TYPE, new EditStudentEventHandler() {
-			public void onEditStudent(EditStudentEvent event) {
-				doEditStudent(event.getId());
-			}
-		});
+        eventBus.addHandler(AddStudentEvent.TYPE, new AddStudentEventHandler() {
+            public void onAddStudent(AddStudentEvent event) {
+                doAddNewStudent();
+            }
+        });
 
-		eventBus.addHandler(EditStudentCancelledEvent.TYPE, new EditStudentCancelledEventHandler() {
-			public void onEditStudentCancelled(EditStudentCancelledEvent event) {
-				doEditStudentCancelled();
-			}			
-		});
+        eventBus.addHandler(EditStudentEvent.TYPE, new EditStudentEventHandler() {
+            public void onEditStudent(EditStudentEvent event) {
+                doEditStudent(event.getId());
+            }
+        });
 
-		eventBus.addHandler(StudentUpdatedEvent.TYPE, new StudentUpdatedEventHandler() {
-			public void onStudentUpdated(StudentUpdatedEvent event) {
-				doStudentUpdated();
-			}
-		});
-	}
+        eventBus.addHandler(EditStudentCancelledEvent.TYPE, new EditStudentCancelledEventHandler() {
+            public void onEditStudentCancelled(EditStudentCancelledEvent event) {
+                doEditStudentCancelled();
+            }
+        });
 
-	private void doAddNewStudent() {
-		// Lets use the presenter to display a dialog...
-		Presenter presenter = new EditStudentPresenter(rpcService, eventBus, new StudentsDialog(globalConstants, StudentsDialog.Type.ADD));
-		presenter.go(container);
+        eventBus.addHandler(StudentUpdatedEvent.TYPE, new StudentUpdatedEventHandler() {
+            public void onStudentUpdated(StudentUpdatedEvent event) {
+                doStudentUpdated();
+            }
+        });
+    }
 
-	}
+    private void doAddNewStudent() {
+        // Lets use the presenter to display a dialog...
+        Presenter presenter = new EditStudentPresenter(rpcService, eventBus,
+                new StudentsDialog(globalConstants, StudentsDialog.Type.ADD));
+        presenter.go(container);
 
-	private void doEditStudent(String id) {
-		Presenter presenter = new EditStudentPresenter(rpcService, eventBus, new StudentsDialog(globalConstants, StudentsDialog.Type.UPDATE), id);
-		presenter.go(container);
-	}
+    }
 
-	private void doEditStudentCancelled() {
-		// Nothing to update...
-	}
+    private void doEditStudent(String id) {
+        Presenter presenter = new EditStudentPresenter(rpcService, eventBus,
+                new StudentsDialog(globalConstants, StudentsDialog.Type.UPDATE), id);
+        presenter.go(container);
+    }
 
-	private void doStudentUpdated() {
-		// (ATB) Update the list of Students...
-		Presenter presenter = new StudentsPresenter(rpcService, eventBus, new StudentsView());
-		presenter.go(container);
-	}
+    private void doEditStudentCancelled() {
+        // Nothing to update...
+    }
 
-	public void go(final HasWidgets container) {
-		this.container = container;
+    private void doStudentUpdated() {
+        // (ATB) Update the list of Students...
+        Presenter presenter = new StudentsPresenter(rpcService, eventBus, new StudentsView());
+        presenter.go(container);
+    }
 
-		Presenter presenter = new StudentsPresenter(rpcService, eventBus, new StudentsView());
-		presenter.go(container);
-	}
+    public void go(final HasWidgets container) {
+        this.container = container;
+
+        Presenter presenter = new StudentsPresenter(rpcService, eventBus, new StudentsView());
+        presenter.go(container);
+    }
 
 }
