@@ -5,16 +5,25 @@ pipeline
     environment
     {
         // Repository
+        // repoUser must be defined as a global variable in jenkins
         credentials = 'BitbucketAuth'
         repository = 'bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git'
         repoUrl = "https://${repoUser}@${repository}"
 
+        // Dirs
         projectDir = 'project/cms/'
+
+        // .War and services
+        cmsWar = 'cmsproject'
+
+        // Web URLs, Ports and stuff
+        tomcatPort = '8888'
+		tomcatUrl = "http://localhost:${tomcatPort}"
+		cmsUrl = "${tomcatUrl}/${cmsWar}/"
 
         // Discord Webhook for some fancy stuff
         discordWebHook = 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
         startTime = new Date().format('dd/MM/yyyy HH:mm:ss')
-
     }
     
     agent any
@@ -36,14 +45,15 @@ pipeline
         
         stage('Clean')
         {
-            steps{
+            steps 
+            {
                 echo 'Cleaning..'
                 dir("${projectDir}")
                 {
                     script
                     {
-                        if (isUnix()) sh './gradlew.sh cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest '
-                        else bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest'                        
+                        if (isUnix()) sh './gradlew.sh cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'
+                        else bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'                        
                     }
                 }                
             }
@@ -101,14 +111,16 @@ pipeline
 
                 stage('Code Quality Report - Checkstyle')
                 {
-                    steps{
+                    steps
+                    {
                         checkstyle canComputeNew: false, defaultEncoding: '', healthy: '5', pattern: "${projectDir}/build/reports/checkstyle/*.xml", unHealthy: '1'
                     }
                 }
 
                 stage('Code Quality Report - Findbugs')
                 {
-                    steps{
+                    steps
+                    {
                         findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '5', includePattern: '', pattern: "${projectDir}/build/reports/findbugs/*.xml", unHealthy: '1'
                     }
                 }
@@ -120,7 +132,8 @@ pipeline
                         echo 'Unit Testing..'
                         dir("${projectDir}")
                         {
-                            script{
+                            script
+                            {
                                 if (isUnix()) sh './gradlew test jacocoTestReport'
                                 else bat 'gradlew test jacocoTestReport'
                             }
@@ -181,18 +194,18 @@ pipeline
                     {
                         if (isUnix())
                         {
-                            sh 'docker build -f Dockerfile -t cmsproject .'
-                            sh 'docker run --name cmsprojectcontainer -d -p 8888:8080 -t cmsproject'      
+                            sh "docker build -f Dockerfile -t cmsproject ."
+                            sh "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"      
                         }
                         else
                         {
-                            bat 'docker build -f Dockerfile -t cmsproject .'
-                            bat 'docker run --name cmsprojectcontainer -d -p 8888:8080 -t cmsproject'                            
+                            bat "docker build -f Dockerfile -t cmsproject ."
+                            bat "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"                           
                         }
 
                         //docker plugin trials
                         //def dockerCMSImage = docker.build("cmsproject:${BUILD_ID}")
-                        //def dockerCMSContainer = dockerCMSImage.run('-p 8888:8080')
+                        //def dockerCMSContainer = dockerCMSImage.run('-p ${tomcatPort}:8080')
                     }
                 }
 
@@ -213,8 +226,8 @@ pipeline
                 {
                     script
                     {
-                        if (isUnix()) sh 'curl http://localhost:8888/cmsproject'
-                        else powershell 'Invoke-RestMethod -Uri http://localhost:8888/cmsproject'
+                        if (isUnix()) sh "curl ${cmsUrl}"
+                        else powershell "Invoke-RestMethod -Uri ${cmsUrl}"
                     }
                 }                
             }
@@ -225,31 +238,12 @@ pipeline
             options{ timeout(time: 1, unit: 'HOURS') }
             steps
             {
-                mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', subject: "Manual Tests", body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
-                //input 'Please Approve or fail the build after UI Acceptance Tests'
-/*
-                withCredentials([[$class: 'UsernamePasswordMultiBinding',
-                credentialsId: "${credentials}",
-                usernameVariable: 'GIT_USERNAME', 
-                passwordVariable: 'GIT_PASSWORD']]) {
+                mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', 
+                    subject: "Manual Tests", 
+                    body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
 
-                    script 
-                    {
-                        dir("${projectDir}"){
-                            if (isUnix()) 
-                            {
-                                sh "git tag release"
-                                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
-                            } 
-                            else 
-                            {
-                                powershell "git tag ${BUILD_TAG}-${currentBuild.currentResult}"
-                                powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
-                            }
-                        }
-                    }
-                }
-*/
+                //input 'Please Approve or fail the build after UI Acceptance Tests'
+
                 script
                 { 
                     if (isUnix())
@@ -266,7 +260,7 @@ pipeline
                     }
 
                     //docker plugin trials
-                    //dockerCMSContainer.stop 
+                    //dockerCMSContainer.stop
                 }
             }
         }
@@ -284,8 +278,8 @@ pipeline
                         if (isUnix()) sh './gradlew deploy --info && %CATALINA_HOME%/bin/startup.sh' //check if works. ex -> echo $TEST_VAR
                         else bat 'gradlew deploy --info && %CATALINA_HOME%/bin/startup.bat'
 
-                        //bat 'docker build -f Dockerfile -t cmsproject .'
-                        //bat 'docker run -p 8888:8080 -t cmsproject'
+                        //bat "docker build -f Dockerfile -t cmsproject ."
+                        //bat "docker run -p ${tomcatPort}:8080 -t cmsproject"
                     }
                 }
             }
@@ -301,7 +295,7 @@ pipeline
 
             discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
             
-/*
+            /*
             withCredentials([[$class: 'UsernamePasswordMultiBinding',
                 credentialsId: "${credentials}",
                 usernameVariable: 'GIT_USERNAME', 
@@ -323,7 +317,7 @@ pipeline
                     }
                 }
             }
-*/
+            */
         }
 
     }
