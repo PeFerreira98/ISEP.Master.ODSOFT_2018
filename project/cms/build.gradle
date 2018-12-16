@@ -163,17 +163,18 @@ checkstyle {
 }
 
 checkstyleMain {
-    source ='src/main/java'
+    source = sourceSets.main.allJava
 }
 
 checkstyleTest {
-    source ='src/test/java'
+    configFile file("checkstyleTest.xml")
+    source = sourceSets.test.allJava
 }
 
 findbugs {
     ignoreFailures = true
     toolVersion = "3.0.1"
-    sourceSets=[sourceSets.main]
+    sourceSets = [sourceSets.main]
     //excludeFilter = file("excludeFilter.xml")
     reportsDir = file("$project.buildDir/reports/findbugs")
     effort = "max"
