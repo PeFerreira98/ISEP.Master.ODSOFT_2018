@@ -32,42 +32,42 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class ContentWidgetView extends ResizeComposite {
 
-	interface ContentWidgetViewUiBinder extends UiBinder<Widget, ContentWidgetView> {
-	}
+    interface ContentWidgetViewUiBinder extends UiBinder<Widget, ContentWidgetView> {
+    }
 
-	private static ContentWidgetViewUiBinder uiBinder = GWT.create(ContentWidgetViewUiBinder.class);
+    private static ContentWidgetViewUiBinder uiBinder = GWT.create(ContentWidgetViewUiBinder.class);
 
-	@UiField
-	Element descElem;
+    @UiField
+    Element descElem;
 
-	@UiField(provided = true)
-	SimplePanel cwPanel;
+    @UiField(provided = true)
+    SimplePanel cwPanel;
 
-	@UiField
-	Element nameElem;
+    @UiField
+    Element nameElem;
 
-	private final boolean hasMargins;
+    private final boolean hasMargins;
 
-	public ContentWidgetView(boolean hasMargins, boolean scrollable) {
-		this.hasMargins = hasMargins;
-		cwPanel = scrollable ? new ScrollPanel() : new SimpleLayoutPanel();
-		cwPanel.setSize("100%", "100%");
-		initWidget(uiBinder.createAndBindUi(this));
-	}
+    public ContentWidgetView(boolean hasMargins, boolean scrollable) {
+        this.hasMargins = hasMargins;
+        cwPanel = scrollable ? new ScrollPanel() : new SimpleLayoutPanel();
+        cwPanel.setSize("100%", "100%");
+        initWidget(uiBinder.createAndBindUi(this));
+    }
 
-	public void setDescription(SafeHtml html) {
-		descElem.setInnerSafeHtml(html);
-	}
+    public void setDescription(SafeHtml html) {
+        descElem.setInnerSafeHtml(html);
+    }
 
-	public void setCwPanel(Widget widget) {
-		cwPanel.setWidget(widget);
-		if (hasMargins) {
-			widget.getElement().getStyle().setMarginLeft(10.0, Unit.PX);
-			widget.getElement().getStyle().setMarginRight(10.0, Unit.PX);
-		}
-	}
+    public void setCwPanel(Widget widget) {
+        cwPanel.setWidget(widget);
+        if (hasMargins) {
+            widget.getElement().getStyle().setMarginLeft(10.0, Unit.PX);
+            widget.getElement().getStyle().setMarginRight(10.0, Unit.PX);
+        }
+    }
 
-	public void setName(String text) {
-		nameElem.setInnerText(text);
-	}
+    public void setName(String text) {
+        nameElem.setInnerText(text);
+    }
 }

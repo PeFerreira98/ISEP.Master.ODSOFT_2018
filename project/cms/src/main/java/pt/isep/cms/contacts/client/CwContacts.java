@@ -34,51 +34,50 @@ import pt.isep.cms.client.ShowcaseConstants;
  */
 public class CwContacts extends ContentWidget {
 
-	/**
-	 * The constants used in this Content Widget.
-	 */
-	// This is only for generation, so we disable it
-	public static interface CwConstants extends Constants {
+    /**
+     * The constants used in this Content Widget.
+     */
+    // This is only for generation, so we disable it
+    public static interface CwConstants extends Constants {
 
-		String cwContactsDescription();
+        String cwContactsDescription();
 
-		String cwContactsName();
-	}
+        String cwContactsName();
+    }
 
-	/**
-	 * An instance of the constants.
-	 */
-	private final CwConstants constants;
-	private final ShowcaseConstants globalConstants;
+    /**
+     * An instance of the constants.
+     */
+    private final CwConstants constants;
+    private final ShowcaseConstants globalConstants;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param constants
-	 *            the constants
-	 */
-	public CwContacts(ShowcaseConstants constants) {
-		super(constants.cwContactsName(), constants.cwContactsDescription());
-		this.globalConstants = constants;
-		this.constants = constants;
-	}
+    /**
+     * Constructor.
+     *
+     * @param constants the constants
+     */
+    public CwContacts(ShowcaseConstants constants) {
+        super(constants.cwContactsName(), constants.cwContactsDescription());
+        this.globalConstants = constants;
+        this.constants = constants;
+    }
 
-	/**
-	 * Initialize this example.
-	 */
-	@Override
-	public Widget onInitialize() {
-		// The service should be created on GWT module loading
-		ContactsServiceAsync rpcService = GWT.create(ContactsService.class);
+    /**
+     * Initialize this example.
+     */
+    @Override
+    public Widget onInitialize() {
+        // The service should be created on GWT module loading
+        ContactsServiceAsync rpcService = GWT.create(ContactsService.class);
 
-		// Should setup the Presenter Panel for the Contacts....
-		VerticalPanel vPanel = new VerticalPanel();
+        // Should setup the Presenter Panel for the Contacts....
+        VerticalPanel vPanel = new VerticalPanel();
 
-		HandlerManager eventBus = new HandlerManager(null);
-		ContactsController appViewer = new ContactsController(rpcService, eventBus, this.globalConstants);
-		appViewer.go(vPanel);
+        HandlerManager eventBus = new HandlerManager(null);
+        ContactsController appViewer = new ContactsController(rpcService, eventBus, this.globalConstants);
+        appViewer.go(vPanel);
 
-		// Return the panel
-		return vPanel;
-	}
+        // Return the panel
+        return vPanel;
+    }
 }

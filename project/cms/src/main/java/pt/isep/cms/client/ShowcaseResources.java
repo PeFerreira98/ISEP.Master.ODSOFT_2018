@@ -23,42 +23,42 @@ import com.google.gwt.resources.client.ImageResource;
  * The images and styles used throughout the application.
  */
 public interface ShowcaseResources extends ClientBundle {
-  ImageResource catI18N();
+    ImageResource catI18N();
 
-  ImageResource catLists();
+    ImageResource catLists();
 
-  ImageResource catOther();
+    ImageResource catOther();
 
-  ImageResource catPanels();
+    ImageResource catPanels();
 
-  ImageResource catPopups();
+    ImageResource catPopups();
 
-  ImageResource catTables();
+    ImageResource catTables();
 
-  ImageResource catTextInput();
+    ImageResource catTextInput();
 
-  ImageResource catWidgets();
+    ImageResource catWidgets();
 
-  /**
-   * The styles used in LTR mode.
-   */
-  @Source("Showcase.gss")
-  CssResource css();
+    /**
+     * The styles used in LTR mode.
+     */
+    @Source("Showcase.gss")
+    CssResource css();
 
-  ImageResource isepLogo();
-  
-  ImageResource gwtLogo();
+    ImageResource isepLogo();
 
-  ImageResource gwtLogoThumb();
+    ImageResource gwtLogo();
 
-  ImageResource jimmy();
+    ImageResource gwtLogoThumb();
 
-  ImageResource jimmyThumb();
+    ImageResource jimmy();
 
-  ImageResource loading();
+    ImageResource jimmyThumb();
 
-  /**
-   * Indicates the locale selection box.
-   */
-  ImageResource locale();
+    ImageResource loading();
+
+    /**
+     * Indicates the locale selection box.
+     */
+    ImageResource locale();
 }

@@ -7,36 +7,31 @@ import junit.framework.TestCase;
 
 import static org.easymock.EasyMock.createStrictMock;
 
-public class ContactDetailsJRETest extends TestCase
-{
-	protected void setUp()
-	{
-	}
+public class ContactDetailsJRETest extends TestCase {
+    protected void setUp() {
+    }
 
-	public void testNewEmptyContactDetails()
-	{
-		ContactDetails cd = new ContactDetails();
+    public void testNewEmptyContactDetails() {
+        ContactDetails cd = new ContactDetails();
 
-		assertTrue(cd.getId().equals("0"));
-		assertTrue(cd.getDisplayName().equals(""));
-	}
+        assertTrue(cd.getId().equals("0"));
+        assertTrue(cd.getDisplayName().equals(""));
+    }
 
-	public void testNewContactDetailsFullInfo()
-	{
-		ContactDetails cd = new ContactDetails("id", "DisplayName");
+    public void testNewContactDetailsFullInfo() {
+        ContactDetails cd = new ContactDetails("id", "DisplayName");
 
-		assertTrue(cd.getId().equals("id"));
-		assertTrue(cd.getDisplayName().equals("DisplayName"));
-	}
+        assertTrue(cd.getId().equals("id"));
+        assertTrue(cd.getDisplayName().equals("DisplayName"));
+    }
 
-	public void testSetContactInfo()
-	{
-		ContactDetails cd = new ContactDetails();
+    public void testSetContactInfo() {
+        ContactDetails cd = new ContactDetails();
 
-		cd.setId("id");
-		cd.setDisplayName("DisplayName");
+        cd.setId("id");
+        cd.setDisplayName("DisplayName");
 
-		assertTrue(cd.getId().equals("id"));
-		assertTrue(cd.getDisplayName().equals("DisplayName"));
-	}
+        assertTrue(cd.getId().equals("id"));
+        assertTrue(cd.getDisplayName().equals("DisplayName"));
+    }
 }

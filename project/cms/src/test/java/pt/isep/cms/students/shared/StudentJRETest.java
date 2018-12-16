@@ -7,55 +7,49 @@ import junit.framework.TestCase;
 
 //import static org.easymock.EasyMock.createStrictMock;
 
-public class StudentJRETest extends TestCase
-{
-	protected void setUp()
-	{
-	}
+public class StudentJRETest extends TestCase {
+    protected void setUp() {
+    }
 
-	public void testNewEmptyStudent()
-	{
-		Student c = new Student();
+    public void testNewEmptyStudent() {
+        Student c = new Student();
 
-		assertTrue(c.getId() == null);
-		assertTrue(c.getFirstName() == null);
-		assertTrue(c.getLastName() == null);
-		assertTrue(c.getEmailAddress() == null);
-		assertTrue(c.getFullName() == null);
-	}
+        assertTrue(c.getId() == null);
+        assertTrue(c.getFirstName() == null);
+        assertTrue(c.getLastName() == null);
+        assertTrue(c.getEmailAddress() == null);
+        assertTrue(c.getFullName() == null);
+    }
 
-	public void testNewStudentFullInfo()
-	{
-		Student c = new Student("id", "firstName", "lastName", "emailAddress");
+    public void testNewStudentFullInfo() {
+        Student c = new Student("id", "firstName", "lastName", "emailAddress");
 
-		assertTrue(c.getId().equals("id"));
-		assertTrue(c.getFirstName().equals("firstName"));
-		assertTrue(c.getLastName().equals("lastName"));
-		assertTrue(c.getEmailAddress().equals("emailAddress"));
-		assertTrue(c.getFullName().equals("firstName lastName"));
-	}
+        assertTrue(c.getId().equals("id"));
+        assertTrue(c.getFirstName().equals("firstName"));
+        assertTrue(c.getLastName().equals("lastName"));
+        assertTrue(c.getEmailAddress().equals("emailAddress"));
+        assertTrue(c.getFullName().equals("firstName lastName"));
+    }
 
-	public void testSetStudentInfo()
-	{
-		Student c = new Student();
+    public void testSetStudentInfo() {
+        Student c = new Student();
 
-		c.setId("id");
-		c.setFirstName("firstName");
-		c.setLastName("lastName");
-		c.setEmailAddress("emailAddress");
+        c.setId("id");
+        c.setFirstName("firstName");
+        c.setLastName("lastName");
+        c.setEmailAddress("emailAddress");
 
-		assertTrue(c.getId().equals("id"));
-		assertTrue(c.getFirstName().equals("firstName"));
-		assertTrue(c.getLastName().equals("lastName"));
-		assertTrue(c.getEmailAddress().equals("emailAddress"));
-		assertTrue(c.getFullName().equals("firstName lastName"));
-	}
+        assertTrue(c.getId().equals("id"));
+        assertTrue(c.getFirstName().equals("firstName"));
+        assertTrue(c.getLastName().equals("lastName"));
+        assertTrue(c.getEmailAddress().equals("emailAddress"));
+        assertTrue(c.getFullName().equals("firstName lastName"));
+    }
 
-	public void testStudentDetails()
-	{
-		Student c = new Student("id", "firstName", "lastName", "emailAddress");
+    public void testStudentDetails() {
+        Student c = new Student("id", "firstName", "lastName", "emailAddress");
 
-		assertTrue(c.getId().equals(c.getLightWeightStudent().getId()));
-		assertTrue(c.getFullName().equals(c.getLightWeightStudent().getDisplayName()));
-	}
+        assertTrue(c.getId().equals(c.getLightWeightStudent().getId()));
+        assertTrue(c.getFullName().equals(c.getLightWeightStudent().getDisplayName()));
+    }
 }

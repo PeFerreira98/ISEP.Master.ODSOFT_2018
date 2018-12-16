@@ -19,140 +19,140 @@ import java.util.List;
 
 public class StudentsPresenter implements Presenter {
 
-	private List<StudentDetails> studentDetails;
+    private List<StudentDetails> studentDetails;
 
-	public interface Display {
-		HasClickHandlers getAddButton();
+    public interface Display {
+        HasClickHandlers getAddButton();
 
-		HasClickHandlers getDeleteButton();
+        HasClickHandlers getDeleteButton();
 
-		HasClickHandlers getList();
+        HasClickHandlers getList();
 
-		void setData(List<String> data);
+        void setData(List<String> data);
 
-		int getClickedRow(ClickEvent event);
+        int getClickedRow(ClickEvent event);
 
-		List<Integer> getSelectedRows();
+        List<Integer> getSelectedRows();
 
-		Widget asWidget();
-	}
+        Widget asWidget();
+    }
 
-	private final StudentsServiceAsync rpcService;
-	private final HandlerManager eventBus;
-	private final Display display;
+    private final StudentsServiceAsync rpcService;
+    private final HandlerManager eventBus;
+    private final Display display;
 
-	public StudentsPresenter(StudentsServiceAsync rpcService, HandlerManager eventBus, Display view) {
-		this.rpcService = rpcService;
-		this.eventBus = eventBus;
-		this.display = view;
-	}
+    public StudentsPresenter(StudentsServiceAsync rpcService, HandlerManager eventBus, Display view) {
+        this.rpcService = rpcService;
+        this.eventBus = eventBus;
+        this.display = view;
+    }
 
-	public void bind() {
-		display.getAddButton().addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				eventBus.fireEvent(new AddStudentEvent());
-			}
-		});
+    public void bind() {
+        display.getAddButton().addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                eventBus.fireEvent(new AddStudentEvent());
+            }
+        });
 
-		display.getDeleteButton().addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				deleteSelectedStudents();
-			}
-		});	
+        display.getDeleteButton().addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                deleteSelectedStudents();
+            }
+        });
 
-		display.getList().addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				int selectedRow = display.getClickedRow(event);
+        display.getList().addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                int selectedRow = display.getClickedRow(event);
 
-				if (selectedRow >= 0) {
-					String id = studentDetails.get(selectedRow).getId();
-					eventBus.fireEvent(new EditStudentEvent(id));
-				}
-			}
-		});
-	}
+                if (selectedRow >= 0) {
+                    String id = studentDetails.get(selectedRow).getId();
+                    eventBus.fireEvent(new EditStudentEvent(id));
+                }
+            }
+        });
+    }
 
-	public void go(final HasWidgets container) {
-		bind();
-		container.clear();
-		container.add(display.asWidget());
+    public void go(final HasWidgets container) {
+        bind();
+        container.clear();
+        container.add(display.asWidget());
 
-		fetchStudentDetails();
-	}
+        fetchStudentDetails();
+    }
 
-	public void sortStudentDetails() {
+    public void sortStudentDetails() {
 
-		// Yes, we could use a more optimized method of sorting, but the
-		// point is to create a test case that helps illustrate the higher
-		// level concepts used when creating MVP-based applications.
-		//
-		for (int i = 0; i < studentDetails.size(); ++i) {
-			for (int j = 0; j < studentDetails.size() - 1; ++j) {
-				if (studentDetails.get(j).getDisplayName()
-						.compareToIgnoreCase(studentDetails.get(j + 1).getDisplayName()) >= 0) {
-					StudentDetails tmp = studentDetails.get(j);
-					studentDetails.set(j, studentDetails.get(j + 1));
-					studentDetails.set(j + 1, tmp);
-				}
-			}
-		}
-	}
+        // Yes, we could use a more optimized method of sorting, but the
+        // point is to create a test case that helps illustrate the higher
+        // level concepts used when creating MVP-based applications.
+        //
+        for (int i = 0; i < studentDetails.size(); ++i) {
+            for (int j = 0; j < studentDetails.size() - 1; ++j) {
+                if (studentDetails.get(j).getDisplayName()
+                        .compareToIgnoreCase(studentDetails.get(j + 1).getDisplayName()) >= 0) {
+                    StudentDetails tmp = studentDetails.get(j);
+                    studentDetails.set(j, studentDetails.get(j + 1));
+                    studentDetails.set(j + 1, tmp);
+                }
+            }
+        }
+    }
 
-	public void setStudentDetails(List<StudentDetails> studentDetails) {
-		this.studentDetails = studentDetails;
-	}
+    public void setStudentDetails(List<StudentDetails> studentDetails) {
+        this.studentDetails = studentDetails;
+    }
 
-	public StudentDetails getStudentDetail(int index) {
-		return studentDetails.get(index);
-	}
+    public StudentDetails getStudentDetail(int index) {
+        return studentDetails.get(index);
+    }
 
-	private void fetchStudentDetails() {
+    private void fetchStudentDetails() {
 
-		rpcService.getStudentDetails(new AsyncCallback<ArrayList<StudentDetails>>() {
-			public void onSuccess(ArrayList<StudentDetails> result) {
-				studentDetails = result;
-				sortStudentDetails();
-				List<String> data = new ArrayList<String>();
+        rpcService.getStudentDetails(new AsyncCallback<ArrayList<StudentDetails>>() {
+            public void onSuccess(ArrayList<StudentDetails> result) {
+                studentDetails = result;
+                sortStudentDetails();
+                List<String> data = new ArrayList<String>();
 
-				for (int i = 0; i < result.size(); ++i) {
-					data.add(studentDetails.get(i).getDisplayName());
-				}
+                for (int i = 0; i < result.size(); ++i) {
+                    data.add(studentDetails.get(i).getDisplayName());
+                }
 
-				display.setData(data);
-			}
+                display.setData(data);
+            }
 
-			public void onFailure(Throwable caught) {
-				Window.alert("Error fetching studentdetails");
-			}
-		});
-		
-	}
+            public void onFailure(Throwable caught) {
+                Window.alert("Error fetching studentdetails");
+            }
+        });
 
-	private void deleteSelectedStudents() {
-		List<Integer> selectedRows = display.getSelectedRows();
-		ArrayList<String> ids = new ArrayList<String>();
+    }
 
-		for (int i = 0; i < selectedRows.size(); ++i) {
-			ids.add(studentDetails.get(selectedRows.get(i)).getId());
-		}
+    private void deleteSelectedStudents() {
+        List<Integer> selectedRows = display.getSelectedRows();
+        ArrayList<String> ids = new ArrayList<String>();
 
-		rpcService.deleteStudents(ids, new AsyncCallback<ArrayList<StudentDetails>>() {
-			public void onSuccess(ArrayList<StudentDetails> result) {
-				studentDetails = result;
-				sortStudentDetails();
-				List<String> data = new ArrayList<String>();
+        for (int i = 0; i < selectedRows.size(); ++i) {
+            ids.add(studentDetails.get(selectedRows.get(i)).getId());
+        }
 
-				for (int i = 0; i < result.size(); ++i) {
-					data.add(studentDetails.get(i).getDisplayName());
-				}
+        rpcService.deleteStudents(ids, new AsyncCallback<ArrayList<StudentDetails>>() {
+            public void onSuccess(ArrayList<StudentDetails> result) {
+                studentDetails = result;
+                sortStudentDetails();
+                List<String> data = new ArrayList<String>();
 
-				display.setData(data);
+                for (int i = 0; i < result.size(); ++i) {
+                    data.add(studentDetails.get(i).getDisplayName());
+                }
 
-			}
+                display.setData(data);
 
-			public void onFailure(Throwable caught) {
-				Window.alert("Error deleting selected students");
-			}
-		});
-	}
+            }
+
+            public void onFailure(Throwable caught) {
+                Window.alert("Error deleting selected students");
+            }
+        });
+    }
 }
