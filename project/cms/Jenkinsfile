@@ -74,12 +74,12 @@ pipeline
                 }
             }			
         }
-        
-        stage("Archive Artifacts + Javadoc + Tests")
+
+        stage("Archive Artifacts + Javadoc + Code quality reports")
         {
             parallel
             {
-                stage('Javadoc Generation')
+                stage('Javadoc')
                 {
                     steps
                     {
@@ -102,10 +102,7 @@ pipeline
                     steps
                     {
                         echo 'Archiving Artefacts..'
-                        dir("${projectDir}")
-                        {
-                            archiveArtifacts artifacts: "build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
-                        }
+                        archiveArtifacts artifacts: "${projectDir}/build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
                     }
                 }
 
@@ -113,7 +110,16 @@ pipeline
                 {
                     steps
                     {
-                        checkstyle canComputeNew: false, defaultEncoding: '', healthy: '5', pattern: "${projectDir}/build/reports/checkstyle/*.xml", unHealthy: '1'
+                        dir("${projectDir}")
+                        {
+                            script
+                            {
+                                if (isUnix()) sh './gradlew checkstyleMain checkstyleTest'
+                                else bat 'gradlew checkstyleMain checkstyleTest'
+                            }
+
+                            checkstyle canComputeNew: false, defaultEncoding: '', healthy: '20', pattern: 'build/reports/checkstyle/*.xml', unHealthy: '15'
+                        }
                     }
                 }
 
@@ -121,10 +127,25 @@ pipeline
                 {
                     steps
                     {
-                        findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '5', includePattern: '', pattern: "${projectDir}/build/reports/findbugs/*.xml", unHealthy: '1'
+                        dir("${projectDir}")
+                        {
+                            script
+                            {
+                                if (isUnix()) sh './gradlew checkstyleMain checkstyleTest'
+                                else bat 'gradlew findbugsMain findbugsTest'
+                            }
+
+                            findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '20', includePattern: '', pattern: 'build/reports/findbugs/*.xml', unHealthy: '15'
+                        }
                     }
                 }
+            }
+        }
 
+        stage("Tests")
+        {
+            parallel
+            {
                 stage('Unit Tests')
                 {
                     steps
@@ -267,7 +288,8 @@ pipeline
 
         stage('Deploy Release')
         {
-            when { tag "release-*" }
+            when { branch '*/master' }
+
             steps
             {
                 echo 'Deploy App in Release Environment..'
@@ -291,7 +313,7 @@ pipeline
     {
         always
         {
-            bitbucketStatusNotify(buildState: currentBuild.currentResult)
+            // bitbucketStatusNotify(buildState: currentBuild.currentResult)
 
             discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
             

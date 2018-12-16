@@ -123,9 +123,9 @@ page at http://checkstyle.sourceforge.net/config.html -->
             <property name="scope" value="protected" />
             <property name="severity" value="warning" />
             <property name="allowMissingJavadoc" value="true" />
-            <property name="allowMissingParamTags" value="true" />
-            <property name="allowMissingReturnTag" value="true" />
-            <property name="allowMissingThrowsTags" value="true" />
+            <property name="allowMissingParamTags" value="false" />
+            <property name="allowMissingReturnTag" value="false" />
+            <property name="allowMissingThrowsTags" value="false" />
             <property name="allowThrowsTagsForSubclasses" value="true" />
             <property name="allowUndeclaredRTE" value="true" />
         </module>

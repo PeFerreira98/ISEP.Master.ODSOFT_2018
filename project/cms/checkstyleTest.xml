@@ -114,7 +114,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
-        <module name="JavadocMethod">
+        <!-- <module name="JavadocMethod">
             <property name="scope" value="protected" />
             <property name="severity" value="warning" />
             <property name="allowMissingJavadoc" value="true" />
@@ -132,7 +132,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
 
         <module name="JavadocStyle">
             <property name="severity" value="warning" />
-        </module>
+        </module> -->
 
         <!--
 
