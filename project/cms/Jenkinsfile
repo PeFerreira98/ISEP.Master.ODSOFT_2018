@@ -215,13 +215,17 @@ pipeline
                     {
                         if (isUnix())
                         {
-                            sh "docker build -f Dockerfile -t cmsproject ."
-                            sh "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"      
+                            //sh "docker build -f Dockerfile -t cmsproject ."
+                            //sh "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"      
+                        
+                            sh 'cd .. && docker-compose up -d'
                         }
                         else
                         {
-                            bat "docker build -f Dockerfile -t cmsproject ."
-                            bat "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"                           
+                            //bat "docker build -f Dockerfile -t cmsproject ."
+                            //bat "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"                           
+                        
+                            bat 'cd .. && docker-compose up -d'
                         }
 
                         //docker plugin trials
@@ -265,23 +269,30 @@ pipeline
 
                 //input 'Please Approve or fail the build after UI Acceptance Tests'
 
-                script
-                { 
-                    if (isUnix())
-                    {
-                        sh 'docker stop cmsprojectcontainer'
-                        sh 'docker rm -f cmsprojectcontainer'
-                        sh 'docker rmi -f cmsproject'     
-                    }
-                    else
-                    {
-                        bat 'docker stop cmsprojectcontainer'
-                        bat 'docker rm -f cmsprojectcontainer' 
-                        bat 'docker rmi -f cmsproject'                            
-                    }
+                dir("${projectDir}")
+                {
+                    script
+                    { 
+                        if (isUnix())
+                        {
+                            //sh 'docker stop cmsprojectcontainer'
+                            //sh 'docker rm -f cmsprojectcontainer'
+                            //sh 'docker rmi -f cmsproject'  
 
-                    //docker plugin trials
-                    //dockerCMSContainer.stop
+                            sh 'cd .. && docker-compose down'   
+                        }
+                        else
+                        {
+                            //bat 'docker stop cmsprojectcontainer'
+                            //bat 'docker rm -f cmsprojectcontainer' 
+                            //bat 'docker rmi -f cmsproject'
+
+                            bat 'cd .. && docker-compose down'                         
+                        }
+
+                        //docker plugin trials
+                        //dockerCMSContainer.stop
+                    }
                 }
             }
         }
@@ -315,7 +326,11 @@ pipeline
         {
             // bitbucketStatusNotify(buildState: currentBuild.currentResult)
 
-            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
+            discordSend description: "Finished: ${BUILD_TAG}
+                \nBuild Status: ${currentBuild.currentResult}
+                \nStart Build Time: ${startTime}
+                \nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", 
+                result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
             
             /*
             withCredentials([[$class: 'UsernamePasswordMultiBinding',

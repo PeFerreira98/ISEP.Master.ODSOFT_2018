@@ -1,10 +1,11 @@
 version: '3.7'
 services:
 
-  h2.db:
+  h2.db: #Check https://hub.docker.com/r/oscarfonts/h2/ for details
     image: oscarfonts/h2
     ports:
       - 8889:81
+      - 8890::1521
 
 #  sql.db:
 #    image: mcr.microsoft.com/mssql/server
