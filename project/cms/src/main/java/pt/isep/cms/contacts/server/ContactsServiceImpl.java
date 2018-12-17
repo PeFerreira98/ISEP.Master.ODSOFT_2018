@@ -4,6 +4,12 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 
 import pt.isep.cms.contacts.client.ContactsService;
 import pt.isep.cms.contacts.shared.Contact;
@@ -27,45 +33,64 @@ public class ContactsServiceImpl extends RemoteServiceServlet implements Contact
             "gailh@example.com", "orville@example.com", "post_master@example.com", "rchilders@example.com",
             "buster@example.com", "user31065@example.com", "ftsgeolbx@example.com" };
 
-    private final HashMap<String, Contact> contacts = new HashMap<String, Contact>();
-    private int serialId;
+    private EntityManagerFactory emfactory = null;
+    private EntityManager entitymanager = null;
 
     public ContactsServiceImpl() {
-        initContacts();
-        serialId = 0;
+        this.emfactory = Persistence.createEntityManagerFactory("CMS");
+
+        this.entitymanager = emfactory.createEntityManager();
+
+        initPersistentContacts();
     }
 
-    private void initContacts() {
-        // TODO: Create a real UID for each contact
-        //
-        for (int i = 0; i < contactsFirstNameData.length && i < contactsLastNameData.length
-                && i < contactsEmailData.length; ++i) {
-            Contact contact = new Contact(String.valueOf(i), contactsFirstNameData[i], contactsLastNameData[i],
-                    contactsEmailData[i]);
-            addContact(contact);
+    private void initPersistentContacts() {
+        // We only do this if the database is empty...
+        Query query = entitymanager.createQuery("Select COUNT(c) from Contact c");
+        Long result = (Long) query.getSingleResult();
+
+        if (result == 0) {
+            this.entitymanager.getTransaction().begin();
+
+            for (int i = 0; i < contactsFirstNameData.length && i < contactsLastNameData.length
+                    && i < contactsEmailData.length; ++i) {
+
+                Contact contact = new Contact(i, contactsFirstNameData[i], contactsLastNameData[i],
+                        contactsEmailData[i]);
+                addContact(contact);
+            }
         }
     }
 
     public Contact addContact(Contact contact) {
-        contact.setId(String.valueOf(serialId++));
-        contacts.put(contact.getId(), contact);
+        // Add the new contact to the database
+        this.entitymanager.getTransaction().begin();
+        this.entitymanager.persist(contact);
+        this.entitymanager.getTransaction().commit();
+
         return contact;
     }
 
     public Contact updateContact(Contact contact) {
-        String lid = contact.getId();
-        contacts.remove(contact.getId());
-        contacts.put(contact.getId(), contact);
+        // Update the contact in the database
+        this.entitymanager.getTransaction().begin();
+        this.entitymanager.merge(contact);
+        this.entitymanager.getTransaction().commit();
+
         return contact;
     }
 
-    public Boolean deleteContact(String id) {
-        contacts.remove(id);
+    public Boolean deleteContact(int id) {
+        // Remove the contact in the database
+        this.entitymanager.getTransaction().begin();
+        Contact contact = entitymanager.find(Contact.class, id);
+        entitymanager.remove(contact);
+        this.entitymanager.getTransaction().commit();
+
         return true;
     }
 
-    public ArrayList<ContactDetails> deleteContacts(ArrayList<String> ids) {
-
+    public ArrayList<ContactDetails> deleteContacts(ArrayList<Integer> ids) {
         for (int i = 0; i < ids.size(); ++i) {
             deleteContact(ids.get(i));
         }
@@ -76,16 +101,19 @@ public class ContactsServiceImpl extends RemoteServiceServlet implements Contact
     public ArrayList<ContactDetails> getContactDetails() {
         ArrayList<ContactDetails> contactDetails = new ArrayList<ContactDetails>();
 
-        Iterator<String> it = contacts.keySet().iterator();
-        while (it.hasNext()) {
-            Contact contact = contacts.get(it.next());
+        Query query = entitymanager.createQuery("Select c from Contact c");
+
+        @SuppressWarnings("unchecked")
+        List<Contact> list = query.getResultList();
+
+        for (Contact contact : list) {
             contactDetails.add(contact.getLightWeightContact());
         }
 
         return contactDetails;
     }
 
-    public Contact getContact(String id) {
-        return contacts.get(id);
+    public Contact getContact(int id) {
+        return entitymanager.find(Contact.class, id);
     }
 }

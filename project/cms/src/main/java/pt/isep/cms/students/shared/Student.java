@@ -2,17 +2,32 @@ package pt.isep.cms.students.shared;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 @SuppressWarnings("serial")
+@Entity
+@Table
 public class Student implements Serializable {
-    public String id;
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    public int id;
     public String firstName;
     public String lastName;
     public String emailAddress;
 
     public Student() {
+        this.id = 0;
+        this.firstName = null;
+        this.lastName = null;
+        this.emailAddress = null;
     }
 
-    public Student(String id, String firstName, String lastName, String emailAddress) {
+    public Student(int id, String firstName, String lastName, String emailAddress) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -23,11 +38,11 @@ public class Student implements Serializable {
         return new StudentDetails(id, getFullName());
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

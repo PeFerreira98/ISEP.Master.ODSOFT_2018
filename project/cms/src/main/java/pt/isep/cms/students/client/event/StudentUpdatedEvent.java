@@ -4,7 +4,7 @@ import com.google.gwt.event.shared.GwtEvent;
 import pt.isep.cms.students.shared.Student;
 
 public class StudentUpdatedEvent extends GwtEvent<StudentUpdatedEventHandler> {
-    public static Type<StudentUpdatedEventHandler> TYPE = new Type<StudentUpdatedEventHandler>();
+    public static final Type<StudentUpdatedEventHandler> TYPE = new Type<StudentUpdatedEventHandler>();
     private final Student updatedStudent;
 
     public StudentUpdatedEvent(Student updatedStudent) {

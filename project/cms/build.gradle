@@ -28,7 +28,16 @@ dependencies {
  	testCompile 'junit:junit:4.12'
  	testCompile 'org.easymock:easymock:2.5.2'
 	testCompile 'com.google.gwt:gwt-dev:2.8.2'
+
+	// For JPA / Eclipselink
+    compile 'org.eclipse.persistence:eclipselink:2.6.1'
+	compile 'org.eclipse.persistence:org.eclipse.persistence.jpa.modelgen.processor:2.6.1'
+	compile 'com.h2database:h2:1.4.191'
 }
+
+// This two lines are required so that the java compiler finds the persistence.xml file during compilation
+sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
+compileJava.dependsOn(processResources)
 
 // If we want to use the default ant build inside gradle
 // ant.importBuild "build.xml"
@@ -85,7 +94,7 @@ tasks.withType(Test) {
 
 // Unit Tests
 test {
-    // ignoreFailures = true
+    ignoreFailures = true
 
 	filter { 
 		//all JRE unit tests, by naming convention

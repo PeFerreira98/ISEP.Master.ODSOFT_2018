@@ -27,9 +27,9 @@ public class ExampleJRETest extends TestCase {
     public void testStudentSort() {
         ArrayList<StudentDetails> studentDetails = new ArrayList<StudentDetails>();
 
-        studentDetails.add(new StudentDetails("0", "c_student"));
-        studentDetails.add(new StudentDetails("1", "b_student"));
-        studentDetails.add(new StudentDetails("2", "a_student"));
+        studentDetails.add(new StudentDetails(0, "c_student"));
+        studentDetails.add(new StudentDetails(1, "b_student"));
+        studentDetails.add(new StudentDetails(2, "a_student"));
 
         studentsPresenter.setStudentDetails(studentDetails);
         studentsPresenter.sortStudentDetails();

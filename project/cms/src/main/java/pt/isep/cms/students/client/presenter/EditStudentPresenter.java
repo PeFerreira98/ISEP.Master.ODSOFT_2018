@@ -43,7 +43,7 @@ public class EditStudentPresenter implements Presenter {
         bind();
     }
 
-    public EditStudentPresenter(StudentsServiceAsync rpcService, HandlerManager eventBus, Display display, String id) {
+    public EditStudentPresenter(StudentsServiceAsync rpcService, HandlerManager eventBus, Display display, int id) {
         this.rpcService = rpcService;
         this.eventBus = eventBus;
         this.display = display;
@@ -89,7 +89,7 @@ public class EditStudentPresenter implements Presenter {
         student.setLastName(display.getLastName().getValue());
         student.setEmailAddress(display.getEmailAddress().getValue());
 
-        if (student.getId() == null) {
+        if (student.getId() == 0) {
             // Adding new student
             rpcService.addStudent(student, new AsyncCallback<Student>() {
                 public void onSuccess(Student result) {

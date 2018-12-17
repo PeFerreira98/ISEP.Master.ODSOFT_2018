@@ -12,13 +12,13 @@ import java.util.ArrayList;
 public interface StudentsService extends RemoteService {
     Student addStudent(Student student);
 
-    Boolean deleteStudent(String id);
+    Boolean deleteStudent(int id);
 
-    ArrayList<StudentDetails> deleteStudents(ArrayList<String> ids);
+    ArrayList<StudentDetails> deleteStudents(ArrayList<Integer> ids);
 
     ArrayList<StudentDetails> getStudentDetails();
 
-    Student getStudent(String id);
+    Student getStudent(int id);
 
     Student updateStudent(Student student);
 }

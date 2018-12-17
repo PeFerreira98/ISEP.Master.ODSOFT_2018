@@ -50,7 +50,7 @@ public class StudentsServiceAsyncGWTTest extends GWTTestCase {
                 assertTrue(resC1 != null);
 
                 assertTrue(resC1.getFirstName().equals(c.getFirstName()));
-                assertTrue(resC1.getId() != null);
+                assertTrue(resC1.getId() != 0);
 
                 StudentsServiceAsync cs1 = GWT.create(StudentsService.class);
                 ServiceDefTarget target1 = (ServiceDefTarget) cs1;
@@ -68,7 +68,7 @@ public class StudentsServiceAsyncGWTTest extends GWTTestCase {
 
                         System.out.println("getStudent " + result.getFirstName().equals(resC1.getFirstName()));
                         assertTrue(result.getFirstName().equals(resC1.getFirstName()));
-                        assertTrue(result.getId().equals(resC1.getId()));
+                        assertTrue(result.getId() == resC1.getId());
 
                         finishTest();
                     }
@@ -111,7 +111,7 @@ public class StudentsServiceAsyncGWTTest extends GWTTestCase {
                 assertTrue(resC1 != null);
 
                 assertTrue(resC1.getFirstName().equals(c1.getFirstName()));
-                assertTrue(resC1.getId() != null);
+                assertTrue(resC1.getId() != 0);
 
                 // verify that it was added
                 StudentsServiceAsync cs3 = GWT.create(StudentsService.class);
@@ -129,7 +129,7 @@ public class StudentsServiceAsyncGWTTest extends GWTTestCase {
                         assertTrue(resC1_2 != null);
 
                         assertTrue(resC1_2.getFirstName().equals(resC1.getFirstName()));
-                        assertTrue(resC1_2.getId().equals(resC1.getId()));
+                        assertTrue(resC1_2.getId() == resC1.getId());
 
                         // Create the service that we will test.
                         StudentsServiceAsync cs1 = GWT.create(StudentsService.class);
@@ -137,7 +137,7 @@ public class StudentsServiceAsyncGWTTest extends GWTTestCase {
                         target1.setServiceEntryPoint(GWT.getModuleBaseURL() + "students/studentsService");
 
                         // delete student with lowest ID
-                        cs1.deleteStudent("0", new AsyncCallback<Boolean>() {
+                        cs1.deleteStudent(0, new AsyncCallback<Boolean>() {
                             public void onFailure(Throwable caught) {
                                 // The request resulted in an unexpected error.
                                 fail("Request failure: " + caught.getMessage());
@@ -165,7 +165,7 @@ public class StudentsServiceAsyncGWTTest extends GWTTestCase {
                                         assertTrue(resC2 != null);
 
                                         assertTrue(resC2.getFirstName().equals(c2.getFirstName()));
-                                        assertTrue(resC2.getId() != null);
+                                        assertTrue(resC2.getId() != 0);
 
                                         StudentsServiceAsync cs4 = GWT.create(StudentsService.class);
                                         ServiceDefTarget target4 = (ServiceDefTarget) cs4;
@@ -183,7 +183,7 @@ public class StudentsServiceAsyncGWTTest extends GWTTestCase {
                                                 assertTrue(resC2_2 != null);
 
                                                 assertTrue(resC2_2.getFirstName().equals(resC2.getFirstName()));
-                                                assertTrue(resC2_2.getId().equals(resC2.getId()));
+                                                assertTrue(resC2_2.getId() == resC2.getId());
 
                                                 // check test student 1 again just to be sure (no way it will just
                                                 // vanish right?)
@@ -204,10 +204,10 @@ public class StudentsServiceAsyncGWTTest extends GWTTestCase {
 
                                                         assertTrue(
                                                                 resC1Error.getFirstName().equals(resC1.getFirstName()));
-                                                        assertTrue(resC1Error.getId().equals(resC1.getId()));
+                                                        assertTrue(resC1Error.getId() == resC1.getId());
 
                                                         // can't have the same id (in theory, but not in this project)
-                                                        assertFalse(resC1.getId().equals(resC2.getId()));
+                                                        assertFalse(resC1.getId() == resC2.getId());
 
                                                         finishTest();
                                                     }

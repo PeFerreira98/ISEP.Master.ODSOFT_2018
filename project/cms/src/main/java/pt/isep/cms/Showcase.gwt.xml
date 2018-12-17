@@ -53,8 +53,12 @@
   <source path="contacts/client" />
   <source path="contacts/shared" />
 
-  <!-- Specify the paths for translatable code source for Contacts  -->
+  <!-- Specify the paths for translatable code source for Students  -->
   <source path="students/client" />
   <source path="students/shared" />
+
+  <!-- Specify the paths for translatable code source for Turmas  -->
+  <source path="turmas/client" />
+  <source path="turmas/shared" />
 
 </module>

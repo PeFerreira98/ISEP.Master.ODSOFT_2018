@@ -28,4 +28,15 @@
     <url-pattern>/showcase/studentsService</url-pattern>
   </servlet-mapping>
 
+    <!-- Servlets for the classes -->
+  <servlet>
+    <servlet-name>classesServiceServlet</servlet-name>
+    <servlet-class>pt.isep.cms.classes.server.ClassesServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>classesServiceServlet</servlet-name>
+    <url-pattern>/showcase/classesService</url-pattern>
+  </servlet-mapping>
+
 </web-app>

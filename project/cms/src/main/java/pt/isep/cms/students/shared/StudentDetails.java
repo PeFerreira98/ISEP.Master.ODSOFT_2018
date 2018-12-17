@@ -4,23 +4,23 @@ import java.io.Serializable;
 
 @SuppressWarnings("serial")
 public class StudentDetails implements Serializable {
-    private String id;
+    private int id;
     private String displayName;
 
     public StudentDetails() {
-        this("0", ""); // this is how you actually do it!
+        this(0, "");
     }
 
-    public StudentDetails(String id, String displayName) {
+    public StudentDetails(int id, String displayName) {
         this.id = id;
         this.displayName = displayName;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

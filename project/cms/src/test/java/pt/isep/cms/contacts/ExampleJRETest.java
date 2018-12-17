@@ -27,9 +27,9 @@ public class ExampleJRETest extends TestCase {
     public void testContactSort() {
         ArrayList<ContactDetails> contactDetails = new ArrayList<ContactDetails>();
 
-        contactDetails.add(new ContactDetails("0", "c_contact"));
-        contactDetails.add(new ContactDetails("1", "b_contact"));
-        contactDetails.add(new ContactDetails("2", "a_contact"));
+        contactDetails.add(new ContactDetails(0, "c_contact"));
+        contactDetails.add(new ContactDetails(1, "b_contact"));
+        contactDetails.add(new ContactDetails(2, "a_contact"));
 
         contactsPresenter.setContactDetails(contactDetails);
         contactsPresenter.sortContactDetails();

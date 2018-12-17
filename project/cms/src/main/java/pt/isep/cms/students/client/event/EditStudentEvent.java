@@ -3,14 +3,14 @@ package pt.isep.cms.students.client.event;
 import com.google.gwt.event.shared.GwtEvent;
 
 public class EditStudentEvent extends GwtEvent<EditStudentEventHandler> {
-    public static Type<EditStudentEventHandler> TYPE = new Type<EditStudentEventHandler>();
-    private final String id;
+    public static final Type<EditStudentEventHandler> TYPE = new Type<EditStudentEventHandler>();
+    private final int id;
 
-    public EditStudentEvent(String id) {
+    public EditStudentEvent(int id) {
         this.id = id;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
