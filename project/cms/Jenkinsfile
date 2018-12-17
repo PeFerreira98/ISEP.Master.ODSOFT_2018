@@ -326,11 +326,7 @@ pipeline
         {
             // bitbucketStatusNotify(buildState: currentBuild.currentResult)
 
-            discordSend description: "Finished: ${BUILD_TAG}
-                \nBuild Status: ${currentBuild.currentResult}
-                \nStart Build Time: ${startTime}
-                \nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", 
-                result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
+            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
             
             /*
             withCredentials([[$class: 'UsernamePasswordMultiBinding',
