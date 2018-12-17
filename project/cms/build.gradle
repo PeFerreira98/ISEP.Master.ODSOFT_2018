@@ -109,7 +109,7 @@ test {
 
 // Integration Tests
 task integrationTest(type: Test) {
-    // ignoreFailures = true
+    ignoreFailures = true
 
 	filter { 
 		//all GWT unit tests, by naming convention

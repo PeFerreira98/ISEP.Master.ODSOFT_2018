@@ -227,10 +227,6 @@ pipeline
                         
                             bat 'cd .. && docker-compose up -d'
                         }
-
-                        //docker plugin trials
-                        //def dockerCMSImage = docker.build("cmsproject:${BUILD_ID}")
-                        //def dockerCMSContainer = dockerCMSImage.run('-p ${tomcatPort}:8080')
                     }
                 }
 
@@ -289,9 +285,6 @@ pipeline
 
                             bat 'cd .. && docker-compose down'
                         }
-
-                        //docker plugin trials
-                        //dockerCMSContainer.stop
                     }
                 }
             }
