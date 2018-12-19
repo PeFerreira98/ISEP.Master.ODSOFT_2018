@@ -5,13 +5,13 @@
   <welcome-file-list>
     <welcome-file>Showcase.html</welcome-file>
   </welcome-file-list>
-  
+
   <!-- Servlets for the contacts -->
   <servlet>
     <servlet-name>contactsServiceServlet</servlet-name>
     <servlet-class>pt.isep.cms.contacts.server.ContactsServiceImpl</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>contactsServiceServlet</servlet-name>
     <url-pattern>/showcase/contactsService</url-pattern>
@@ -22,21 +22,21 @@
     <servlet-name>studentsServiceServlet</servlet-name>
     <servlet-class>pt.isep.cms.students.server.StudentsServiceImpl</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>studentsServiceServlet</servlet-name>
     <url-pattern>/showcase/studentsService</url-pattern>
   </servlet-mapping>
 
-    <!-- Servlets for the classes -->
+  <!-- Servlets for the turmas -->
   <servlet>
-    <servlet-name>classesServiceServlet</servlet-name>
-    <servlet-class>pt.isep.cms.classes.server.ClassesServiceImpl</servlet-class>
+    <servlet-name>turmasServiceServlet</servlet-name>
+    <servlet-class>pt.isep.cms.turmas.server.TurmasServiceImpl</servlet-class>
   </servlet>
-  
+
   <servlet-mapping>
-    <servlet-name>classesServiceServlet</servlet-name>
-    <url-pattern>/showcase/classesService</url-pattern>
+    <servlet-name>turmasServiceServlet</servlet-name>
+    <url-pattern>/showcase/turmasService</url-pattern>
   </servlet-mapping>
 
 </web-app>
