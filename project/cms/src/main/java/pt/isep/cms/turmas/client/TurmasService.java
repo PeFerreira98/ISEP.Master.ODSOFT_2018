@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 @RemoteServiceRelativePath("turmasService")
 public interface TurmasService extends RemoteService {
-
     Turma addTurma(Turma turma);
 
     Boolean deleteTurma(String id);

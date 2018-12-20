@@ -12,12 +12,12 @@ import pt.isep.cms.turmas.shared.TurmaDetails;
 @SuppressWarnings("serial")
 public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasService {
 
-    private static final String[] turmasFirstNameData = new String[] { "Hollie", "Emerson", "Healy", "Brigitte", "Elba",
-            "Claudio", "Dena", "Christina", "Gail", "Orville", "Rae", "Mildred", "Candice", "Louise", "Emilio",
+    private static final String[] turmasFirstNameData = new String[] { "Hollie", "Emerson", "Healy", "Brigitte",
+            "Elba", "Claudio", "Dena", "Christina", "Gail", "Orville", "Rae", "Mildred", "Candice", "Louise", "Emilio",
             "Geneva", "Heriberto", "Bulrush", "Abigail", "Chad", "Terry", "Bell" };
 
-    private final String[] turmasLastNameData = new String[] { "Voss", "Milton", "Colette", "Cobb", "Lockhart", "Engle",
-            "Pacheco", "Blake", "Horton", "Daniel", "Childers", "Starnes", "Carson", "Kelchner", "Hutchinson",
+    private final String[] turmasLastNameData = new String[] { "Voss", "Milton", "Colette", "Cobb", "Lockhart",
+            "Engle", "Pacheco", "Blake", "Horton", "Daniel", "Childers", "Starnes", "Carson", "Kelchner", "Hutchinson",
             "Underwood", "Rush", "Bouchard", "Louis", "Andrews", "English", "Snedden" };
 
     private final String[] turmasEmailData = new String[] { "mark@example.com", "hollie@example.com",
@@ -27,17 +27,17 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
             "gailh@example.com", "orville@example.com", "post_master@example.com", "rchilders@example.com",
             "buster@example.com", "user31065@example.com", "ftsgeolbx@example.com" };
 
-    private final HashMap<String, Turma> turmas = new HashMap<String, Turma>();
+    private final HashMap<String, Turma> turmas;
     private int serialId;
 
     public TurmasServiceImpl() {
-        initTurmas();
+        turmas = new HashMap<String, Turma>();
         serialId = 0;
+
+        initTurmas();
     }
 
     private void initTurmas() {
-        // TODO: Create a real UID for each turma
-        //
         for (int i = 0; i < turmasFirstNameData.length && i < turmasLastNameData.length
                 && i < turmasEmailData.length; ++i) {
             Turma turma = new Turma(String.valueOf(i), turmasFirstNameData[i], turmasLastNameData[i],
@@ -46,16 +46,18 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
         }
     }
 
+    // fixed this Id = list.size stupidity
     public Turma addTurma(Turma turma) {
         turma.setId(String.valueOf(serialId++));
         turmas.put(turma.getId(), turma);
+
         return turma;
     }
 
     public Turma updateTurma(Turma turma) {
-        String lid = turma.getId();
         turmas.remove(turma.getId());
         turmas.put(turma.getId(), turma);
+
         return turma;
     }
 
@@ -65,7 +67,6 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
     }
 
     public ArrayList<TurmaDetails> deleteTurmas(ArrayList<String> ids) {
-
         for (int i = 0; i < ids.size(); ++i) {
             deleteTurma(ids.get(i));
         }
@@ -76,9 +77,8 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
     public ArrayList<TurmaDetails> getTurmaDetails() {
         ArrayList<TurmaDetails> turmaDetails = new ArrayList<TurmaDetails>();
 
-        Iterator<String> it = turmas.keySet().iterator();
-        while (it.hasNext()) {
-            Turma turma = turmas.get(it.next());
+        for (Turma turma : turmas.values()) // yeah, this exists...
+        {
             turmaDetails.add(turma.getLightWeightTurma());
         }
 

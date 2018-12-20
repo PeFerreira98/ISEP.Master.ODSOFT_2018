@@ -30,7 +30,7 @@ import pt.isep.cms.client.ContentWidget;
 import pt.isep.cms.client.ShowcaseConstants;
 
 /**
- * Main Content Widget for Turmas.
+ * Main Content Widget for turmas.
  */
 public class CwTurmas extends ContentWidget {
 

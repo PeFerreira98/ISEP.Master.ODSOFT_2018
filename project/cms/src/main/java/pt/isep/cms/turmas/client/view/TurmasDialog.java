@@ -111,7 +111,7 @@ public class TurmasDialog implements EditTurmaPresenter.Display {
         VerticalPanel contentDetailsPanel = new VerticalPanel();
         contentDetailsPanel.setWidth("100%");
 
-        // Create the turmas list
+        // Create the Turmas list
         //
         detailsTable = new FlexTable();
         detailsTable.setCellSpacing(0);

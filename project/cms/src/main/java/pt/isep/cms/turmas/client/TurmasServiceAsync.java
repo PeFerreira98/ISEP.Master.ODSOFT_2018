@@ -8,7 +8,6 @@ import pt.isep.cms.turmas.shared.TurmaDetails;
 import java.util.ArrayList;
 
 public interface TurmasServiceAsync {
-
     public void addTurma(Turma turma, AsyncCallback<Turma> callback);
 
     public void deleteTurma(String id, AsyncCallback<Boolean> callback);

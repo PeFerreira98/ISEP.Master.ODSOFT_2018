@@ -28,4 +28,15 @@
     <url-pattern>/showcase/studentsService</url-pattern>
   </servlet-mapping>
 
+    <!-- Servlets for the turmas -->
+  <servlet>
+    <servlet-name>turmasServiceServlet</servlet-name>
+    <servlet-class>pt.isep.cms.turmas.server.TurmasServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>turmasServiceServlet</servlet-name>
+    <url-pattern>/showcase/turmasService</url-pattern>
+  </servlet-mapping>
+
 </web-app>
