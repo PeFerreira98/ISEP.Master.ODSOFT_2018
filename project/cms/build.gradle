@@ -129,8 +129,8 @@ task integrationTest(type: Test) {
 // Mutation Tests
 pitest {
     pitestVersion = "1.3.0"
-    targetClasses = ["pt.isep.cms.contacts.*","pt.isep.cms.students.*"] 
-    excludedClasses =["pt.isep.cms.contacts.client.*", "pt.isep.cms.students.client.*"] 
+    targetClasses = ["pt.isep.cms.contacts.*","pt.isep.cms.students.*", "pt.isep.cms.turmas.*"] 
+    excludedClasses =["pt.isep.cms.contacts.client.*", "pt.isep.cms.students.client.*", "pt.isep.cms.turmas.client.*"] 
     outputFormats=['HTML']
     testSourceSets = [sourceSets.test]
     mainSourceSets = [sourceSets.main]
