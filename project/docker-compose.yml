@@ -7,14 +7,9 @@ services:
       - 8889:81
       - 8890:1521
 
-#  sql.db:
-#    image: mcr.microsoft.com/mssql/server
-#    ports:
-#      - 8890:1433
-
   cms:
     build: 
-      context: ./cms
+      context: ./cms.1
       dockerfile: Dockerfile
     ports:
       - 8888:8080
