@@ -11,13 +11,13 @@ public interface TurmasServiceAsync {
 
     public void addTurma(Turma turma, AsyncCallback<Turma> callback);
 
-    public void deleteTurma(int id, AsyncCallback<Boolean> callback);
+    public void deleteTurma(String id, AsyncCallback<Boolean> callback);
 
-    public void deleteTurmas(ArrayList<Integer> ids, AsyncCallback<ArrayList<TurmaDetails>> callback);
+    public void deleteTurmas(ArrayList<String> ids, AsyncCallback<ArrayList<TurmaDetails>> callback);
 
     public void getTurmaDetails(AsyncCallback<ArrayList<TurmaDetails>> callback);
 
-    public void getTurma(int id, AsyncCallback<Turma> callback);
+    public void getTurma(String id, AsyncCallback<Turma> callback);
 
     public void updateTurma(Turma turma, AsyncCallback<Turma> callback);
 }

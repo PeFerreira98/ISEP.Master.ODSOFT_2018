@@ -4,23 +4,23 @@ import java.io.Serializable;
 
 @SuppressWarnings("serial")
 public class TurmaDetails implements Serializable {
-    private int id;
+    private String id;
     private String displayName;
 
     public TurmaDetails() {
-        this(0, "");
+        this("0", "");
     }
 
-    public TurmaDetails(int id, String displayName) {
+    public TurmaDetails(String id, String displayName) {
         this.id = id;
         this.displayName = displayName;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

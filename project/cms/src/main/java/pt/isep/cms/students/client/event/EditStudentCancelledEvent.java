@@ -3,7 +3,7 @@ package pt.isep.cms.students.client.event;
 import com.google.gwt.event.shared.GwtEvent;
 
 public class EditStudentCancelledEvent extends GwtEvent<EditStudentCancelledEventHandler> {
-    public static final Type<EditStudentCancelledEventHandler> TYPE = new Type<EditStudentCancelledEventHandler>();
+    public static Type<EditStudentCancelledEventHandler> TYPE = new Type<EditStudentCancelledEventHandler>();
 
     @Override
     public Type<EditStudentCancelledEventHandler> getAssociatedType() {

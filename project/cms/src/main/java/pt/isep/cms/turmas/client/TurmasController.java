@@ -81,7 +81,7 @@ public class TurmasController implements Presenter { // (ATB) No history at this
 
     }
 
-    private void doEditTurma(int id) {
+    private void doEditTurma(String id) {
         Presenter presenter = new EditTurmaPresenter(rpcService, eventBus,
                 new TurmasDialog(globalConstants, TurmasDialog.Type.UPDATE), id);
         presenter.go(container);

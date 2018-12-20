@@ -14,24 +14,24 @@ public class ContactDetailsJRETest extends TestCase {
     public void testNewEmptyContactDetails() {
         ContactDetails cd = new ContactDetails();
 
-        assertTrue(cd.getId() == 0);
+        assertTrue(cd.getId().equals("0"));
         assertTrue(cd.getDisplayName().equals(""));
     }
 
     public void testNewContactDetailsFullInfo() {
-        ContactDetails cd = new ContactDetails(1, "DisplayName");
+        ContactDetails cd = new ContactDetails("id", "DisplayName");
 
-        assertTrue(cd.getId() == 1);
+        assertTrue(cd.getId().equals("id"));
         assertTrue(cd.getDisplayName().equals("DisplayName"));
     }
 
     public void testSetContactInfo() {
         ContactDetails cd = new ContactDetails();
 
-        cd.setId(1);
+        cd.setId("id");
         cd.setDisplayName("DisplayName");
 
-        assertTrue(cd.getId() == 1);
+        assertTrue(cd.getId().equals("id"));
         assertTrue(cd.getDisplayName().equals("DisplayName"));
     }
 }

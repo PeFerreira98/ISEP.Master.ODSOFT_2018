@@ -14,7 +14,7 @@ public class StudentJRETest extends TestCase {
     public void testNewEmptyStudent() {
         Student c = new Student();
 
-        assertTrue(c.getId() == 0);
+        assertTrue(c.getId() == null);
         assertTrue(c.getFirstName() == null);
         assertTrue(c.getLastName() == null);
         assertTrue(c.getEmailAddress() == null);
@@ -22,9 +22,9 @@ public class StudentJRETest extends TestCase {
     }
 
     public void testNewStudentFullInfo() {
-        Student c = new Student(1, "firstName", "lastName", "emailAddress");
+        Student c = new Student("id", "firstName", "lastName", "emailAddress");
 
-        assertTrue(c.getId() == 1);
+        assertTrue(c.getId().equals("id"));
         assertTrue(c.getFirstName().equals("firstName"));
         assertTrue(c.getLastName().equals("lastName"));
         assertTrue(c.getEmailAddress().equals("emailAddress"));
@@ -34,12 +34,12 @@ public class StudentJRETest extends TestCase {
     public void testSetStudentInfo() {
         Student c = new Student();
 
-        c.setId(1);
+        c.setId("id");
         c.setFirstName("firstName");
         c.setLastName("lastName");
         c.setEmailAddress("emailAddress");
 
-        assertTrue(c.getId() == 1);
+        assertTrue(c.getId().equals("id"));
         assertTrue(c.getFirstName().equals("firstName"));
         assertTrue(c.getLastName().equals("lastName"));
         assertTrue(c.getEmailAddress().equals("emailAddress"));
@@ -47,9 +47,9 @@ public class StudentJRETest extends TestCase {
     }
 
     public void testStudentDetails() {
-        Student c = new Student(1, "firstName", "lastName", "emailAddress");
+        Student c = new Student("id", "firstName", "lastName", "emailAddress");
 
-        assertTrue(c.getId() == c.getLightWeightStudent().getId());
+        assertTrue(c.getId().equals(c.getLightWeightStudent().getId()));
         assertTrue(c.getFullName().equals(c.getLightWeightStudent().getDisplayName()));
     }
 }

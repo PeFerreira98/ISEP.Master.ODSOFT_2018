@@ -4,7 +4,7 @@ import com.google.gwt.event.shared.GwtEvent;
 import pt.isep.cms.contacts.shared.Contact;
 
 public class ContactUpdatedEvent extends GwtEvent<ContactUpdatedEventHandler> {
-    public static final Type<ContactUpdatedEventHandler> TYPE = new Type<ContactUpdatedEventHandler>();
+    public static Type<ContactUpdatedEventHandler> TYPE = new Type<ContactUpdatedEventHandler>();
     private final Contact updatedContact;
 
     public ContactUpdatedEvent(Contact updatedContact) {

@@ -81,7 +81,7 @@ public class ContactsController implements Presenter { // (ATB) No history at th
 
     }
 
-    private void doEditContact(int id) {
+    private void doEditContact(String id) {
         Presenter presenter = new EditContactPresenter(rpcService, eventBus,
                 new ContactsDialog(globalConstants, ContactsDialog.Type.UPDATE), id);
         presenter.go(container);

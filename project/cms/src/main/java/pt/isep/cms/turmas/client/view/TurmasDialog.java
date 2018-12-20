@@ -116,8 +116,8 @@ public class TurmasDialog implements EditTurmaPresenter.Display {
         detailsTable = new FlexTable();
         detailsTable.setCellSpacing(0);
         detailsTable.setWidth("100%");
-        detailsTable.addStyleName("contacts-ListContainer");
-        detailsTable.getColumnFormatter().addStyleName(1, "add-contact-input");
+        detailsTable.addStyleName("turmas-ListContainer");
+        detailsTable.getColumnFormatter().addStyleName(1, "add-turma-input");
         firstName = new TextBox();
         lastName = new TextBox();
         emailAddress = new TextBox();

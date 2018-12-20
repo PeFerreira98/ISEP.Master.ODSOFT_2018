@@ -4,12 +4,6 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 
 import pt.isep.cms.students.client.StudentsService;
 import pt.isep.cms.students.shared.Student;
@@ -33,64 +27,46 @@ public class StudentsServiceImpl extends RemoteServiceServlet implements Student
             "gailh@example.com", "orville@example.com", "post_master@example.com", "rchilders@example.com",
             "buster@example.com", "user31065@example.com", "ftsgeolbx@example.com" };
 
-    private EntityManagerFactory emfactory = null;
-    private EntityManager entitymanager = null;
+    private final HashMap<String, Student> students;
+    private int serialId;
 
     public StudentsServiceImpl() {
-        this.emfactory = Persistence.createEntityManagerFactory("CMS");
+        students = new HashMap<String, Student>();
+        serialId = 0;
 
-        this.entitymanager = emfactory.createEntityManager();
-
-        initPersistentStudents();
+        initStudents();
     }
 
-    private void initPersistentStudents() {
-        // We only do this if the database is empty...
-        Query query = entitymanager.createQuery("Select COUNT(c) from Student c");
-        Long result = (Long) query.getSingleResult();
-
-        if (result == 0) {
-            this.entitymanager.getTransaction().begin();
-
-            for (int i = 0; i < studentsFirstNameData.length && i < studentsLastNameData.length
-                    && i < studentsEmailData.length; ++i) {
-
-                Student turma = new Student(i, studentsFirstNameData[i], studentsLastNameData[i],
-                        studentsEmailData[i]);
-                addStudent(turma);
-            }
+    private void initStudents() {
+        for (int i = 0; i < studentsFirstNameData.length && i < studentsLastNameData.length
+                && i < studentsEmailData.length; ++i) {
+            Student student = new Student(String.valueOf(i), studentsFirstNameData[i], studentsLastNameData[i],
+                    studentsEmailData[i]);
+            addStudent(student);
         }
     }
 
-    public Student addStudent(Student turma) {
-        // Add the new turma to the database
-        this.entitymanager.getTransaction().begin();
-        this.entitymanager.persist(turma);
-        this.entitymanager.getTransaction().commit();
+    // fixed this Id = list.size stupidity
+    public Student addStudent(Student student) {
+        student.setId(String.valueOf(serialId++));
+        students.put(student.getId(), student);
 
-        return turma;
+        return student;
     }
 
-    public Student updateStudent(Student turma) {
-        // Update the turma in the database
-        this.entitymanager.getTransaction().begin();
-        this.entitymanager.merge(turma);
-        this.entitymanager.getTransaction().commit();
+    public Student updateStudent(Student student) {
+        students.remove(student.getId());
+        students.put(student.getId(), student);
 
-        return turma;
+        return student;
     }
 
-    public Boolean deleteStudent(int id) {
-        // Remove the turma in the database
-        this.entitymanager.getTransaction().begin();
-        Student turma = entitymanager.find(Student.class, id);
-        entitymanager.remove(turma);
-        this.entitymanager.getTransaction().commit();
-
+    public Boolean deleteStudent(String id) {
+        students.remove(id);
         return true;
     }
 
-    public ArrayList<StudentDetails> deleteStudents(ArrayList<Integer> ids) {
+    public ArrayList<StudentDetails> deleteStudents(ArrayList<String> ids) {
         for (int i = 0; i < ids.size(); ++i) {
             deleteStudent(ids.get(i));
         }
@@ -99,21 +75,17 @@ public class StudentsServiceImpl extends RemoteServiceServlet implements Student
     }
 
     public ArrayList<StudentDetails> getStudentDetails() {
-        ArrayList<StudentDetails> turmaDetails = new ArrayList<StudentDetails>();
+        ArrayList<StudentDetails> studentDetails = new ArrayList<StudentDetails>();
 
-        Query query = entitymanager.createQuery("Select c from Student c");
-
-        @SuppressWarnings("unchecked")
-        List<Student> list = query.getResultList();
-
-        for (Student turma : list) {
-            turmaDetails.add(turma.getLightWeightStudent());
+        for (Student student : students.values()) // yeah, this exists...
+        {
+            studentDetails.add(student.getLightWeightStudent());
         }
 
-        return turmaDetails;
+        return studentDetails;
     }
 
-    public Student getStudent(int id) {
-        return entitymanager.find(Student.class, id);
+    public Student getStudent(String id) {
+        return students.get(id);
     }
 }

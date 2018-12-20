@@ -4,12 +4,6 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 
 import pt.isep.cms.turmas.client.TurmasService;
 import pt.isep.cms.turmas.shared.Turma;
@@ -18,12 +12,12 @@ import pt.isep.cms.turmas.shared.TurmaDetails;
 @SuppressWarnings("serial")
 public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasService {
 
-    private static final String[] turmasFirstNameData = new String[] { "Hollie", "Emerson", "Healy", "Brigitte",
-            "Elba", "Claudio", "Dena", "Christina", "Gail", "Orville", "Rae", "Mildred", "Candice", "Louise", "Emilio",
+    private static final String[] turmasFirstNameData = new String[] { "Hollie", "Emerson", "Healy", "Brigitte", "Elba",
+            "Claudio", "Dena", "Christina", "Gail", "Orville", "Rae", "Mildred", "Candice", "Louise", "Emilio",
             "Geneva", "Heriberto", "Bulrush", "Abigail", "Chad", "Terry", "Bell" };
 
-    private final String[] turmasLastNameData = new String[] { "Voss", "Milton", "Colette", "Cobb", "Lockhart",
-            "Engle", "Pacheco", "Blake", "Horton", "Daniel", "Childers", "Starnes", "Carson", "Kelchner", "Hutchinson",
+    private final String[] turmasLastNameData = new String[] { "Voss", "Milton", "Colette", "Cobb", "Lockhart", "Engle",
+            "Pacheco", "Blake", "Horton", "Daniel", "Childers", "Starnes", "Carson", "Kelchner", "Hutchinson",
             "Underwood", "Rush", "Bouchard", "Louis", "Andrews", "English", "Snedden" };
 
     private final String[] turmasEmailData = new String[] { "mark@example.com", "hollie@example.com",
@@ -33,64 +27,45 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
             "gailh@example.com", "orville@example.com", "post_master@example.com", "rchilders@example.com",
             "buster@example.com", "user31065@example.com", "ftsgeolbx@example.com" };
 
-    private EntityManagerFactory emfactory = null;
-    private EntityManager entitymanager = null;
+    private final HashMap<String, Turma> turmas = new HashMap<String, Turma>();
+    private int serialId;
 
     public TurmasServiceImpl() {
-        this.emfactory = Persistence.createEntityManagerFactory("CMS");
-
-        this.entitymanager = emfactory.createEntityManager();
-
-        initPersistentTurmas();
+        initTurmas();
+        serialId = 0;
     }
 
-    private void initPersistentTurmas() {
-        // We only do this if the database is empty...
-        Query query = entitymanager.createQuery("Select COUNT(c) from Turma c");
-        Long result = (Long) query.getSingleResult();
-
-        if (result == 0) {
-            this.entitymanager.getTransaction().begin();
-
-            for (int i = 0; i < turmasFirstNameData.length && i < turmasLastNameData.length
-                    && i < turmasEmailData.length; ++i) {
-
-                Turma turma = new Turma(i, turmasFirstNameData[i], turmasLastNameData[i],
-                        turmasEmailData[i]);
-                addTurma(turma);
-            }
+    private void initTurmas() {
+        // TODO: Create a real UID for each turma
+        //
+        for (int i = 0; i < turmasFirstNameData.length && i < turmasLastNameData.length
+                && i < turmasEmailData.length; ++i) {
+            Turma turma = new Turma(String.valueOf(i), turmasFirstNameData[i], turmasLastNameData[i],
+                    turmasEmailData[i]);
+            addTurma(turma);
         }
     }
 
     public Turma addTurma(Turma turma) {
-        // Add the new turma to the database
-        this.entitymanager.getTransaction().begin();
-        this.entitymanager.persist(turma);
-        this.entitymanager.getTransaction().commit();
-
+        turma.setId(String.valueOf(serialId++));
+        turmas.put(turma.getId(), turma);
         return turma;
     }
 
     public Turma updateTurma(Turma turma) {
-        // Update the turma in the database
-        this.entitymanager.getTransaction().begin();
-        this.entitymanager.merge(turma);
-        this.entitymanager.getTransaction().commit();
-
+        String lid = turma.getId();
+        turmas.remove(turma.getId());
+        turmas.put(turma.getId(), turma);
         return turma;
     }
 
-    public Boolean deleteTurma(int id) {
-        // Remove the turma in the database
-        this.entitymanager.getTransaction().begin();
-        Turma turma = entitymanager.find(Turma.class, id);
-        entitymanager.remove(turma);
-        this.entitymanager.getTransaction().commit();
-
+    public Boolean deleteTurma(String id) {
+        turmas.remove(id);
         return true;
     }
 
-    public ArrayList<TurmaDetails> deleteTurmas(ArrayList<Integer> ids) {
+    public ArrayList<TurmaDetails> deleteTurmas(ArrayList<String> ids) {
+
         for (int i = 0; i < ids.size(); ++i) {
             deleteTurma(ids.get(i));
         }
@@ -101,19 +76,16 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
     public ArrayList<TurmaDetails> getTurmaDetails() {
         ArrayList<TurmaDetails> turmaDetails = new ArrayList<TurmaDetails>();
 
-        Query query = entitymanager.createQuery("Select c from Turma c");
-
-        @SuppressWarnings("unchecked")
-        List<Turma> list = query.getResultList();
-
-        for (Turma turma : list) {
+        Iterator<String> it = turmas.keySet().iterator();
+        while (it.hasNext()) {
+            Turma turma = turmas.get(it.next());
             turmaDetails.add(turma.getLightWeightTurma());
         }
 
         return turmaDetails;
     }
 
-    public Turma getTurma(int id) {
-        return entitymanager.find(Turma.class, id);
+    public Turma getTurma(String id) {
+        return turmas.get(id);
     }
 }

@@ -9,7 +9,7 @@ services:
 
   cms:
     build: 
-      context: ./cms.1
+      context: ./cms
       dockerfile: Dockerfile
     ports:
       - 8888:8080

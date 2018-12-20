@@ -13,13 +13,13 @@ public interface TurmasService extends RemoteService {
 
     Turma addTurma(Turma turma);
 
-    Boolean deleteTurma(int id);
+    Boolean deleteTurma(String id);
 
-    ArrayList<TurmaDetails> deleteTurmas(ArrayList<Integer> ids);
+    ArrayList<TurmaDetails> deleteTurmas(ArrayList<String> ids);
 
     ArrayList<TurmaDetails> getTurmaDetails();
 
-    Turma getTurma(int id);
+    Turma getTurma(String id);
 
     Turma updateTurma(Turma turma);
 }

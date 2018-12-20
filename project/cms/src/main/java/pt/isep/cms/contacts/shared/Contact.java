@@ -2,43 +2,32 @@ package pt.isep.cms.contacts.shared;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 @SuppressWarnings("serial")
-@Entity
-@Table
 public class Contact implements Serializable {
+    public String id;
+    public String firstName;
+    public String lastName;
+    public String emailAddress;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    private int id;
-    private String firstName;
-    private String lastName;
-    private String emailAddress;
+    public Contact() {
+    }
 
-    public Contact(int id, String firstName, String lastName, String emailAddress) {
+    public Contact(String id, String firstName, String lastName, String emailAddress) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
     }
 
-    public Contact() {
-        this.id = 0;
-        this.firstName = null;
-        this.lastName = null;
-        this.emailAddress = null;
+    public ContactDetails getLightWeightContact() {
+        return new ContactDetails(id, getFullName());
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -68,9 +57,5 @@ public class Contact implements Serializable {
 
     public String getFullName() {
         return firstName == null || lastName == null ? null : firstName + " " + lastName;
-    }
-
-    public ContactDetails getLightWeightContact() {
-        return new ContactDetails(id, getFullName());
     }
 }
