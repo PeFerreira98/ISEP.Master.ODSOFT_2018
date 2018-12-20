@@ -1,0 +1,350 @@
+#!/usr/bin/env groovy
+
+pipeline
+{
+    environment
+    {
+        // Repository
+        // repoUser must be defined as a global variable in jenkins
+        credentials = 'BitbucketAuth'
+        repository = 'bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git'
+        repoUrl = "https://${repoUser}@${repository}"
+
+        // Dirs
+        projectDir = 'project/cms/'
+
+        // .War and services
+        cmsWar = 'cmsproject'
+
+        // Web URLs, Ports and stuff
+        tomcatPort = '8888'
+		tomcatUrl = "http://localhost:${tomcatPort}"
+		cmsUrl = "${tomcatUrl}/${cmsWar}/"
+
+        // Discord Webhook for some fancy stuff
+        discordWebHook = 'https://discordapp.com/api/webhooks/514846042005569537/yWTNJnwN-pdceFvll4LofJ1ihg4BDho8Vg_g27DaU_jipQWjld8endZ_3CbzJcqVN9fo'
+        startTime = new Date().format('dd/MM/yyyy HH:mm:ss')
+    }
+    
+    agent any
+
+    stages
+    {
+        stage("GitCheckout")
+        {
+            steps
+            {
+                echo 'Checkout..'
+                // keep this commented in source control for Jenkins Automatic Jobs to succeed. 
+                // when using script in Jenkins, comment scm and uncomment normal checkout
+                
+                //checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])  
+                checkout scm
+            }
+        }
+        
+        stage('Clean')
+        {
+            steps 
+            {
+                echo 'Cleaning..'
+                dir("${projectDir}")
+                {
+                    script
+                    {
+                        if (isUnix()) sh './gradlew.sh cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'
+                        else bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'                        
+                    }
+                }                
+            }
+        }
+            
+        stage('Build')
+        {
+            steps
+            {
+                echo 'Building..'
+                dir("${projectDir}")
+                {
+                    script
+                    {
+                        if (isUnix()) sh './gradlew build'
+                        else bat 'gradlew build'
+                    }
+                }
+            }			
+        }
+
+        stage("Archive Artifacts + Javadoc + Code quality reports")
+        {
+            parallel
+            {
+                stage('Javadoc')
+                {
+                    steps
+                    {
+                        echo 'Generating Javadoc..'
+                        dir("${projectDir}")
+                        {
+                            script
+                            {
+                                if (isUnix()) sh './gradlew javadoc'
+                                else bat 'gradlew javadoc'
+                            }
+
+                            step([$class: 'JavadocArchiver', javadocDir: "build/docs/javadoc", keepAll: false])
+                        }
+                    }	
+                }
+                
+                stage('Archiving Artifacts')
+                {
+                    steps
+                    {
+                        echo 'Archiving Artefacts..'
+                        archiveArtifacts artifacts: "${projectDir}/build/libs/*.war", fingerprint: true, onlyIfSuccessful: true
+                    }
+                }
+
+                stage('Code Quality Report - Checkstyle')
+                {
+                    steps
+                    {
+                        dir("${projectDir}")
+                        {
+                            script
+                            {
+                                if (isUnix()) sh './gradlew checkstyleMain checkstyleTest'
+                                else bat 'gradlew checkstyleMain checkstyleTest'
+                            }
+
+                            checkstyle canComputeNew: false, defaultEncoding: '', healthy: '20', pattern: 'build/reports/checkstyle/*.xml', unHealthy: '15'
+                        }
+                    }
+                }
+
+                stage('Code Quality Report - Findbugs')
+                {
+                    steps
+                    {
+                        dir("${projectDir}")
+                        {
+                            script
+                            {
+                                if (isUnix()) sh './gradlew checkstyleMain checkstyleTest'
+                                else bat 'gradlew findbugsMain findbugsTest'
+                            }
+
+                            findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '20', includePattern: '', pattern: 'build/reports/findbugs/*.xml', unHealthy: '15'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Tests")
+        {
+            parallel
+            {
+                stage('Unit Tests')
+                {
+                    steps
+                    {
+                        echo 'Unit Testing..'
+                        dir("${projectDir}")
+                        {
+                            script
+                            {
+                                if (isUnix()) sh './gradlew test jacocoTestReport'
+                                else bat 'gradlew test jacocoTestReport'
+                            }
+
+                            junit allowEmptyResults: true, testResults: "build/test-results/test/*.xml"
+                            jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/test.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
+                        }
+                    }	
+                }
+                
+                stage('Integration Tests')
+                {
+                    steps
+                    {
+                        echo 'Integration Testing..'
+                        dir("${projectDir}")
+                        {
+                            script
+                            {
+                                if (isUnix()) sh './gradlew integrationTest jacocoIntegrationReport'
+                                else bat 'gradlew integrationTest jacocoIntegrationReport'
+                            }
+
+                            junit allowEmptyResults: true, testResults: "build/test-results/integrationTest/*.xml"
+                            jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/integrationTest.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
+                        }
+                    }	
+                }
+
+                stage('Mutation Tests')
+                {
+                    steps
+                    {
+                        echo 'Mutation Testing..'
+                        dir("${projectDir}")
+                        {
+                            script
+                            {
+                                if (isUnix()) sh './gradlew pitest'
+                                else bat 'gradlew pitest'
+                            }
+
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
+                        }
+                    }	
+                }
+            }
+        }
+
+        stage('Deploy for Testing')
+        {
+            steps
+            {
+                echo 'Deploy App..'
+                dir("${projectDir}")
+                {
+                    script
+                    {
+                        if (isUnix())
+                        {
+                            //sh "docker build -f Dockerfile -t cmsproject ."
+                            //sh "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"      
+                        
+                            sh 'cd .. && docker-compose up -d'
+                        }
+                        else
+                        {
+                            //bat "docker build -f Dockerfile -t cmsproject ."
+                            //bat "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"                           
+                        
+                            bat 'cd .. && docker-compose up -d'
+                        }
+                    }
+                }
+
+
+            }
+        }
+
+        stage('System Smoke Tests')
+        {
+            options{ retry(5) }
+            
+            steps
+            {
+                echo 'System Testing..'
+                sleep(3)
+
+                dir("${projectDir}")
+                {
+                    script
+                    {
+                        if (isUnix()) sh "curl ${cmsUrl}"
+                        else powershell "Invoke-RestMethod -Uri ${cmsUrl}"
+                    }
+                }                
+            }
+        }
+
+        stage('Manual UI Acceptance Tests')
+        {
+            options{ timeout(time: 1, unit: 'HOURS') }
+            steps
+            {
+                mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', 
+                    subject: "Manual Tests", 
+                    body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
+
+                //input 'Please Approve or fail the build after UI Acceptance Tests'
+
+                dir("${projectDir}")
+                {
+                    script
+                    { 
+                        if (isUnix())
+                        {
+                            //sh 'docker stop cmsprojectcontainer'
+                            //sh 'docker rm -f cmsprojectcontainer'
+                            //sh 'docker rmi -f cmsproject'     
+
+                            sh 'cd .. && docker-compose down'  
+                        }
+                        else
+                        {
+                            //bat 'docker stop cmsprojectcontainer'
+                            //bat 'docker rm -f cmsprojectcontainer' 
+                            //bat 'docker rmi -f cmsproject'        
+
+                            bat 'cd .. && docker-compose down'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Release')
+        {
+            when { branch '*/master' }
+
+            steps
+            {
+                echo 'Deploy App in Release Environment..'
+                dir("${projectDir}")
+                {
+                    script
+                    {
+                        if (isUnix()) sh './gradlew deploy --info && %CATALINA_HOME%/bin/startup.sh' //check if works. ex -> echo $TEST_VAR
+                        else bat 'gradlew deploy --info && %CATALINA_HOME%/bin/startup.bat'
+
+                        //bat "docker build -f Dockerfile -t cmsproject ."
+                        //bat "docker run -p ${tomcatPort}:8080 -t cmsproject"
+                    }
+                }
+            }
+        }
+
+    }
+
+    post
+    {
+        always
+        {
+            // bitbucketStatusNotify(buildState: currentBuild.currentResult)
+
+            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
+            
+            /*
+            withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                credentialsId: "${credentials}",
+                usernameVariable: 'GIT_USERNAME', 
+                passwordVariable: 'GIT_PASSWORD']]) {
+
+                script 
+                {
+                    dir("${projectDir}"){
+                        if (isUnix()) 
+                        {
+                            sh "git tag ${BUILD_TAG}-${currentBuild.currentResult}"
+                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
+                        } 
+                        else 
+                        {
+                            powershell "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
+                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
+                        }
+                    }
+                }
+            }
+            */
+        }
+
+    }
+}
