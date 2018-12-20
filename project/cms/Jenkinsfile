@@ -218,14 +218,14 @@ pipeline
                             //sh "docker build -f Dockerfile -t cmsproject ."
                             //sh "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"      
                         
-                            sh 'cd .. && docker-compose up -d'
+                            sh 'cd .. && docker-compose up -d --build'
                         }
                         else
                         {
                             //bat "docker build -f Dockerfile -t cmsproject ."
                             //bat "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"                           
                         
-                            bat 'cd .. && docker-compose up -d'
+                            bat 'cd .. && docker-compose up -d --build'
                         }
                     }
                 }
@@ -275,7 +275,7 @@ pipeline
                             //sh 'docker rm -f cmsprojectcontainer'
                             //sh 'docker rmi -f cmsproject'     
 
-                            sh 'cd .. && docker-compose down'  
+                            sh 'cd .. && docker-compose down --rmi local'  
                         }
                         else
                         {
@@ -283,7 +283,7 @@ pipeline
                             //bat 'docker rm -f cmsprojectcontainer' 
                             //bat 'docker rmi -f cmsproject'        
 
-                            bat 'cd .. && docker-compose down'
+                            bat 'cd .. && docker-compose down --rmi local'
                         }
                     }
                 }
