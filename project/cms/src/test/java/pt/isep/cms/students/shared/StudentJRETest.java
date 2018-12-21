@@ -22,7 +22,7 @@ public class StudentJRETest extends TestCase {
     }
 
     public void testNewStudentFullInfo() {
-        Student c = new Student("id", "firstName", "lastName", "emailAddress");
+        Student c = new Student("id", "firstName", "lastName", "emailAddress", null);
 
         assertTrue(c.getId().equals("id"));
         assertTrue(c.getFirstName().equals("firstName"));
@@ -47,7 +47,7 @@ public class StudentJRETest extends TestCase {
     }
 
     public void testStudentDetails() {
-        Student c = new Student("id", "firstName", "lastName", "emailAddress");
+        Student c = new Student("id", "firstName", "lastName", "emailAddress", null);
 
         assertTrue(c.getId().equals(c.getLightWeightStudent().getId()));
         assertTrue(c.getFullName().equals(c.getLightWeightStudent().getDisplayName()));

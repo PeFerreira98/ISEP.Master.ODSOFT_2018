@@ -8,6 +8,7 @@ import java.util.Iterator;
 import pt.isep.cms.students.client.StudentsService;
 import pt.isep.cms.students.shared.Student;
 import pt.isep.cms.students.shared.StudentDetails;
+import pt.isep.cms.turmas.shared.Turma;
 
 @SuppressWarnings("serial")
 public class StudentsServiceImpl extends RemoteServiceServlet implements StudentsService {
@@ -41,7 +42,7 @@ public class StudentsServiceImpl extends RemoteServiceServlet implements Student
         for (int i = 0; i < studentsFirstNameData.length && i < studentsLastNameData.length
                 && i < studentsEmailData.length; ++i) {
             Student student = new Student(String.valueOf(i), studentsFirstNameData[i], studentsLastNameData[i],
-                    studentsEmailData[i]);
+                    studentsEmailData[i], null);
             addStudent(student);
         }
     }

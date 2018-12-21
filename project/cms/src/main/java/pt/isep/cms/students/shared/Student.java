@@ -1,6 +1,7 @@
 package pt.isep.cms.students.shared;
 
 import java.io.Serializable;
+import pt.isep.cms.turmas.shared.Turma;
 
 @SuppressWarnings("serial")
 public class Student implements Serializable {
@@ -8,15 +9,19 @@ public class Student implements Serializable {
     public String firstName;
     public String lastName;
     public String emailAddress;
+    // @ManyToOne
+    // @JoinColumn(name = "id")
+    public Turma turma;
 
     public Student() {
     }
 
-    public Student(String id, String firstName, String lastName, String emailAddress) {
+    public Student(String id, String firstName, String lastName, String emailAddress, Turma turma) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
+        this.turma = turma;
     }
 
     public StudentDetails getLightWeightStudent() {
@@ -53,6 +58,14 @@ public class Student implements Serializable {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public Turma getTurma() {
+        return this.turma;
+    }
+
+    public void setTurma(Turma turma) {
+        this.turma = turma;
     }
 
     public String getFullName() {
