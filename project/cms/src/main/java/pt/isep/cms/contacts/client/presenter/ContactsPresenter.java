@@ -65,7 +65,7 @@ public class ContactsPresenter implements Presenter {
                 int selectedRow = display.getClickedRow(event);
 
                 if (selectedRow >= 0) {
-                    String id = contactDetails.get(selectedRow).getId();
+                    int id = contactDetails.get(selectedRow).getId();
                     eventBus.fireEvent(new EditContactEvent(id));
                 }
             }
@@ -129,7 +129,7 @@ public class ContactsPresenter implements Presenter {
 
     private void deleteSelectedContacts() {
         List<Integer> selectedRows = display.getSelectedRows();
-        ArrayList<String> ids = new ArrayList<String>();
+        ArrayList<Integer> ids = new ArrayList<Integer>();
 
         for (int i = 0; i < selectedRows.size(); ++i) {
             ids.add(contactDetails.get(selectedRows.get(i)).getId());

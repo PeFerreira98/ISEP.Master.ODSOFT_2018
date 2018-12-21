@@ -6,13 +6,17 @@
 	<persistence-unit name="CMS" transaction-type="RESOURCE_LOCAL">
 
 		<class>pt.isep.cms.contacts.shared.Contact</class>
+		<!-- <class>pt.isep.cms.students.shared.Student</class> -->
+		<!-- <class>pt.isep.cms.turmas.shared.Turma</class> -->
 
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:h2:~/database/cms;MV_STORE=FALSE"/>
+			<!-- <property name="javax.persistence.jdbc.url" value="jdbc:h2:tcp://h2.db:1521/./cms"/> -->
 			<property name="javax.persistence.jdbc.password" value=""/>
 			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
 			<property name="javax.persistence.jdbc.user" value=""/>
-			<property name="javax.persistence.schema-generation.database.action" value="create"/>
+			<!-- <property name="javax.persistence.jdbc.user" value="sa"/> -->
+			<property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
 			<property name="eclipselink.logging.level" value="FINE"/>
 		</properties>
 

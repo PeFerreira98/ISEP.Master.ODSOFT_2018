@@ -42,7 +42,7 @@ compileJava.dependsOn(processResources)
 // If we want to use the default ant build inside gradle
 // ant.importBuild "build.xml"
 
-putnami{
+putnami {
 
 	module 'pt.isep.cms.Showcase'
 	//module 'com.google.gwt.sample.contacts.Contacts'
