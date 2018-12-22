@@ -5,18 +5,18 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class Turma implements Serializable {
     public String id;
-    public String name;
-    public String teacher;
-    public String description;
+    public String firstName;
+    public String lastName;
+    public String emailAddress;
 
     public Turma() {
     }
 
-    public Turma(String id, String name, String teacher, String description) {
+    public Turma(String id, String firstName, String lastName, String emailAddress) {
         this.id = id;
-        this.name = name;
-        this.teacher = teacher;
-        this.description = description;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailAddress = emailAddress;
     }
 
     public TurmaDetails getLightWeightTurma() {
@@ -32,30 +32,30 @@ public class Turma implements Serializable {
     }
 
     public String getFirstName() {
-        return name;
+        return firstName;
     }
 
-    public void setFirstName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getLastName() {
-        return teacher;
+        return lastName;
     }
 
-    public void setLastName(String teacher) {
-        this.teacher = teacher;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmailAddress() {
-        return description;
+        return emailAddress;
     }
 
-    public void setEmailAddress(String description) {
-        this.description = description;
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 
     public String getFullName() {
-        return name;
+        return firstName == null || lastName == null ? null : firstName + " " + lastName;
     }
 }
