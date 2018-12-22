@@ -30,15 +30,11 @@ pipeline
 
     stages
     {
-        stage("GitCheckout")
+        stage("Git Checkout")
         {
             steps
             {
                 echo 'Checkout..'
-                // keep this commented in source control for Jenkins Automatic Jobs to succeed. 
-                // when using script in Jenkins, comment scm and uncomment normal checkout
-                
-                //checkout([$class: 'GitSCM', branches: [[name: '*/feature/*']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])  
                 checkout scm
             }
         }
@@ -47,7 +43,6 @@ pipeline
         {
             steps 
             {
-                echo 'Cleaning..'
                 dir("${projectDir}")
                 {
                     script
@@ -70,12 +65,9 @@ pipeline
                     {
                         if (isUnix()) sh './gradlew build'
                         else bat 'gradlew build'
-                        
-                        if (isUnix()) sh 'docker run -d -p 8890:1521 -p 8889:81 --name=H2TestDB oscarfonts/h2'
-                        else bat 'docker run -d -p 8890:1521 -p 8889:81 --name=H2TestDB oscarfonts/h2'
                     }
                 }
-            }			
+            }
         }
 
         stage("Archive Artifacts + Javadoc + Code quality reports")
@@ -134,12 +126,27 @@ pipeline
                         {
                             script
                             {
-                                if (isUnix()) sh './gradlew checkstyleMain checkstyleTest'
+                                if (isUnix()) sh './gradlew findbugsMain findbugsTest'
                                 else bat 'gradlew findbugsMain findbugsTest'
                             }
 
                             findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '20', includePattern: '', pattern: 'build/reports/findbugs/*.xml', unHealthy: '15'
                         }
+                    }
+                }
+            }
+        }
+
+        stage("Test Preparation")
+        {
+            steps
+            {
+                dir("${projectDir}")
+                {
+                    script
+                    {
+                        if (isUnix()) sh 'docker run -d -p 8890:1521 -p 8889:81 --name=H2TestDB oscarfonts/h2'
+                        else bat 'docker run -d -p 8890:1521 -p 8889:81 --name=H2TestDB oscarfonts/h2'
                     }
                 }
             }
@@ -194,19 +201,19 @@ pipeline
                         echo 'Mutation Testing..'
                         dir("${projectDir}")
                         {
-                            script
-                            {
-                                try {
+                            try {
+                                script
+                                {
                                     if (isUnix()) sh './gradlew pitest'
                                     else bat 'gradlew pitest'
-                                } 
-                                catch(eTestMutation) 
-                                {
-                                    echo 'Exception caught while processing Mutatuion Tests'
                                 }
+                                
+                                publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
+                            } 
+                            catch(eTestMutation) 
+                            {
+                                echo 'Exception caught while processing Mutatuion Tests'
                             }
-
-                            publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
                         }
                     }	
                 }
@@ -271,21 +278,6 @@ pipeline
                     body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
 
                 //input 'Please Approve or fail the build after UI Acceptance Tests'
-
-                dir("${projectDir}")
-                {
-                    script
-                    { 
-                        if (isUnix())
-                        {
-                            sh 'cd .. && docker-compose down --rmi local'  
-                        }
-                        else
-                        {
-                            bat 'cd .. && docker-compose down --rmi local'
-                        }
-                    }
-                }
             }
         }
 
@@ -309,11 +301,27 @@ pipeline
                 }
             }
         }
-
     }
 
     post
     {
+        success {
+
+            echo 'Creating PDF report..'
+            dir("${projectDir}")
+            {
+                script 
+                {
+                    if (isUnix()) sh './gradlew pdf'
+                    else bat 'gradlew pdf'
+                    archiveArtifacts allowEmptyArchive: false, artifacts: "**/*.pdf", fingerprint: true, onlyIfSuccessful: true
+                }
+
+                echo 'Ziping artfacts..'
+                zip archive: true, glob: 'buil/reports/relatory/*.pdf,Jenkisfile,build.gradle,build/docs/', zipFile: 'submission.zip'
+            }
+        }
+
         always
         {
             // bitbucketStatusNotify(buildState: currentBuild.currentResult)
@@ -345,5 +353,28 @@ pipeline
             */
         }
 
+        cleanup
+        {
+            dir("${projectDir}")
+            {
+                script
+                { 
+                    if (isUnix())
+                    {
+                        sh 'docker stop H2TestDB'
+                        sh 'docker rm -f H2TestDB'
+
+                        sh 'cd .. && docker-compose down --rmi local'  
+                    }
+                    else
+                    {
+                        bat 'docker stop H2TestDB'
+                        bat 'docker rm -f H2TestDB'
+
+                        bat 'cd .. && docker-compose down --rmi local'
+                    }
+                }
+            }
+        }
     }
 }
