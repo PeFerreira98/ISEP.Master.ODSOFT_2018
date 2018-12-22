@@ -38,7 +38,7 @@ pipeline
                 // keep this commented in source control for Jenkins Automatic Jobs to succeed. 
                 // when using script in Jenkins, comment scm and uncomment normal checkout
                 
-                //checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])  
+                //checkout([$class: 'GitSCM', branches: [[name: '*/feature/*']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])  
                 checkout scm
             }
         }
@@ -196,18 +196,17 @@ pipeline
                         {
                             script
                             {
-                            	try
-                            	{
-                                	if (isUnix()) sh './gradlew pitest'
-                                	else bat 'gradlew pitest'
-                            	}
-                            	catch(Exception e)
-                            	{
-                            		LOG.error("Exception caught while processing", e);
-                            	}
+                                try {
+                                    if (isUnix()) sh './gradlew pitest'
+                                    else bat 'gradlew pitest'
+                                } 
+                                catch(eTestMutation) 
+                                {
+                                    echo 'Exception caught while processing Mutatuion Tests'
+                                }
                             }
 
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
+                            publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
                         }
                     }	
                 }
