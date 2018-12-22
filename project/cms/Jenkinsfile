@@ -35,6 +35,7 @@ pipeline
             steps
             {
                 echo 'Checkout..'
+                //checkout([$class: 'GitSCM', branches: [[name: '*/feature/db-h2']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])
                 checkout scm
             }
         }
@@ -169,8 +170,10 @@ pipeline
                                 else bat 'gradlew test jacocoTestReport'
                             }
 
-                            junit allowEmptyResults: true, testResults: "build/test-results/test/*.xml"
-                            jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/test.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
+                            junit allowEmptyResults: false, testResults: "build/test-results/test/*.xml"
+                            //jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/test.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
+                            
+                            jacoco buildOverBuild: true, changeBuildStatus: true, classPattern: 'build/classes', deltaBranchCoverage: '15', deltaClassCoverage: '15', deltaComplexityCoverage: '15', deltaLineCoverage: '15', deltaMethodCoverage: '15', exclusionPattern: '**/*Test*.class,**/cms/client/', execPattern: 'build/jacoco/test.exec', inclusionPattern: '**/*.class', maximumBranchCoverage: '10', maximumClassCoverage: '10', maximumComplexityCoverage: '10', maximumInstructionCoverage: '10', maximumLineCoverage: '10', maximumMethodCoverage: '10', minimumBranchCoverage: '10', minimumClassCoverage: '10', minimumComplexityCoverage: '10', minimumInstructionCoverage: '10', minimumLineCoverage: '10', minimumMethodCoverage: '10', sourceExclusionPattern: '**/*Test*.java,**/cms/client/', sourcePattern: 'src/main/java'
                         }
                     }	
                 }
@@ -188,8 +191,9 @@ pipeline
                                 else bat 'gradlew integrationTest jacocoIntegrationReport'
                             }
 
-                            junit allowEmptyResults: true, testResults: "build/test-results/integrationTest/*.xml"
-                            jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/integrationTest.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
+                            junit allowEmptyResults: false, testResults: "build/test-results/integrationTest/*.xml"
+                            //jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/integrationTest.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
+                            jacoco buildOverBuild: true, changeBuildStatus: true, classPattern: 'build/classes', deltaBranchCoverage: '15', deltaClassCoverage: '15', deltaComplexityCoverage: '15', deltaLineCoverage: '15', deltaMethodCoverage: '15', exclusionPattern: '**/*Test*.class,**/cms/client/', execPattern: 'build/jacoco/integrationTest.exec', inclusionPattern: '**/*.class', maximumBranchCoverage: '10', maximumClassCoverage: '10', maximumComplexityCoverage: '10', maximumInstructionCoverage: '10', maximumLineCoverage: '10', maximumMethodCoverage: '10', minimumBranchCoverage: '10', minimumClassCoverage: '10', minimumComplexityCoverage: '10', minimumInstructionCoverage: '10', minimumLineCoverage: '10', minimumMethodCoverage: '10', sourceExclusionPattern: '**/*Test*.java,**/cms/client/', sourcePattern: 'src/main/java'
                         }
                     }	
                 }
@@ -201,19 +205,20 @@ pipeline
                         echo 'Mutation Testing..'
                         dir("${projectDir}")
                         {
-                            try {
-                                script
-                                {
+                            script
+                            {
+                                try {
                                     if (isUnix()) sh './gradlew pitest'
                                     else bat 'gradlew pitest'
+                                } 
+                                catch(eTestMutation) 
+                                {
+                                    echo 'Exception caught while processing Mutatuion Tests'
+                                    currentBuild.result = 'SUCCESS'
                                 }
-                                
-                                publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
-                            } 
-                            catch(eTestMutation) 
-                            {
-                                echo 'Exception caught while processing Mutatuion Tests'
                             }
+                            
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
                         }
                     }	
                 }
@@ -318,7 +323,7 @@ pipeline
                 }
 
                 echo 'Ziping artfacts..'
-                zip archive: true, glob: 'buil/reports/relatory/*.pdf,Jenkisfile,build.gradle,build/docs/', zipFile: 'submission.zip'
+                zip archive: true, glob: 'build/reports/relatory/*.pdf,Jenkinsfile,build.gradle,build/docs/javadoc', zipFile: 'submission.zip'
             }
         }
 

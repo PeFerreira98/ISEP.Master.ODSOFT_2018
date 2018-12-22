@@ -216,9 +216,8 @@ findbugsTest {
 markdownToPdf {
 }
 
-
 task cleanOldPdf(type: Delete) {
-    delete fileTree('build/reports/relatory') {
+    delete fileTree("$project.buildDir/reports/relatory") {
         include '*.pdf'
     }
 }

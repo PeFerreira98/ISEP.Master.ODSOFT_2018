@@ -3,7 +3,7 @@ package pt.isep.cms.students.client.event;
 import com.google.gwt.event.shared.GwtEvent;
 
 public class EditStudentEvent extends GwtEvent<EditStudentEventHandler> {
-    public static Type<EditStudentEventHandler> TYPE = new Type<EditStudentEventHandler>();
+    public static final Type<EditStudentEventHandler> TYPE = new Type<EditStudentEventHandler>();
     private final String id;
 
     public EditStudentEvent(String id) {

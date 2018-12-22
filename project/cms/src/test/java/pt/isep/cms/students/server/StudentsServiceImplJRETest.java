@@ -19,8 +19,7 @@ public class StudentsServiceImplJRETest extends TestCase {
     }
 
     public void testGetUnexistingStudent() {
-        Student c = new Student();
-        assertTrue(cs.getStudent(c.getId()) == null);
+        assertTrue(cs.getStudent(new Student().getId()) == null);
     }
 
     public void testAddStudent() {

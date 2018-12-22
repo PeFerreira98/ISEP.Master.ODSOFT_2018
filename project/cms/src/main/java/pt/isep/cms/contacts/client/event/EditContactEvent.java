@@ -3,7 +3,7 @@ package pt.isep.cms.contacts.client.event;
 import com.google.gwt.event.shared.GwtEvent;
 
 public class EditContactEvent extends GwtEvent<EditContactEventHandler> {
-    public static Type<EditContactEventHandler> TYPE = new Type<EditContactEventHandler>();
+    public static final Type<EditContactEventHandler> TYPE = new Type<EditContactEventHandler>();
     private final int id;
 
     public EditContactEvent(int id) {
