@@ -70,6 +70,9 @@ pipeline
                     {
                         if (isUnix()) sh './gradlew build'
                         else bat 'gradlew build'
+                        
+                        if (isUnix()) sh 'docker run -d -p 8890:1521 -p 8889:81 --name=H2TestDB oscarfonts/h2'
+                        else bat 'docker run -d -p 8890:1521 -p 8889:81 --name=H2TestDB oscarfonts/h2'
                     }
                 }
             }			
@@ -193,8 +196,15 @@ pipeline
                         {
                             script
                             {
-                                if (isUnix()) sh './gradlew pitest'
-                                else bat 'gradlew pitest'
+                            	try
+                            	{
+                                	if (isUnix()) sh './gradlew pitest'
+                                	else bat 'gradlew pitest'
+                            	}
+                            	catch(Exception e)
+                            	{
+                            		LOG.error("Exception caught while processing", e);
+                            	}
                             }
 
                             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
@@ -215,16 +225,16 @@ pipeline
                     {
                         if (isUnix())
                         {
-                            //sh "docker build -f Dockerfile -t cmsproject ."
-                            //sh "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"      
+                        	sh 'docker stop H2TestDB'
+                            sh 'docker rm -f H2TestDB'
                         
                             sh 'cd .. && docker-compose up -d --build'
                         }
                         else
                         {
-                            //bat "docker build -f Dockerfile -t cmsproject ."
-                            //bat "docker run --name cmsprojectcontainer -d -p ${tomcatPort}:8080 -t cmsproject"                           
-                        
+                        	bat 'docker stop H2TestDB'
+                            bat 'docker rm -f H2TestDB'
+                            
                             bat 'cd .. && docker-compose up -d --build'
                         }
                     }
@@ -271,18 +281,10 @@ pipeline
                     { 
                         if (isUnix())
                         {
-                            //sh 'docker stop cmsprojectcontainer'
-                            //sh 'docker rm -f cmsprojectcontainer'
-                            //sh 'docker rmi -f cmsproject'     
-
                             sh 'cd .. && docker-compose down --rmi local'  
                         }
                         else
                         {
-                            //bat 'docker stop cmsprojectcontainer'
-                            //bat 'docker rm -f cmsprojectcontainer' 
-                            //bat 'docker rmi -f cmsproject'        
-
                             bat 'cd .. && docker-compose down --rmi local'
                         }
                     }

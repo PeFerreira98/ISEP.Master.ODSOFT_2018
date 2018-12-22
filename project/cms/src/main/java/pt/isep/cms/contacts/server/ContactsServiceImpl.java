@@ -16,7 +16,8 @@ import pt.isep.cms.contacts.shared.Contact;
 import pt.isep.cms.contacts.shared.ContactDetails;
 
 @SuppressWarnings("serial")
-public class ContactsServiceImpl extends RemoteServiceServlet implements ContactsService {
+public class ContactsServiceImpl extends RemoteServiceServlet implements ContactsService
+{
 
     private static final String[] contactsFirstNameData = new String[] { "Hollie", "Emerson", "Healy", "Brigitte",
             "Elba", "Claudio", "Dena", "Christina", "Gail", "Orville", "Rae", "Mildred", "Candice", "Louise", "Emilio",
