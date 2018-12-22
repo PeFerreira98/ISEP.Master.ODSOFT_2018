@@ -43,7 +43,7 @@ pipeline
             }
         }
         
-        stage('Clean')
+        stage('Preparation')
         {
             steps 
             {
@@ -248,7 +248,7 @@ pipeline
             steps
             {
                 echo 'System Testing..'
-                sleep(3)
+                sleep(5)
 
                 dir("${projectDir}")
                 {
