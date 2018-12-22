@@ -98,7 +98,7 @@ public class EditStudentPresenter implements Presenter {
         // ISSUE Fix after db is working
         // Turma t = new turmasService().get(
         // display.getTurma().getValue() );
-        Turma t = new Turma("", "", "", "");
+        Turma t = new Turma(0, "", "", "");
         student.setTurma(t);
 
         if (student.getId() == null) {

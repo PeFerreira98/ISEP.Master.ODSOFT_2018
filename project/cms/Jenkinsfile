@@ -238,8 +238,6 @@ pipeline
                         }
                     }
                 }
-
-
             }
         }
 
@@ -293,7 +291,7 @@ pipeline
 
         stage('Deploy Release')
         {
-            when { branch '*/master' }
+            when { branch '*master' }
 
             steps
             {

@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Column;
 
 @SuppressWarnings("serial")
 @Entity
@@ -18,7 +19,7 @@ public class Contact implements Serializable {
     private int id;
     public String firstName;
     public String lastName;
-    // @Column(unique = true)
+    @Column(unique = true)
     public String emailAddress;
 
     public Contact() {

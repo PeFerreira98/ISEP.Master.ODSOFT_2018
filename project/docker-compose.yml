@@ -5,7 +5,7 @@ services:
     image: oscarfonts/h2
     ports:
       - 8889:81
-      - 8890:1521
+      - 1521:1521
 
   cms:
     build: 

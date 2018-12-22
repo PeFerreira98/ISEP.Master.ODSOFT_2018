@@ -4,13 +4,13 @@ import com.google.gwt.event.shared.GwtEvent;
 
 public class EditTurmaEvent extends GwtEvent<EditTurmaEventHandler> {
     public static Type<EditTurmaEventHandler> TYPE = new Type<EditTurmaEventHandler>();
-    private final String id;
+    private final int id;
 
-    public EditTurmaEvent(String id) {
+    public EditTurmaEvent(int id) {
         this.id = id;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 

@@ -65,7 +65,7 @@ public class TurmasPresenter implements Presenter {
                 int selectedRow = display.getClickedRow(event);
 
                 if (selectedRow >= 0) {
-                    String id = turmaDetails.get(selectedRow).getId();
+                    int id = turmaDetails.get(selectedRow).getId();
                     eventBus.fireEvent(new EditTurmaEvent(id));
                 }
             }
@@ -130,7 +130,7 @@ public class TurmasPresenter implements Presenter {
 
     private void deleteSelectedTurmas() {
         List<Integer> selectedRows = display.getSelectedRows();
-        ArrayList<String> ids = new ArrayList<String>();
+        ArrayList<Integer> ids = new ArrayList<Integer>();
 
         for (int i = 0; i < selectedRows.size(); ++i) {
             ids.add(turmaDetails.get(selectedRows.get(i)).getId());
@@ -147,7 +147,6 @@ public class TurmasPresenter implements Presenter {
                 }
 
                 display.setData(data);
-
             }
 
             public void onFailure(Throwable caught) {
