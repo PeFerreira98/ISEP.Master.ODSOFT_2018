@@ -328,7 +328,7 @@ pipeline
                 }
 
                 echo 'Ziping artfacts..'
-                zip archive: true, glob: 'build/reports/relatory/*.pdf,Jenkinsfile,build.gradle,Dockerfile,../docker-compose.yml,buid/libs/*.war,build/docs/javadoc', zipFile: 'submission.zip'
+                zip archive: true, glob: 'build/reports/relatory/*.pdf,Jenkinsfile,build.gradle,Dockerfile,../docker-compose.yml,build/libs/*.war,build/docs/javadoc,../report.md', zipFile: 'submission.zip'
 
                 echo 'Deleting ZIP..'
                 script
