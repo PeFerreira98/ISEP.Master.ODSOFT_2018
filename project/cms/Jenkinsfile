@@ -35,7 +35,7 @@ pipeline
             steps
             {
                 echo 'Checkout..'
-                //checkout([$class: 'GitSCM', branches: [[name: '*/feature/db-h2']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])
+                //checkout([$class: 'GitSCM', branches: [[name: '*/develop']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])
                 checkout scm
             }
         }
@@ -50,34 +50,6 @@ pipeline
                     {
                         if (isUnix()) sh './gradlew.sh cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'
                         else bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'
-                    
-                        try
-                        {
-                            if (isUnix())
-                            {
-                                sh 'docker stop H2TestDB'
-                                sh 'docker rm -f H2TestDB'
-                            }
-                            else
-                            {
-                                bat 'docker stop H2TestDB'
-                                bat 'docker rm -f H2TestDB'
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            echo 'docker was already stopped'
-                        }
-
-                        try
-                        {
-                            if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
-                            else bat 'cd .. && docker-compose down --rmi local'
-                        }
-                        catch (Exception e)
-                        {
-                            echo 'docker was already stopped'
-                        }
                     }
                 }                
             }
@@ -200,7 +172,6 @@ pipeline
 
                             junit allowEmptyResults: false, testResults: "build/test-results/test/*.xml"
                             //jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/test.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
-                            
                             jacoco buildOverBuild: true, changeBuildStatus: true, classPattern: 'build/classes', deltaBranchCoverage: '15', deltaClassCoverage: '15', deltaComplexityCoverage: '15', deltaLineCoverage: '15', deltaMethodCoverage: '15', exclusionPattern: '**/*Test*.class,**/client/', execPattern: 'build/jacoco/test.exec', inclusionPattern: '**/*.class', maximumBranchCoverage: '10', maximumClassCoverage: '10', maximumComplexityCoverage: '10', maximumInstructionCoverage: '10', maximumLineCoverage: '10', maximumMethodCoverage: '10', minimumBranchCoverage: '10', minimumClassCoverage: '10', minimumComplexityCoverage: '10', minimumInstructionCoverage: '10', minimumLineCoverage: '10', minimumMethodCoverage: '10', sourceExclusionPattern: '**/*Test*.java,**/client/', sourcePattern: 'src/main/java'
                         }
                     }	
@@ -311,12 +282,21 @@ pipeline
                     body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
 
                 //input 'Please Approve or fail the build after UI Acceptance Tests'
+                
+                dir("${projectDir}")
+                {
+                    script
+                    {
+                        if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
+                        else bat 'cd .. && docker-compose down --rmi local'
+                    }
+                }
             }
         }
 
         stage('Deploy Release')
         {
-            when { branch '*master' }
+            when { branch '*release/*' }
 
             steps
             {
@@ -358,39 +338,8 @@ pipeline
                 }
             }
         }
-
-        always
-        {
-            // bitbucketStatusNotify(buildState: currentBuild.currentResult)
-
-            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
-            
-            /*
-            withCredentials([[$class: 'UsernamePasswordMultiBinding',
-                credentialsId: "${credentials}",
-                usernameVariable: 'GIT_USERNAME', 
-                passwordVariable: 'GIT_PASSWORD']]) {
-
-                script 
-                {
-                    dir("${projectDir}"){
-                        if (isUnix()) 
-                        {
-                            sh "git tag ${BUILD_TAG}-${currentBuild.currentResult}"
-                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
-                        } 
-                        else 
-                        {
-                            powershell "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
-                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
-                        }
-                    }
-                }
-            }
-            */
-        }
-
-        cleanup
+        
+        failure
         {
             dir("${projectDir}")
             {
@@ -425,6 +374,13 @@ pipeline
                     }
                 }
             }
+        }
+
+        always
+        {
+            bitbucketStatusNotify(buildState: currentBuild.currentResult)
+
+            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
         }
     }
 }
