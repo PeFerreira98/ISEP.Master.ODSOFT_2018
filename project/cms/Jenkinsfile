@@ -327,14 +327,18 @@ pipeline
                     archiveArtifacts allowEmptyArchive: false, artifacts: "**/*.pdf", fingerprint: true, onlyIfSuccessful: true
                 }
 
+            }
+            
+            dir('project/')
+            {
                 echo 'Ziping artfacts..'
-                zip archive: true, glob: 'build/reports/relatory/*.pdf,Jenkinsfile,build.gradle,Dockerfile,../docker-compose.yml,build/libs/*.war,build/docs/javadoc,../report.md', zipFile: 'submission.zip'
-
+                zip archive: true, glob: 'cms/build/reports/relatory/*.pdf,cms/Jenkinsfile,cms/build.gradle,cms/Dockerfile,docker-compose.yml,cms/build/libs/*.war,cms/build/docs/javadoc,report.md', zipFile: 'ODSOFT_M1D_1140953_1141233.zip'
+            
                 echo 'Deleting ZIP..'
                 script
                 {
-                    if (isUnix()) sh "rm ./zips/${moodlezip}.zip"
-                    else  bat "del ./zips/${moodlezip}.zip"
+                    if (isUnix()) sh "rm ./ODSOFT_M1D_1140953_1141233.zip"
+                    else  bat "del ./ODSOFT_M1D_1140953_1141233.zip"
                 }
             }
         }
