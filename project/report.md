@@ -52,6 +52,14 @@ Foram também considerados:
 
 ## 2.2 Documentation and Containerisation
 
+### Contentorização de software
+
+Para colocar o nosso software em containers, utilizamos a ferramenta **Docker** que aliado a ficheiros de configuração **DockerFile** criam uma **Docker Image** que vai ser executada num **container**.
+
+O nosso programa está dividido em duas partes. O CMS software que será executado num container com base image de Tomcat 8 (apesar da equipa ponderar utilizar a imagem Java 8 inicialmente). Como o .war file não executa adequadamente utilizando Java, decidiu-se então, utilizar Tomcat. Experimentou-se a base image Tomcat 8 Alpine (muito menos tamanho) que se adequa muito a esta situação onde só um container usa essa base image, no entanto, no final, ficou estabelecido usar a base image normal e completa pela estabilidade. A base de dados H2, foi executada num container separado utilizando uma base image disponivel na **Docker Hub**.
+
+Como ficheiro de 'regras' utilizamos **docker-compose** que indica a ordem e dependências entre containers, entre outras configurações incluindo a **docker-network**, uma rede isolada que permite a comunicação entre containers. Essa comunicação utiliza o nome do serviço como url facilitando o processo.
+
 ### Gerar PDF a partir do ficheiro `report.md`
 
 Para gerar o PDF a partir do ficheiro `report.md` após uma breve pesquisa foi encontrado um *plugin* para o gradle, **Markdown-to-PDF**, que satisfaz os requisitos para este projeto, transformando ficheiros *.md* em PDF, pelo que optamos pela utilização do mesmo. 
