@@ -8,7 +8,7 @@ public class TurmaDetails implements Serializable {
     private String displayName;
 
     public TurmaDetails() {
-        this("0", ""); // this is how you actually do it!
+        this("0", "");
     }
 
     public TurmaDetails(String id, String displayName) {
