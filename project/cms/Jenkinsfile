@@ -351,39 +351,8 @@ pipeline
                 zip archive: true, glob: 'build/reports/relatory/*.pdf,Jenkinsfile,build.gradle,Dockerfile,../docker-compose.yml,buid/libs/*.war,build/docs/javadoc', zipFile: 'submission.zip'
             }
         }
-
-        always
-        {
-            // bitbucketStatusNotify(buildState: currentBuild.currentResult)
-
-            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
-            
-            /*
-            withCredentials([[$class: 'UsernamePasswordMultiBinding',
-                credentialsId: "${credentials}",
-                usernameVariable: 'GIT_USERNAME', 
-                passwordVariable: 'GIT_PASSWORD']]) {
-
-                script 
-                {
-                    dir("${projectDir}"){
-                        if (isUnix()) 
-                        {
-                            sh "git tag ${BUILD_TAG}-${currentBuild.currentResult}"
-                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
-                        } 
-                        else 
-                        {
-                            powershell "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
-                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
-                        }
-                    }
-                }
-            }
-            */
-        }
-
-        cleanup
+        
+        failure
         {
             dir("${projectDir}")
             {
@@ -418,6 +387,13 @@ pipeline
                     }
                 }
             }
+        }
+
+        always
+        {
+            // bitbucketStatusNotify(buildState: currentBuild.currentResult)
+
+            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
         }
     }
 }
