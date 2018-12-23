@@ -12,13 +12,13 @@ import java.util.ArrayList;
 public interface TurmasService extends RemoteService {
     Turma addTurma(Turma turma);
 
-    Boolean deleteTurma(String id);
+    Boolean deleteTurma(int id);
 
-    ArrayList<TurmaDetails> deleteTurmas(ArrayList<String> ids);
+    ArrayList<TurmaDetails> deleteTurmas(ArrayList<Integer> ids);
 
     ArrayList<TurmaDetails> getTurmaDetails();
 
-    Turma getTurma(String id);
+    Turma getTurma(int id);
 
     Turma updateTurma(Turma turma);
 }

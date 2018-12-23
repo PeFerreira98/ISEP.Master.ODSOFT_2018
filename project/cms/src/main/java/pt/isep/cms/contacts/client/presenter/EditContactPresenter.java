@@ -43,7 +43,7 @@ public class EditContactPresenter implements Presenter {
         bind();
     }
 
-    public EditContactPresenter(ContactsServiceAsync rpcService, HandlerManager eventBus, Display display, String id) {
+    public EditContactPresenter(ContactsServiceAsync rpcService, HandlerManager eventBus, Display display, int id) {
         this.rpcService = rpcService;
         this.eventBus = eventBus;
         this.display = display;
@@ -89,7 +89,7 @@ public class EditContactPresenter implements Presenter {
         contact.setLastName(display.getLastName().getValue());
         contact.setEmailAddress(display.getEmailAddress().getValue());
 
-        if (contact.getId() == null) {
+        if (contact.getId() == 0) {
             // Adding new contact
             rpcService.addContact(contact, new AsyncCallback<Contact>() {
                 public void onSuccess(Contact result) {

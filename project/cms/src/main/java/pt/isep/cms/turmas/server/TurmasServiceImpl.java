@@ -4,13 +4,20 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
 
 import pt.isep.cms.turmas.client.TurmasService;
 import pt.isep.cms.turmas.shared.Turma;
 import pt.isep.cms.turmas.shared.TurmaDetails;
 
 @SuppressWarnings("serial")
-public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasService {
+public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasService
+{
 
     private static final String[] turmasFirstNameData = new String[] { "Hollie", "Emerson", "Healy", "Brigitte",
             "Elba", "Claudio", "Dena", "Christina", "Gail", "Orville", "Rae", "Mildred", "Candice", "Louise", "Emilio",
@@ -27,46 +34,69 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
             "gailh@example.com", "orville@example.com", "post_master@example.com", "rchilders@example.com",
             "buster@example.com", "user31065@example.com", "ftsgeolbx@example.com" };
 
-    private final HashMap<String, Turma> turmas;
-    private int serialId;
+    private EntityManagerFactory emfactory = null;
+    private EntityManager entitymanager = null;
 
     public TurmasServiceImpl() {
-        turmas = new HashMap<String, Turma>();
-        serialId = 0;
+        // initTurmas();
+        // serialId = 0;
 
-        initTurmas();
+        this.emfactory = Persistence.createEntityManagerFactory("CMS");
+
+        this.entitymanager = emfactory.createEntityManager();
+
+        initPersistentTurmas();
     }
 
-    private void initTurmas() {
-        for (int i = 0; i < turmasFirstNameData.length && i < turmasLastNameData.length
-                && i < turmasEmailData.length; ++i) {
-            Turma turma = new Turma(String.valueOf(i), turmasFirstNameData[i], turmasLastNameData[i],
-                    turmasEmailData[i]);
-            addTurma(turma);
+    private void initPersistentTurmas() {
+        // We only do this if the database is empty...
+        Query query = entitymanager.createQuery("Select COUNT(c) from Turma c");
+        Long result = (Long) query.getSingleResult();
+
+        if (result == 0) {
+            this.entitymanager.getTransaction().begin();
+
+            for (int i = 0; i < turmasFirstNameData.length && i < turmasLastNameData.length
+                    && i < turmasEmailData.length; ++i) {
+
+                Turma turma = new Turma(i, turmasFirstNameData[i], turmasLastNameData[i],
+                        turmasEmailData[i]);
+                this.entitymanager.persist(turma);
+            }
+
+            this.entitymanager.getTransaction().commit();
         }
     }
 
-    // fixed this Id = list.size stupidity
     public Turma addTurma(Turma turma) {
-        turma.setId(String.valueOf(serialId++));
-        turmas.put(turma.getId(), turma);
+        // Add the new turma to the database
+        this.entitymanager.getTransaction().begin();
+        this.entitymanager.persist(turma);
+        this.entitymanager.getTransaction().commit();
 
         return turma;
     }
 
     public Turma updateTurma(Turma turma) {
-        turmas.remove(turma.getId());
-        turmas.put(turma.getId(), turma);
+        // Update the turma in the database
+        this.entitymanager.getTransaction().begin();
+        this.entitymanager.merge(turma);
+        this.entitymanager.getTransaction().commit();
 
         return turma;
     }
 
-    public Boolean deleteTurma(String id) {
-        turmas.remove(id);
+    public Boolean deleteTurma(int id) {
+        // Remove the turma in the database
+        this.entitymanager.getTransaction().begin();
+        Turma turma = entitymanager.find(Turma.class, id);
+        entitymanager.remove(turma);
+        this.entitymanager.getTransaction().commit();
+
         return true;
     }
 
-    public ArrayList<TurmaDetails> deleteTurmas(ArrayList<String> ids) {
+    public ArrayList<TurmaDetails> deleteTurmas(ArrayList<Integer> ids) {
         for (int i = 0; i < ids.size(); ++i) {
             deleteTurma(ids.get(i));
         }
@@ -77,15 +107,35 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
     public ArrayList<TurmaDetails> getTurmaDetails() {
         ArrayList<TurmaDetails> turmaDetails = new ArrayList<TurmaDetails>();
 
-        for (Turma turma : turmas.values()) // yeah, this exists...
-        {
+        Query query = entitymanager.createQuery("Select c from Turma c");
+
+        @SuppressWarnings("unchecked")
+        List<Turma> list = query.getResultList();
+
+        for (Turma turma : list) {
             turmaDetails.add(turma.getLightWeightTurma());
         }
 
         return turmaDetails;
     }
 
-    public Turma getTurma(String id) {
-        return turmas.get(id);
+    public Turma getTurma(int id) {
+        Turma turma = entitymanager.find(Turma.class, id);
+
+        return turma;
+    }
+
+    public Turma getTurma(String name) {
+        Query query = entitymanager.createQuery("Select c from Turma c where c.name like '" + name + "'");
+
+        @SuppressWarnings("unchecked")
+        Turma turma = (Turma)query.getSingleResult();
+
+        return turma;
+    }
+
+    public int getTurmaCount(Turma turma) {
+        Query query = entitymanager.createQuery("Select COUNT(c) from Student c where c.turmaid = " + turma.getId());
+        return (int) query.getSingleResult();
     }
 }

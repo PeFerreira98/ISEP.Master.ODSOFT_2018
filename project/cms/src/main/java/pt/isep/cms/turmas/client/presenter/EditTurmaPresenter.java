@@ -43,7 +43,7 @@ public class EditTurmaPresenter implements Presenter {
         bind();
     }
 
-    public EditTurmaPresenter(TurmasServiceAsync rpcService, HandlerManager eventBus, Display display, String id) {
+    public EditTurmaPresenter(TurmasServiceAsync rpcService, HandlerManager eventBus, Display display, int id) {
         this.rpcService = rpcService;
         this.eventBus = eventBus;
         this.display = display;
@@ -89,7 +89,7 @@ public class EditTurmaPresenter implements Presenter {
         turma.setLastName(display.getLastName().getValue());
         turma.setEmailAddress(display.getEmailAddress().getValue());
 
-        if (turma.getId() == null) {
+        if (turma.getId() == 0) {
             // Adding new turma
             rpcService.addTurma(turma, new AsyncCallback<Turma>() {
                 public void onSuccess(Turma result) {

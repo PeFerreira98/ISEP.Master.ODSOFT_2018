@@ -2,17 +2,32 @@ package pt.isep.cms.contacts.shared;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Column;
+
 @SuppressWarnings("serial")
+@Entity
+@Table
 public class Contact implements Serializable {
-    public String id;
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    private int id;
     public String firstName;
     public String lastName;
+    @Column(unique = true)
     public String emailAddress;
 
     public Contact() {
+        super();
     }
 
-    public Contact(String id, String firstName, String lastName, String emailAddress) {
+    public Contact(int id, String firstName, String lastName, String emailAddress) {
+        super();
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -23,11 +38,11 @@ public class Contact implements Serializable {
         return new ContactDetails(id, getFullName());
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

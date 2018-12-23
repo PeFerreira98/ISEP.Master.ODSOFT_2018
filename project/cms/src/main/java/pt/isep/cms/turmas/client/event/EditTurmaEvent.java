@@ -3,14 +3,14 @@ package pt.isep.cms.turmas.client.event;
 import com.google.gwt.event.shared.GwtEvent;
 
 public class EditTurmaEvent extends GwtEvent<EditTurmaEventHandler> {
-    public static Type<EditTurmaEventHandler> TYPE = new Type<EditTurmaEventHandler>();
-    private final String id;
+    public static final Type<EditTurmaEventHandler> TYPE = new Type<EditTurmaEventHandler>();
+    private final int id;
 
-    public EditTurmaEvent(String id) {
+    public EditTurmaEvent(int id) {
         this.id = id;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 

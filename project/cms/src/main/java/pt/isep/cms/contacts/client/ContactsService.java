@@ -13,13 +13,13 @@ public interface ContactsService extends RemoteService {
 
     Contact addContact(Contact contact);
 
-    Boolean deleteContact(String id);
+    Boolean deleteContact(int id);
 
-    ArrayList<ContactDetails> deleteContacts(ArrayList<String> ids);
+    ArrayList<ContactDetails> deleteContacts(ArrayList<Integer> ids);
 
     ArrayList<ContactDetails> getContactDetails();
 
-    Contact getContact(String id);
+    Contact getContact(int id);
 
     Contact updateContact(Contact contact);
 }

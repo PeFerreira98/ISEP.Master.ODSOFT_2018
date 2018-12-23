@@ -1,18 +1,18 @@
-package pt.isep.cms.contacts.shared;
+package pt.isep.cms.turmas.shared;
 
-import pt.isep.cms.contacts.shared.ContactDetails;
-import pt.isep.cms.contacts.shared.Contact;
+import pt.isep.cms.turmas.shared.TurmaDetails;
+import pt.isep.cms.turmas.shared.Turma;
 
 import junit.framework.TestCase;
 
 //import static org.easymock.EasyMock.createStrictMock;
 
-public class ContactJRETest extends TestCase {
+public class TurmaJRETest extends TestCase {
     protected void setUp() {
     }
 
-    public void testNewEmptyContact() {
-        Contact c = new Contact();
+    public void testNewEmptyTurma() {
+        Turma c = new Turma();
 
         assertTrue(c.getId() == 0);
         assertTrue(c.getFirstName() == null);
@@ -21,8 +21,8 @@ public class ContactJRETest extends TestCase {
         assertTrue(c.getFullName() == null);
     }
 
-    public void testNewContactFullInfo() {
-        Contact c = new Contact(1, "firstName", "lastName", "emailAddress");
+    public void testNewTurmaFullInfo() {
+        Turma c = new Turma(1, "firstName", "lastName", "emailAddress");
 
         assertTrue(c.getId() == 1);
         assertTrue(c.getFirstName().equals("firstName"));
@@ -31,8 +31,8 @@ public class ContactJRETest extends TestCase {
         assertTrue(c.getFullName().equals("firstName lastName"));
     }
 
-    public void testSetContactInfo() {
-        Contact c = new Contact();
+    public void testSetTurmaInfo() {
+        Turma c = new Turma();
 
         c.setId(1);
         c.setFirstName("firstName");
@@ -46,10 +46,10 @@ public class ContactJRETest extends TestCase {
         assertTrue(c.getFullName().equals("firstName lastName"));
     }
 
-    public void testContactDetails() {
-        Contact c = new Contact(1, "firstName", "lastName", "emailAddress");
+    public void testTurmaDetails() {
+        Turma c = new Turma(1, "firstName", "lastName", "emailAddress");
 
-        assertTrue(c.getId() == c.getLightWeightContact().getId());
-        assertTrue(c.getFullName().equals(c.getLightWeightContact().getDisplayName()));
+        assertTrue(c.getId() == c.getLightWeightTurma().getId());
+        assertTrue(c.getFullName().equals(c.getLightWeightTurma().getDisplayName()));
     }
 }
