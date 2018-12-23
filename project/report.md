@@ -36,7 +36,11 @@ Passando a explicar as stages do Pipeline de uma maneira muito breve:
 
 1. **System Test**: smoke test para testar se o sistema está a correr.
 
-1. **Testes de aceitação**: 
+1. **Testes de aceitação**: teste que requere uma intervenção manual de um utilizador e uma verificação do software por parte deste.
+
+Á medida que desenvolvemos o pipeline,  não deixamos de notar a elevada complexidade de acções e regras efectuadas num só unico Jenkinsfile. Desde build, a cleanups, a testes, a deployments, a archivements... 
+
+Apesar de ainda utilizarmos o padrão de utilizar um unico multibranch pipeline job com um unico Jenkinsfile, não deixamos de ponderar em talvez dividir a lógica de Deployment para outro job e consecutivamente outro Jenkinsfile proprio em que será utilizado como base o .war file criado no job anterior, arquivado anteriormente num repositorio proprio para artifacts (como artifactory (pago) e/ou Nexus repository OSS (free)). Isto simplificava a leitura e a manutenção de um DevOps responsável pelo sistema de continuous development.
 
 ### Diagrama de entidades
 
