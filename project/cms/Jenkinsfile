@@ -50,34 +50,6 @@ pipeline
                     {
                         if (isUnix()) sh './gradlew.sh cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'
                         else bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'
-                    
-                        try
-                        {
-                            if (isUnix())
-                            {
-                                sh 'docker stop H2TestDB'
-                                sh 'docker rm -f H2TestDB'
-                            }
-                            else
-                            {
-                                bat 'docker stop H2TestDB'
-                                bat 'docker rm -f H2TestDB'
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            echo 'docker was already stopped'
-                        }
-
-                        try
-                        {
-                            if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
-                            else bat 'cd .. && docker-compose down --rmi local'
-                        }
-                        catch (Exception e)
-                        {
-                            echo 'docker was already stopped'
-                        }
                     }
                 }                
             }
@@ -246,7 +218,7 @@ pipeline
                                 }
                             }
                             
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
+                            publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "build/reports/pitest", reportFiles: 'index.html', reportName: 'Mutation Report', reportTitles: 'Mutation Report'])
                         }
                     }	
                 }
@@ -311,6 +283,15 @@ pipeline
                     body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
 
                 //input 'Please Approve or fail the build after UI Acceptance Tests'
+                
+                dir("${projectDir}")
+                {
+                    script
+                    {
+                        if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
+                        else bat 'cd .. && docker-compose down --rmi local'
+                    }
+                }
             }
         }
 
