@@ -363,21 +363,29 @@ pipeline
             dir("${projectDir}")
             {
                 script
-                { 
-                    if (isUnix())
+                {
+                    /*
+                    try
                     {
-                        sh 'docker stop H2TestDB'
-                        sh 'docker rm -f H2TestDB'
-
-                        sh 'cd .. && docker-compose down --rmi local'  
+                        if (isUnix())
+                        {
+                            sh 'docker stop H2TestDB'
+                            sh 'docker rm -f H2TestDB'
+                        }
+                        else
+                        {
+                            bat 'docker stop H2TestDB'
+                            bat 'docker rm -f H2TestDB'
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        bat 'docker stop H2TestDB'
-                        bat 'docker rm -f H2TestDB'
-
-                        bat 'cd .. && docker-compose down --rmi local'
+                        echo 'docker was already stopped'
                     }
+                    */
+
+                    if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
+                    else bat 'cd .. && docker-compose down --rmi local'
                 }
             }
         }

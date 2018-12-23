@@ -3,22 +3,28 @@ CMS - College Management System
 
 Neste documento é apresentado todo o processo realizado para o projeto final de **Organização e Desenvolvimento de Software**.
 
+## Branching Strategy
+
+### Gitflow
+
+Durante o decorrer deste projeto foi utilizado o gitflow com recurso à ferramenta **SourceTree** que tornou todo o processo muito mais fácil, sendo apenas necessário clicar num botão para iniciar uma *feature*, *bug fix* ou *release*.
+Apesar da equipa envolvida neste projeto ser bastante pequena e o scope deste projeto ser relativamente simples optamos usar o gitflow completo pela facilidade de utilização graças às ferramentas disponiblizadas.
 
 ## 2.1 Base Pipeline and Persistence
 
 ### Pipeline Design
 
-No Jenkins foi criado um job MultiBranch Pipeline capaz compilar os diversos branches do projeto para permitir **Continuous Integration**.
+No Jenkins foi criado um job MultiBranch Pipeline capaz compilar os diversos branches do projeto, de modo a permitir **Continuous Integration**.
 
 ![Pipeline Design](pipeline.png)
 
 ### Diagrama de entidades
 
-Na base de dados é possivel verificar as entidades **Class** e **Students** com as repetivas ligações representadas na figura seguinte:
+Na base de dados é possivel verificar as entidades **Class** e **Students**, com as repetivas ligações representadas na figura seguinte:
 
 ![Diagrama Entidades](https://scontent.fopo1-1.fna.fbcdn.net/v/t1.15752-9/49005466_2150237678371894_1916061030450987008_n.png?_nc_cat=109&_nc_ht=scontent.fopo1-1.fna&oh=692d3ab74bbf962b0500555e2fd1ec93&oe=5C8B088D)
 
-Foi tambem considerado o limite de aluno na turma e que um aluno só pode pretencer a uma turma.
+Foi também considerado o limite de aluno na turma e que um aluno só pode pretencer a uma turma.
 
 
 ## 2.2 Documentation and Containerisation
