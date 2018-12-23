@@ -34,10 +34,6 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
             "gailh@example.com", "orville@example.com", "post_master@example.com", "rchilders@example.com",
             "buster@example.com", "user31065@example.com", "ftsgeolbx@example.com" };
 
-    // private final HashMap<String, Turma> turmas = new HashMap<String,
-    // Turma>();
-    // private int serialId;
-
     private EntityManagerFactory emfactory = null;
     private EntityManager entitymanager = null;
 
@@ -129,59 +125,17 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
         return turma;
     }
 
-    // private void initTurmas() {
-    // // TODO: Create a real UID for each turma
-    // //
-    // for (int i = 0; i < turmasFirstNameData.length && i <
-    // turmasLastNameData.length
-    // && i < turmasEmailData.length; ++i) {
-    // Turma turma = new Turma(String.valueOf(i), turmasFirstNameData[i],
-    // turmasLastNameData[i],
-    // turmasEmailData[i]);
-    // addTurma(turma);
-    // }
-    // }
+    public Turma getTurma(String name) {
+        Query query = entitymanager.createQuery("Select c from Turma c where c.name like '" + name + "'");
 
-    // public Turma addTurma(Turma turma) {
-    // turma.setId(String.valueOf(serialId++));
-    // turmas.put(turma.getId(), turma);
-    // return turma;
-    // }
+        @SuppressWarnings("unchecked")
+        Turma turma = (Turma)query.getSingleResult();
 
-    // public Turma updateTurma(Turma turma) {
-    // String lid = turma.getId();
-    // turmas.remove(turma.getId());
-    // turmas.put(turma.getId(), turma);
-    // return turma;
-    // }
+        return turma;
+    }
 
-    // public Boolean deleteTurma(String id) {
-    // turmas.remove(id);
-    // return true;
-    // }
-
-    // public ArrayList<TurmaDetails> deleteTurmas(ArrayList<String> ids) {
-
-    // for (int i = 0; i < ids.size(); ++i) {
-    // deleteTurma(ids.get(i));
-    // }
-
-    // return getTurmaDetails();
-    // }
-
-    // public ArrayList<TurmaDetails> getTurmaDetails() {
-    // ArrayList<TurmaDetails> turmaDetails = new ArrayList<TurmaDetails>();
-
-    // Iterator<String> it = turmas.keySet().iterator();
-    // while (it.hasNext()) {
-    // Turma turma = turmas.get(it.next());
-    // turmaDetails.add(turma.getLightWeightTurma());
-    // }
-
-    // return turmaDetails;
-    // }
-
-    // public Turma getTurma(String id) {
-    // return turmas.get(id);
-    // }
+    public int getTurmaCount(Turma turma) {
+        Query query = entitymanager.createQuery("Select COUNT(c) from Student c where c.turmaid = " + turma.getId());
+        return (int) query.getSingleResult();
+    }
 }

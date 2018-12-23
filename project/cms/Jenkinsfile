@@ -49,7 +49,35 @@ pipeline
                     script
                     {
                         if (isUnix()) sh './gradlew.sh cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'
-                        else bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'                        
+                        else bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'
+                    
+                        try
+                        {
+                            if (isUnix())
+                            {
+                                sh 'docker stop H2TestDB'
+                                sh 'docker rm -f H2TestDB'
+                            }
+                            else
+                            {
+                                bat 'docker stop H2TestDB'
+                                bat 'docker rm -f H2TestDB'
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            echo 'docker was already stopped'
+                        }
+
+                        try
+                        {
+                            if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
+                            else bat 'cd .. && docker-compose down --rmi local'
+                        }
+                        catch (Exception e)
+                        {
+                            echo 'docker was already stopped'
+                        }
                     }
                 }                
             }
@@ -173,7 +201,7 @@ pipeline
                             junit allowEmptyResults: false, testResults: "build/test-results/test/*.xml"
                             //jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/test.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
                             
-                            jacoco buildOverBuild: true, changeBuildStatus: true, classPattern: 'build/classes', deltaBranchCoverage: '15', deltaClassCoverage: '15', deltaComplexityCoverage: '15', deltaLineCoverage: '15', deltaMethodCoverage: '15', exclusionPattern: '**/*Test*.class,**/cms/client/', execPattern: 'build/jacoco/test.exec', inclusionPattern: '**/*.class', maximumBranchCoverage: '10', maximumClassCoverage: '10', maximumComplexityCoverage: '10', maximumInstructionCoverage: '10', maximumLineCoverage: '10', maximumMethodCoverage: '10', minimumBranchCoverage: '10', minimumClassCoverage: '10', minimumComplexityCoverage: '10', minimumInstructionCoverage: '10', minimumLineCoverage: '10', minimumMethodCoverage: '10', sourceExclusionPattern: '**/*Test*.java,**/cms/client/', sourcePattern: 'src/main/java'
+                            jacoco buildOverBuild: true, changeBuildStatus: true, classPattern: 'build/classes', deltaBranchCoverage: '15', deltaClassCoverage: '15', deltaComplexityCoverage: '15', deltaLineCoverage: '15', deltaMethodCoverage: '15', exclusionPattern: '**/*Test*.class,**/client/', execPattern: 'build/jacoco/test.exec', inclusionPattern: '**/*.class', maximumBranchCoverage: '10', maximumClassCoverage: '10', maximumComplexityCoverage: '10', maximumInstructionCoverage: '10', maximumLineCoverage: '10', maximumMethodCoverage: '10', minimumBranchCoverage: '10', minimumClassCoverage: '10', minimumComplexityCoverage: '10', minimumInstructionCoverage: '10', minimumLineCoverage: '10', minimumMethodCoverage: '10', sourceExclusionPattern: '**/*Test*.java,**/client/', sourcePattern: 'src/main/java'
                         }
                     }	
                 }
@@ -193,7 +221,7 @@ pipeline
 
                             junit allowEmptyResults: false, testResults: "build/test-results/integrationTest/*.xml"
                             //jacoco classPattern: "build/classes", exclusionPattern: '**/*Test*.class', execPattern: "build/jacoco/integrationTest.exec", sourceExclusionPattern: '**/*Test*.java', sourcePattern: "src/main/java"
-                            jacoco buildOverBuild: true, changeBuildStatus: true, classPattern: 'build/classes', deltaBranchCoverage: '15', deltaClassCoverage: '15', deltaComplexityCoverage: '15', deltaLineCoverage: '15', deltaMethodCoverage: '15', exclusionPattern: '**/*Test*.class,**/cms/client/', execPattern: 'build/jacoco/integrationTest.exec', inclusionPattern: '**/*.class', maximumBranchCoverage: '10', maximumClassCoverage: '10', maximumComplexityCoverage: '10', maximumInstructionCoverage: '10', maximumLineCoverage: '10', maximumMethodCoverage: '10', minimumBranchCoverage: '10', minimumClassCoverage: '10', minimumComplexityCoverage: '10', minimumInstructionCoverage: '10', minimumLineCoverage: '10', minimumMethodCoverage: '10', sourceExclusionPattern: '**/*Test*.java,**/cms/client/', sourcePattern: 'src/main/java'
+                            jacoco buildOverBuild: true, changeBuildStatus: true, classPattern: 'build/classes', deltaBranchCoverage: '15', deltaClassCoverage: '15', deltaComplexityCoverage: '15', deltaLineCoverage: '15', deltaMethodCoverage: '15', exclusionPattern: '**/*Test*.class,**/client/', execPattern: 'build/jacoco/integrationTest.exec', inclusionPattern: '**/*.class', maximumBranchCoverage: '10', maximumClassCoverage: '10', maximumComplexityCoverage: '10', maximumInstructionCoverage: '10', maximumLineCoverage: '10', maximumMethodCoverage: '10', minimumBranchCoverage: '10', minimumClassCoverage: '10', minimumComplexityCoverage: '10', minimumInstructionCoverage: '10', minimumLineCoverage: '10', minimumMethodCoverage: '10', sourceExclusionPattern: '**/*Test*.java,**/client/', sourcePattern: 'src/main/java'
                         }
                     }	
                 }
@@ -297,11 +325,8 @@ pipeline
                 {
                     script
                     {
-                        if (isUnix()) sh './gradlew deploy --info && %CATALINA_HOME%/bin/startup.sh' //check if works. ex -> echo $TEST_VAR
+                        if (isUnix()) sh './gradlew deploy --info && %CATALINA_HOME%/bin/startup.sh'
                         else bat 'gradlew deploy --info && %CATALINA_HOME%/bin/startup.bat'
-
-                        //bat "docker build -f Dockerfile -t cmsproject ."
-                        //bat "docker run -p ${tomcatPort}:8080 -t cmsproject"
                     }
                 }
             }
@@ -323,7 +348,7 @@ pipeline
                 }
 
                 echo 'Ziping artfacts..'
-                zip archive: true, glob: 'build/reports/relatory/*.pdf,Jenkinsfile,build.gradle,build/docs/javadoc', zipFile: 'submission.zip'
+                zip archive: true, glob: 'build/reports/relatory/*.pdf,Jenkinsfile,build.gradle,Dockerfile,../docker-compose.yml,buid/libs/*.war,build/docs/javadoc', zipFile: 'submission.zip'
             }
         }
 
@@ -364,7 +389,6 @@ pipeline
             {
                 script
                 {
-                    /*
                     try
                     {
                         if (isUnix())
@@ -382,10 +406,16 @@ pipeline
                     {
                         echo 'docker was already stopped'
                     }
-                    */
 
-                    if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
-                    else bat 'cd .. && docker-compose down --rmi local'
+                    try
+                    {
+                        if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
+                        else bat 'cd .. && docker-compose down --rmi local'
+                    }
+                    catch (Exception e)
+                    {
+                        echo 'docker was already stopped'
+                    }
                 }
             }
         }
