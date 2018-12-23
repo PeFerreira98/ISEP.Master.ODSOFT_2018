@@ -50,6 +50,34 @@ pipeline
                     {
                         if (isUnix()) sh './gradlew.sh cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'
                         else bat 'gradlew.bat cleanTest cleanIntegrationTest cleanJacocoTestReport cleanJacocoIntegrationReport cleanPitest cleanCheckstyleMain cleanCheckstyleTest cleanFindbugsMain cleanFindbugsTest'
+                    
+                        try
+                        {
+                            if (isUnix())
+                            {
+                                sh 'docker stop H2TestDB'
+                                sh 'docker rm -f H2TestDB'
+                            }
+                            else
+                            {
+                                bat 'docker stop H2TestDB'
+                                bat 'docker rm -f H2TestDB'
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            echo 'docker was already stopped'
+                        }
+
+                        try
+                        {
+                            if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
+                            else bat 'cd .. && docker-compose down --rmi local'
+                        }
+                        catch (Exception e)
+                        {
+                            echo 'docker was already stopped'
+                        }
                     }
                 }                
             }
@@ -114,7 +142,7 @@ pipeline
                                 else bat 'gradlew checkstyleMain checkstyleTest'
                             }
 
-                            checkstyle canComputeNew: false, defaultEncoding: '', healthy: '20', pattern: 'build/reports/checkstyle/*.xml', unHealthy: '15'
+                            checkstyle canComputeNew: false, defaultEncoding: '', failedTotalAll: '300', healthy: '30', pattern: 'build/reports/checkstyle/*.xml', unHealthy: '15', unstableTotalAll: '500'
                         }
                     }
                 }
@@ -131,7 +159,7 @@ pipeline
                                 else bat 'gradlew findbugsMain findbugsTest'
                             }
 
-                            findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '20', includePattern: '', pattern: 'build/reports/findbugs/*.xml', unHealthy: '15'
+                            findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', failedTotalAll: '25', healthy: '30', includePattern: '', pattern: 'build/reports/findbugs/*.xml', unHealthy: '15', unstableTotalAll: '50'
                         }
                     }
                 }
@@ -283,15 +311,6 @@ pipeline
                     body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
 
                 //input 'Please Approve or fail the build after UI Acceptance Tests'
-                
-                dir("${projectDir}")
-                {
-                    script
-                    {
-                        if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
-                        else bat 'cd .. && docker-compose down --rmi local'
-                    }
-                }
             }
         }
 
@@ -316,8 +335,8 @@ pipeline
 
     post
     {
-        success {
-
+        success
+        {
             echo 'Creating PDF report..'
             dir("${projectDir}")
             {
@@ -330,10 +349,48 @@ pipeline
 
                 echo 'Ziping artfacts..'
                 zip archive: true, glob: 'build/reports/relatory/*.pdf,Jenkinsfile,build.gradle,Dockerfile,../docker-compose.yml,buid/libs/*.war,build/docs/javadoc', zipFile: 'submission.zip'
+
+                echo 'Deleting ZIP..'
+                script
+                {
+                    if (isUnix()) sh "rm ./zips/${moodlezip}.zip"
+                    else  bat "del ./zips/${moodlezip}.zip"
+                }
             }
         }
-        
-        failure
+
+        always
+        {
+            // bitbucketStatusNotify(buildState: currentBuild.currentResult)
+
+            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
+            
+            /*
+            withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                credentialsId: "${credentials}",
+                usernameVariable: 'GIT_USERNAME', 
+                passwordVariable: 'GIT_PASSWORD']]) {
+
+                script 
+                {
+                    dir("${projectDir}"){
+                        if (isUnix()) 
+                        {
+                            sh "git tag ${BUILD_TAG}-${currentBuild.currentResult}"
+                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
+                        } 
+                        else 
+                        {
+                            powershell "git tag Build#${BUILD_NUMBER}-${currentBuild.currentResult}"
+                            powershell "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${repository} --tags"
+                        }
+                    }
+                }
+            }
+            */
+        }
+
+        cleanup
         {
             dir("${projectDir}")
             {
@@ -356,7 +413,7 @@ pipeline
                     {
                         echo 'docker was already stopped'
                     }
-
+                    
                     try
                     {
                         if (isUnix()) sh 'cd .. && docker-compose down --rmi local'
@@ -368,13 +425,6 @@ pipeline
                     }
                 }
             }
-        }
-
-        always
-        {
-            // bitbucketStatusNotify(buildState: currentBuild.currentResult)
-
-            discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
         }
     }
 }

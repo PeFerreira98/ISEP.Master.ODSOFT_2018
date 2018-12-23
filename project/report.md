@@ -14,9 +14,29 @@ Apesar da equipa envolvida neste projeto ser bastante pequena e o scope deste pr
 
 ### Pipeline Design
 
-No Jenkins foi criado um job MultiBranch Pipeline capaz compilar os diversos branches do projeto, de modo a permitir **Continuous Integration**.
+No Jenkins foi criado um job MultiBranch Pipeline capaz executar o pipeline para os diversos branches do projeto, de modo a permitir **Continuous Integration**.
 
 ![Pipeline Design](pipeline.png)
+
+Passando a explicar as stages do Pipeline de uma maneira muito breve:
+
+1. **Checkout**: obter a última versão dispnível do conteúdo do repositório.
+
+1. **Preparação**: Limpar os relatórios de builds anteriores e terminar quaisquer containers que vão ser utilizados que, possam estar a correr de builds anteriores ou testes.
+
+1. **Build**: Build do projeto inteiro.
+
+1. **Paralelo**: Várias tarefas de *archiving* e documentação, juntamente com análise da qualidade de código.
+
+1. **Preparação para testes**: Arrancar os containers que são necessários para executar os testes.
+
+1. **Testes**: Os testes unitários, de integração e de mutação são todos executados em paralelo.
+
+1. **Deploy para testes**: arranca os containers necessários para os smoke tests e testes de aceitação.
+
+1. **System Test**: smoke test para testar se o sistema está a correr.
+
+1. **Testes de aceitação**: 
 
 ### Diagrama de entidades
 
@@ -24,52 +44,80 @@ Na base de dados é possivel verificar as entidades **Class** e **Students**, co
 
 ![Diagrama Entidades](https://scontent.fopo1-1.fna.fbcdn.net/v/t1.15752-9/49005466_2150237678371894_1916061030450987008_n.png?_nc_cat=109&_nc_ht=scontent.fopo1-1.fna&oh=692d3ab74bbf962b0500555e2fd1ec93&oe=5C8B088D)
 
-Foi também considerado o limite de aluno na turma e que um aluno só pode pretencer a uma turma.
+Foram também considerados:
+
+* o limite máximo de alunos por turma
+* um aluno só pode pretencer a uma turma.
 
 
 ## 2.2 Documentation and Containerisation
 
-### Gerar PDF a partir do ficheiro `Readme.md`
+### Gerar PDF a partir do ficheiro `report.md`
 
-Para gerar o PDF a partir do ficheiro `Readme.md` foram encontradas duas formas possíveis de o fazer. 
+Para gerar o PDF a partir do ficheiro `report.md` após uma breve pesquisa foi encontrado um *plugin* para o gradle, **Markdown-to-PDF**, que satisfaz os requisitos para este projeto, transformando ficheiros *.md* em PDF, pelo que optamos pela utilização do mesmo. 
 
-Na primeira solução encontrada, seria necessário criar um novo projeto, tal como o **CMS**, mas para transformar ficheiros *markdown* em PDF. Esta solução não nos pareceu viável. 
-
-Na segunda solução encontrada, foi verificado que é possível transformar ficheiros markdown em PDF através de *task* no ficheiro `build.gradle`, utilizando o *plugin* **Markdown-to-PDF** baseado em **flexmark**.
-
-Para utilizar este *plugin* foi acrescentado ao ficheiro: 
+Para utilizar este *plugin* foi acrescentado ao `build.gradle`: 
 
 * Um *buidscript* com um repositório de *maven* e dependecias; 
 * Acrescentado o *id* do *plugin* e versão; 
 * E, por fim, acrescentada a tarefa que permite gerar o PDF. 
 
-Neste último passo deparamo-nos com um erro em que o tipo associado à tarefa não existia. Para resolver este erro foi necessário verificar o código fonte para perceber que o nome do tipo de tarefa necessitava do prefixo "de.fntsoftware.gradle". 
+No entanto, verificamos que caso o pdf já exista não é atualizado, pelo que foi criada uma *task* adicional para limpar algum ficheiro PDF que já exista no diretório antes da criação do PDF.
+Esta task foi adicionada às dependências da *task* principal para garantir que é sempre executada antes de criar o PDF.
 
 ### Gerar o *ZIP* para submissão no Moodle
 
-Recorreu-se ao plugin do Jenkins **Pipeline Utility Steps**, que inclui a funcionalidade de zip, para gerar o ficheiro ZIP de submissão no Moodle.
+Uma vez que o Jenkins tem acesso a todos os artefactos produzidos durante a build e que existe um *plugin*, **Pipeline Utility Steps**, que inclui a funcionalidade de zip, para gerar o ficheiro ZIP de submissão no Moodle, optou-se pela utilização do mesmo.
 
-Foi colocado na **Post Build Action Success** do pipeline uma vez que é suposto ser executado 
+Foi colocado na **Post Build Action Success** do pipeline uma vez que é suposto ser executado para todas as "*successful builds*".
+
+A **alternativa** a isto seria recorrer a uma *task* no gradle para a criação do zip, mas uma vez que o *plugin* do Jenkins permite arquivar automaticamente o ficheiro criado optou-se por utilizar o *plugin* do Jenkins pela sua simplicidade.
 
 
 ## 2.3 Code Quality and Integration Tests
 
 ### Verificação da qualidade do código através de Checkstyle
 
-Para verificação da qualidade de código através do plugin **Checkstyle** no Jenkins foi necessário configurar o projeto **CMS**:
+Para verificação da qualidade de código utilizou-se, como sugerido no enunciado, a ferramenta **Checkstyle**.
 
-1. Foi acrescentado o ficheiro de configuração do Checkstyle e dos testes , respetivamente, `checkstyle.xml` e `checkstyleTest.xml`, diretamente na pasta **cms**;
-2. Acrescentadas as tasks necessárias ao ficheiro `build.gradle`:
-	* `checkstyle`
-	* `checkstyleMain`
-	* `checkstyleTest`
+Para a utilização da ferramenta foi necessário configurar:
 
-Para verificação da qualidade de código através do *plugin* **Checkstyle** foi necessário instalar o mesmo.
+1. Incluir no `build.gradle` o plugin **Checkstyle** e definir quais os ficheiros com as regras de verificação para as *tasks* checkstyleMain e checkstyleTest. Isto foi feito com o intuito de ter regras diferentes para o código de testes, como por exemplo permitir a utilização de packages como o junit;
+
+1. Foram acrescentados os ficheiros de configuração do Checkstyle, respetivamente, `checkstyle.xml` e `checkstyleTest.xml`, com regras distintas como indicado anteriormente;
+
+1. Foi adicionado o plugin **Checkstyle** no Jenkins;
+
+1. Foi adiconada uma *Stage* ao `Jenkinsfile` para a verificação do código recorrendo ao *plugin* referido no ponto anterior.
+
+       Max. avisos unstable: 500
+       Max. avisos failure: 300
+	   Healthy: 50%
+       Unhealthy: 15%
 
 
 ### Verificação da qualidade do código através de FindBugs
 
+Para verificação da qualidade de código utilizou-se, como sugerido no enunciado, a ferramenta **Findbugs**.
 
+Para a utilização da ferramenta foi necessário configurar:
 
-### Cobertura de testes
+1. Incluir no `build.gradle` o plugin **Findbugs**. Ao contrário do **Checkstyle** neste plugin não foi configurado nenhum ficheiro ;
 
+1. Foi adicionado o plugin **Findbugs** no Jenkins;
+
+1. Foi adiconada uma *Stage* ao `Jenkinsfile` para a verificação do código recorrendo ao *plugin* referido no ponto anterior. Esta stage é executada em paralelo com outras stages de documentação e arquiv
+
+       Max. avisos unstable: 50
+       Max. avisos failure: 25
+	   Healthy: 50%
+       Unhealthy: 15%
+
+### Testes de integração e Cobertura de testes
+
+Tal como no trabalho anterior foram criados testes de Integração para testar as novas funcionalidades.
+
+Foram ajustados os valores mínimos, assim como, o valor máximo da degradação da cobertura de código.
+
+       Cobertura min: 50%
+	   Delta máx. de degradação: 15%
