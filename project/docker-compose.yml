@@ -7,11 +7,6 @@ services:
       - 8889:81
       - 8890:1521
 
-#  sql.db:
-#    image: mcr.microsoft.com/mssql/server
-#    ports:
-#      - 8890:1433
-
   cms:
     build: 
       context: ./cms

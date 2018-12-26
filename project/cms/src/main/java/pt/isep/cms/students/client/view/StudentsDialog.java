@@ -75,6 +75,7 @@ public class StudentsDialog implements EditStudentPresenter.Display {
     private final TextBox firstName;
     private final TextBox lastName;
     private final TextBox emailAddress;
+    private final TextBox turma;
     private final FlexTable detailsTable;
     private final Button saveButton;
     private final Button cancelButton;
@@ -86,6 +87,8 @@ public class StudentsDialog implements EditStudentPresenter.Display {
         detailsTable.setWidget(1, 1, lastName);
         detailsTable.setWidget(2, 0, new Label("Email Address"));
         detailsTable.setWidget(2, 1, emailAddress);
+        detailsTable.setWidget(3, 0, new Label("Turma"));
+        detailsTable.setWidget(3, 1, turma);
         firstName.setFocus(true);
     }
 
@@ -121,6 +124,7 @@ public class StudentsDialog implements EditStudentPresenter.Display {
         firstName = new TextBox();
         lastName = new TextBox();
         emailAddress = new TextBox();
+        turma = new TextBox();
         initDetailsTable();
         contentDetailsPanel.add(detailsTable);
 
@@ -185,6 +189,13 @@ public class StudentsDialog implements EditStudentPresenter.Display {
     public HasValue<String> getEmailAddress() {
         // TODO Auto-generated method stub
         return emailAddress;
+        // return null;
+    }
+
+    @Override
+    public HasValue<String> getTurma() {
+        // TODO Auto-generated method stub
+        return turma;
         // return null;
     }
 

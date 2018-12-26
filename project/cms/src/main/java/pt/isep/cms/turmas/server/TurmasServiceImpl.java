@@ -16,7 +16,8 @@ import pt.isep.cms.turmas.shared.Turma;
 import pt.isep.cms.turmas.shared.TurmaDetails;
 
 @SuppressWarnings("serial")
-public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasService {
+public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasService
+{
 
     private static final String[] turmasFirstNameData = new String[] { "Hollie", "Emerson", "Healy", "Brigitte",
             "Elba", "Claudio", "Dena", "Christina", "Gail", "Orville", "Rae", "Mildred", "Candice", "Louise", "Emilio",
@@ -37,6 +38,9 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
     private EntityManager entitymanager = null;
 
     public TurmasServiceImpl() {
+        // initTurmas();
+        // serialId = 0;
+
         this.emfactory = Persistence.createEntityManagerFactory("CMS");
 
         this.entitymanager = emfactory.createEntityManager();
@@ -57,8 +61,10 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
 
                 Turma turma = new Turma(i, turmasFirstNameData[i], turmasLastNameData[i],
                         turmasEmailData[i]);
-                addTurma(turma);
+                this.entitymanager.persist(turma);
             }
+
+            this.entitymanager.getTransaction().commit();
         }
     }
 
@@ -114,6 +120,22 @@ public class TurmasServiceImpl extends RemoteServiceServlet implements TurmasSer
     }
 
     public Turma getTurma(int id) {
-        return entitymanager.find(Turma.class, id);
+        Turma turma = entitymanager.find(Turma.class, id);
+
+        return turma;
+    }
+
+    public Turma getTurma(String name) {
+        Query query = entitymanager.createQuery("Select c from Turma c where c.name like '" + name + "'");
+
+        @SuppressWarnings("unchecked")
+        Turma turma = (Turma)query.getSingleResult();
+
+        return turma;
+    }
+
+    public int getTurmaCount(Turma turma) {
+        Query query = entitymanager.createQuery("Select COUNT(c) from Student c where c.turmaid = " + turma.getId());
+        return (int) query.getSingleResult();
     }
 }

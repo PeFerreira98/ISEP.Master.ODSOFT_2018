@@ -16,7 +16,8 @@ import pt.isep.cms.contacts.shared.Contact;
 import pt.isep.cms.contacts.shared.ContactDetails;
 
 @SuppressWarnings("serial")
-public class ContactsServiceImpl extends RemoteServiceServlet implements ContactsService {
+public class ContactsServiceImpl extends RemoteServiceServlet implements ContactsService
+{
 
     private static final String[] contactsFirstNameData = new String[] { "Hollie", "Emerson", "Healy", "Brigitte",
             "Elba", "Claudio", "Dena", "Christina", "Gail", "Orville", "Rae", "Mildred", "Candice", "Louise", "Emilio",
@@ -33,10 +34,17 @@ public class ContactsServiceImpl extends RemoteServiceServlet implements Contact
             "gailh@example.com", "orville@example.com", "post_master@example.com", "rchilders@example.com",
             "buster@example.com", "user31065@example.com", "ftsgeolbx@example.com" };
 
+    // private final HashMap<String, Contact> contacts = new HashMap<String,
+    // Contact>();
+    // private int serialId;
+
     private EntityManagerFactory emfactory = null;
     private EntityManager entitymanager = null;
 
     public ContactsServiceImpl() {
+        // initContacts();
+        // serialId = 0;
+
         this.emfactory = Persistence.createEntityManagerFactory("CMS");
 
         this.entitymanager = emfactory.createEntityManager();
@@ -57,8 +65,10 @@ public class ContactsServiceImpl extends RemoteServiceServlet implements Contact
 
                 Contact contact = new Contact(i, contactsFirstNameData[i], contactsLastNameData[i],
                         contactsEmailData[i]);
-                addContact(contact);
+                this.entitymanager.persist(contact);
             }
+
+            this.entitymanager.getTransaction().commit();
         }
     }
 
@@ -114,6 +124,64 @@ public class ContactsServiceImpl extends RemoteServiceServlet implements Contact
     }
 
     public Contact getContact(int id) {
-        return entitymanager.find(Contact.class, id);
+        Contact contact = entitymanager.find(Contact.class, id);
+
+        return contact;
     }
+
+    // private void initContacts() {
+    // // TODO: Create a real UID for each contact
+    // //
+    // for (int i = 0; i < contactsFirstNameData.length && i <
+    // contactsLastNameData.length
+    // && i < contactsEmailData.length; ++i) {
+    // Contact contact = new Contact(String.valueOf(i), contactsFirstNameData[i],
+    // contactsLastNameData[i],
+    // contactsEmailData[i]);
+    // addContact(contact);
+    // }
+    // }
+
+    // public Contact addContact(Contact contact) {
+    // contact.setId(String.valueOf(serialId++));
+    // contacts.put(contact.getId(), contact);
+    // return contact;
+    // }
+
+    // public Contact updateContact(Contact contact) {
+    // String lid = contact.getId();
+    // contacts.remove(contact.getId());
+    // contacts.put(contact.getId(), contact);
+    // return contact;
+    // }
+
+    // public Boolean deleteContact(String id) {
+    // contacts.remove(id);
+    // return true;
+    // }
+
+    // public ArrayList<ContactDetails> deleteContacts(ArrayList<String> ids) {
+
+    // for (int i = 0; i < ids.size(); ++i) {
+    // deleteContact(ids.get(i));
+    // }
+
+    // return getContactDetails();
+    // }
+
+    // public ArrayList<ContactDetails> getContactDetails() {
+    // ArrayList<ContactDetails> contactDetails = new ArrayList<ContactDetails>();
+
+    // Iterator<String> it = contacts.keySet().iterator();
+    // while (it.hasNext()) {
+    // Contact contact = contacts.get(it.next());
+    // contactDetails.add(contact.getLightWeightContact());
+    // }
+
+    // return contactDetails;
+    // }
+
+    // public Contact getContact(String id) {
+    // return contacts.get(id);
+    // }
 }

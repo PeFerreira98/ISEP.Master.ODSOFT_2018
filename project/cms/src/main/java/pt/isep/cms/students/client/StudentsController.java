@@ -80,7 +80,7 @@ public class StudentsController implements Presenter { // (ATB) No history at th
 
     }
 
-    private void doEditStudent(int id) {
+    private void doEditStudent(String id) {
         Presenter presenter = new EditStudentPresenter(rpcService, eventBus,
                 new StudentsDialog(globalConstants, StudentsDialog.Type.UPDATE), id);
         presenter.go(container);

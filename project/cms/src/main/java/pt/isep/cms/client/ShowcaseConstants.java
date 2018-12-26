@@ -32,10 +32,9 @@ import pt.isep.cms.turmas.client.TurmasController;
 /**
  * Constants used throughout the showcase.
  */
-public interface ShowcaseConstants
-        extends MenuConstants, CwContacts.CwConstants, ContactsDialog.CwConstants, ContactsController.CwConstants,
-        CwStudents.CwConstants, StudentsDialog.CwConstants, StudentsController.CwConstants, CwTurmas.CwConstants,
-        TurmasDialog.CwConstants, TurmasController.CwConstants {
+public interface ShowcaseConstants extends MenuConstants, CwContacts.CwConstants, ContactsDialog.CwConstants,
+        ContactsController.CwConstants, CwStudents.CwConstants, StudentsDialog.CwConstants,
+        StudentsController.CwConstants, CwTurmas.CwConstants, TurmasDialog.CwConstants, TurmasController.CwConstants {
 
     /**
      * The path to source code for examples, raw files, and style definitions.

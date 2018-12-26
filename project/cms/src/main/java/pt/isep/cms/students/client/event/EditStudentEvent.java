@@ -4,13 +4,13 @@ import com.google.gwt.event.shared.GwtEvent;
 
 public class EditStudentEvent extends GwtEvent<EditStudentEventHandler> {
     public static final Type<EditStudentEventHandler> TYPE = new Type<EditStudentEventHandler>();
-    private final int id;
+    private final String id;
 
-    public EditStudentEvent(int id) {
+    public EditStudentEvent(String id) {
         this.id = id;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

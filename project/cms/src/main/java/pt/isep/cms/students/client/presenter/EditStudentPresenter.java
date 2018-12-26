@@ -12,6 +12,7 @@ import pt.isep.cms.students.client.StudentsServiceAsync;
 import pt.isep.cms.students.client.event.StudentUpdatedEvent;
 import pt.isep.cms.students.client.event.EditStudentCancelledEvent;
 import pt.isep.cms.students.shared.Student;
+import pt.isep.cms.turmas.shared.Turma;
 
 public class EditStudentPresenter implements Presenter {
     public interface Display {
@@ -24,6 +25,8 @@ public class EditStudentPresenter implements Presenter {
         HasValue<String> getLastName();
 
         HasValue<String> getEmailAddress();
+
+        HasValue<String> getTurma();
 
         void show();
 
@@ -43,7 +46,7 @@ public class EditStudentPresenter implements Presenter {
         bind();
     }
 
-    public EditStudentPresenter(StudentsServiceAsync rpcService, HandlerManager eventBus, Display display, int id) {
+    public EditStudentPresenter(StudentsServiceAsync rpcService, HandlerManager eventBus, Display display, String id) {
         this.rpcService = rpcService;
         this.eventBus = eventBus;
         this.display = display;
@@ -55,6 +58,10 @@ public class EditStudentPresenter implements Presenter {
                 EditStudentPresenter.this.display.getFirstName().setValue(student.getFirstName());
                 EditStudentPresenter.this.display.getLastName().setValue(student.getLastName());
                 EditStudentPresenter.this.display.getEmailAddress().setValue(student.getEmailAddress());
+                // ISSUE
+                // EditStudentPresenter.this.display.getTurma().setValue(student.getTurma().getFirstName());
+                
+                EditStudentPresenter.this.display.getTurma().setValue("");
             }
 
             public void onFailure(Throwable caught) {
@@ -88,8 +95,13 @@ public class EditStudentPresenter implements Presenter {
         student.setFirstName(display.getFirstName().getValue());
         student.setLastName(display.getLastName().getValue());
         student.setEmailAddress(display.getEmailAddress().getValue());
+        // ISSUE Fix after db is working
+        // Turma t = new turmasService().get(
+        // display.getTurma().getValue() );
+        Turma t = new Turma(0, "", "", "");
+        student.setTurma(t);
 
-        if (student.getId() == 0) {
+        if (student.getId() == null) {
             // Adding new student
             rpcService.addStudent(student, new AsyncCallback<Student>() {
                 public void onSuccess(Student result) {

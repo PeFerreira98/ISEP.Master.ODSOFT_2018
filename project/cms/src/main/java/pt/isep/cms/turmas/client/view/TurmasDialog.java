@@ -48,21 +48,21 @@ public class TurmasDialog implements EditTurmaPresenter.Display {
 
         String cwUpdateTurmaDialogCaption();
 
-//		String cwDialogBoxClose();
-//
-//		String cwDialogBoxDescription();
-//
-//		String cwDialogBoxDetails();
-//
-//		String cwDialogBoxItem();
-//
-//		String cwDialogBoxListBoxInfo();
-//
-//		String cwDialogBoxMakeTransparent();
-//
-//		String cwDialogBoxName();
-//
-//		String cwDialogBoxShowButton();
+        // String cwDialogBoxClose();
+        //
+        // String cwDialogBoxDescription();
+        //
+        // String cwDialogBoxDetails();
+        //
+        // String cwDialogBoxItem();
+        //
+        // String cwDialogBoxListBoxInfo();
+        //
+        // String cwDialogBoxMakeTransparent();
+        //
+        // String cwDialogBoxName();
+        //
+        // String cwDialogBoxShowButton();
     }
 
     /**
@@ -72,21 +72,21 @@ public class TurmasDialog implements EditTurmaPresenter.Display {
     private final ShowcaseConstants globalConstants;
 
     // Widgets
-    private final TextBox firstName;
-    private final TextBox lastName;
-    private final TextBox emailAddress;
+    private final TextBox name;
+    private final TextBox teacher;
+    private final TextBox description;
     private final FlexTable detailsTable;
     private final Button saveButton;
     private final Button cancelButton;
 
     private void initDetailsTable() {
-        detailsTable.setWidget(0, 0, new Label("Firstname"));
-        detailsTable.setWidget(0, 1, firstName);
-        detailsTable.setWidget(1, 0, new Label("Lastname"));
-        detailsTable.setWidget(1, 1, lastName);
-        detailsTable.setWidget(2, 0, new Label("Email Address"));
-        detailsTable.setWidget(2, 1, emailAddress);
-        firstName.setFocus(true);
+        detailsTable.setWidget(0, 0, new Label("Name"));
+        detailsTable.setWidget(0, 1, name);
+        detailsTable.setWidget(1, 0, new Label("Teacher"));
+        detailsTable.setWidget(1, 1, teacher);
+        detailsTable.setWidget(2, 0, new Label("Description"));
+        detailsTable.setWidget(2, 1, description);
+        name.setFocus(true);
     }
 
     DecoratorPanel contentDetailsDecorator;
@@ -111,16 +111,16 @@ public class TurmasDialog implements EditTurmaPresenter.Display {
         VerticalPanel contentDetailsPanel = new VerticalPanel();
         contentDetailsPanel.setWidth("100%");
 
-        // Create the turmas list
+        // Create the Turmas list
         //
         detailsTable = new FlexTable();
         detailsTable.setCellSpacing(0);
         detailsTable.setWidth("100%");
-        detailsTable.addStyleName("contacts-ListContainer");
-        detailsTable.getColumnFormatter().addStyleName(1, "add-contact-input");
-        firstName = new TextBox();
-        lastName = new TextBox();
-        emailAddress = new TextBox();
+        detailsTable.addStyleName("turmas-ListContainer");
+        detailsTable.getColumnFormatter().addStyleName(1, "add-turma-input");
+        name = new TextBox();
+        teacher = new TextBox();
+        description = new TextBox();
         initDetailsTable();
         contentDetailsPanel.add(detailsTable);
 
@@ -170,21 +170,21 @@ public class TurmasDialog implements EditTurmaPresenter.Display {
     @Override
     public HasValue<String> getFirstName() {
         // TODO Auto-generated method stub
-        return firstName;
+        return name;
         // return null;
     }
 
     @Override
     public HasValue<String> getLastName() {
         // TODO Auto-generated method stub
-        return lastName;
+        return teacher;
         // return null;
     }
 
     @Override
     public HasValue<String> getEmailAddress() {
         // TODO Auto-generated method stub
-        return emailAddress;
+        return description;
         // return null;
     }
 

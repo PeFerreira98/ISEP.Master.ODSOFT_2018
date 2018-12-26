@@ -1,48 +1,38 @@
 package pt.isep.cms.students.shared;
 
 import java.io.Serializable;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import pt.isep.cms.turmas.shared.Turma;
 
 @SuppressWarnings("serial")
-@Entity
-@Table
 public class Student implements Serializable {
-
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    public int id;
+    public String id;
     public String firstName;
     public String lastName;
     public String emailAddress;
+    // @ManyToOne
+    // @JoinColumn(name = "id")
+    public Turma turma;
 
     public Student() {
-        this.id = 0;
-        this.firstName = null;
-        this.lastName = null;
-        this.emailAddress = null;
     }
 
-    public Student(int id, String firstName, String lastName, String emailAddress) {
+    public Student(String id, String firstName, String lastName, String emailAddress, Turma turma) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
+        this.turma = turma;
     }
 
     public StudentDetails getLightWeightStudent() {
         return new StudentDetails(id, getFullName());
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -68,6 +58,14 @@ public class Student implements Serializable {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public Turma getTurma() {
+        return this.turma;
+    }
+
+    public void setTurma(Turma turma) {
+        this.turma = turma;
     }
 
     public String getFullName() {

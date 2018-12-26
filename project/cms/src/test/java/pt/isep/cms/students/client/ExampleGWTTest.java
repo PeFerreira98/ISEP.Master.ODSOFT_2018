@@ -35,9 +35,9 @@ public class ExampleGWTTest extends GWTTestCase {
 
     public void testStudentSort() {
         ArrayList<StudentDetails> studentDetails = new ArrayList<StudentDetails>();
-        studentDetails.add(new StudentDetails(0, "c_student"));
-        studentDetails.add(new StudentDetails(1, "b_student"));
-        studentDetails.add(new StudentDetails(2, "a_student"));
+        studentDetails.add(new StudentDetails("0", "c_student"));
+        studentDetails.add(new StudentDetails("1", "b_student"));
+        studentDetails.add(new StudentDetails("2", "a_student"));
         studentsPresenter.setStudentDetails(studentDetails);
         studentsPresenter.sortStudentDetails();
         assertTrue(studentsPresenter.getStudentDetail(0).getDisplayName().equals("a_student"));
@@ -59,7 +59,7 @@ public class ExampleGWTTest extends GWTTestCase {
         // fail("Ainda nao implementado");
 
         // Send a request to the server.
-        studentsService.getStudent(2, new AsyncCallback<Student>() {
+        studentsService.getStudent("2", new AsyncCallback<Student>() {
             public void onFailure(Throwable caught) {
                 // The request resulted in an unexpected error.
                 fail("Request failure: " + caught.getMessage());

@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Column;
 
 @SuppressWarnings("serial")
 @Entity
@@ -16,22 +17,25 @@ public class Contact implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int id;
-    private String firstName;
-    private String lastName;
-    private String emailAddress;
+    public String firstName;
+    public String lastName;
+    @Column(unique = true)
+    public String emailAddress;
+
+    public Contact() {
+        super();
+    }
 
     public Contact(int id, String firstName, String lastName, String emailAddress) {
+        super();
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
     }
 
-    public Contact() {
-        this.id = 0;
-        this.firstName = null;
-        this.lastName = null;
-        this.emailAddress = null;
+    public ContactDetails getLightWeightContact() {
+        return new ContactDetails(id, getFullName());
     }
 
     public int getId() {
@@ -68,9 +72,5 @@ public class Contact implements Serializable {
 
     public String getFullName() {
         return firstName == null || lastName == null ? null : firstName + " " + lastName;
-    }
-
-    public ContactDetails getLightWeightContact() {
-        return new ContactDetails(id, getFullName());
     }
 }

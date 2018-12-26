@@ -122,9 +122,10 @@ public class TurmasPresenter implements Presenter {
             }
 
             public void onFailure(Throwable caught) {
-                Window.alert("Error fetching turma details");
+                Window.alert("Error fetching turmadetails");
             }
         });
+
     }
 
     private void deleteSelectedTurmas() {
@@ -146,7 +147,6 @@ public class TurmasPresenter implements Presenter {
                 }
 
                 display.setData(data);
-
             }
 
             public void onFailure(Throwable caught) {

@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Column;
 
 @SuppressWarnings("serial")
 @Entity
@@ -16,22 +17,23 @@ public class Turma implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int id;
-    private String firstName;
-    private String lastName;
-    private String emailAddress;
-
-    public Turma(int id, String firstName, String lastName, String emailAddress) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.emailAddress = emailAddress;
-    }
+    @Column(unique = true)
+    public String name;
+    public String teacher;
+    public String description;
 
     public Turma() {
-        this.id = 0;
-        this.firstName = null;
-        this.lastName = null;
-        this.emailAddress = null;
+    }
+
+    public Turma(int id, String name, String teacher, String description) {
+        this.id = id;
+        this.name = name;
+        this.teacher = teacher;
+        this.description = description;
+    }
+
+    public TurmaDetails getLightWeightTurma() {
+        return new TurmaDetails(id, getFullName());
     }
 
     public int getId() {
@@ -43,34 +45,30 @@ public class Turma implements Serializable {
     }
 
     public String getFirstName() {
-        return firstName;
+        return name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFirstName(String name) {
+        this.name = name;
     }
 
     public String getLastName() {
-        return lastName;
+        return teacher;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLastName(String teacher) {
+        this.teacher = teacher;
     }
 
     public String getEmailAddress() {
-        return emailAddress;
+        return description;
     }
 
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
+    public void setEmailAddress(String description) {
+        this.description = description;
     }
 
     public String getFullName() {
-        return firstName == null || lastName == null || emailAddress == null ? null : firstName + " " + lastName  + " " + emailAddress;
-    }
-
-    public TurmaDetails getLightWeightTurma() {
-        return new TurmaDetails(id, getFullName());
+        return name;
     }
 }

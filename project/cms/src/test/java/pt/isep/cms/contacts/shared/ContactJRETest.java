@@ -22,9 +22,9 @@ public class ContactJRETest extends TestCase {
     }
 
     public void testNewContactFullInfo() {
-        Contact c = new Contact(2, "firstName", "lastName", "emailAddress");
+        Contact c = new Contact(1, "firstName", "lastName", "emailAddress");
 
-        assertTrue(c.getId() == 2);
+        assertTrue(c.getId() == 1);
         assertTrue(c.getFirstName().equals("firstName"));
         assertTrue(c.getLastName().equals("lastName"));
         assertTrue(c.getEmailAddress().equals("emailAddress"));

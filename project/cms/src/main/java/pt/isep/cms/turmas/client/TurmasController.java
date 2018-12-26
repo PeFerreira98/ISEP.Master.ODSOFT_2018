@@ -1,18 +1,17 @@
 package pt.isep.cms.turmas.client;
 
 import pt.isep.cms.client.ShowcaseConstants;
-
 import pt.isep.cms.turmas.client.event.AddTurmaEvent;
 import pt.isep.cms.turmas.client.event.AddTurmaEventHandler;
-import pt.isep.cms.turmas.client.event.TurmaUpdatedEvent;
-import pt.isep.cms.turmas.client.event.TurmaUpdatedEventHandler;
-import pt.isep.cms.turmas.client.event.EditTurmaEvent;
-import pt.isep.cms.turmas.client.event.EditTurmaEventHandler;
 import pt.isep.cms.turmas.client.event.EditTurmaCancelledEvent;
 import pt.isep.cms.turmas.client.event.EditTurmaCancelledEventHandler;
+import pt.isep.cms.turmas.client.event.EditTurmaEvent;
+import pt.isep.cms.turmas.client.event.EditTurmaEventHandler;
+import pt.isep.cms.turmas.client.event.TurmaUpdatedEvent;
+import pt.isep.cms.turmas.client.event.TurmaUpdatedEventHandler;
 import pt.isep.cms.turmas.client.presenter.TurmasPresenter;
-import pt.isep.cms.turmas.client.presenter.EditTurmaPresenter;
 import pt.isep.cms.turmas.client.presenter.Presenter;
+import pt.isep.cms.turmas.client.presenter.EditTurmaPresenter;
 import pt.isep.cms.turmas.client.view.TurmasView;
 
 import com.google.gwt.event.shared.HandlerManager;
@@ -92,7 +91,7 @@ public class TurmasController implements Presenter { // (ATB) No history at this
     }
 
     private void doTurmaUpdated() {
-        // (ATB) Update the list of turmas...
+        // (ATB) Update the list of Turmas...
         Presenter presenter = new TurmasPresenter(rpcService, eventBus, new TurmasView());
         presenter.go(container);
     }
