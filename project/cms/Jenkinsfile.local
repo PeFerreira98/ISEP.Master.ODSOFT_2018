@@ -4,12 +4,19 @@ pipeline
 {
     environment
     {
-        //plugin -> pipeline utils
+        //parameter -> repoUser
+        //parameter -> DISCORD_WEBHOOK
 
-        //parameters -> DISCORD_WEBHOOK (***/***)
+        //plugin -> pipeline utils
 
         //environment -> docker
         //environment -> sonarqube
+
+        // Repository
+        credentials = 'BitbucketAuth'
+        repository = 'bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git'
+        repoUrl = "https://${repoUser}@${repository}"
+        branch = '*/develop'
 
         // Dirs
         projectDir = 'project/cms/'
@@ -21,9 +28,6 @@ pipeline
         tomcatPort = '8888'
 		tomcatUrl = "http://localhost:${tomcatPort}"
 		cmsUrl = "${tomcatUrl}/${cmsWar}/"
-
-        // Email
-        emailDestination = '1140953@isep.ipp.pt 1141233@isep.ipp.pt'
 
         // Discord Webhook for some fancy stuff
         startTime = new Date().format('dd/MM/yyyy HH:mm:ss')
@@ -39,7 +43,7 @@ pipeline
             steps
             {
                 echo 'Checkout..'
-                checkout scm
+                checkout([$class: 'GitSCM', branches: [[name: "${branch}"]], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: "${credentials}", url: "${repoUrl}"]]])
             }
         }
         
@@ -302,7 +306,7 @@ pipeline
             options{ timeout(time: 1, unit: 'HOURS') }
             steps
             {
-                mail (to: "${emailDestination}", 
+                mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', 
                     subject: "Manual Tests", 
                     body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
 
