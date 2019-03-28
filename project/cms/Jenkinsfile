@@ -199,7 +199,7 @@ pipeline
                         }
                     }	
                 }
-/*
+
                 stage('Mutation Tests')
                 {
                     steps
@@ -224,7 +224,6 @@ pipeline
                         }
                     }	
                 }
-*/
             }
         }
 
@@ -340,7 +339,6 @@ pipeline
 
     post
     {
-/*
         success
         {
             echo 'Creating PDF report..'
@@ -352,9 +350,9 @@ pipeline
                 {
                     if (isUnix()) sh './gradlew pdf'
                     else bat 'gradlew pdf'
-            */
+            
                     //archiveArtifacts allowEmptyArchive: false, artifacts: "**/*.pdf", fingerprint: true, onlyIfSuccessful: true
-            /*    }
+                }
 
             }
             
@@ -371,7 +369,6 @@ pipeline
                 }
             }
         }
-*/
 
         failure
         {
@@ -413,8 +410,6 @@ pipeline
 /*
         always
         {
-            //bitbucketStatusNotify(buildState: currentBuild.currentResult)
-
             //discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
         }
 */

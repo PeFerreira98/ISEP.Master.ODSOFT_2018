@@ -13,8 +13,10 @@ pipeline
         //environment -> sonarqube
 
         // Repository
-        credentials = 'BitbucketAuth'
-        repository = 'bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git'
+        //credentials = 'BitbucketAuth'
+        credentials = 'GitHubAuth'
+        //repository = 'bitbucket.org/mei-isep/odsoft-18-19-ifp-g114.git'
+        repository = 'github.com/PeFerreira98/ODSOFT_2018.git'
         repoUrl = "https://${repoUser}@${repository}"
         branch = '*/develop'
 
@@ -28,6 +30,9 @@ pipeline
         tomcatPort = '8888'
 		tomcatUrl = "http://localhost:${tomcatPort}"
 		cmsUrl = "${tomcatUrl}/${cmsWar}/"
+
+        // Email
+        emailDestination = '1140953@isep.ipp.pt'// 1141233@isep.ipp.pt'
 
         // Discord Webhook for some fancy stuff
         startTime = new Date().format('dd/MM/yyyy HH:mm:ss')
@@ -203,7 +208,7 @@ pipeline
                         }
                     }	
                 }
-/*
+
                 stage('Mutation Tests')
                 {
                     steps
@@ -228,7 +233,6 @@ pipeline
                         }
                     }	
                 }
-*/
             }
         }
 
@@ -306,7 +310,7 @@ pipeline
             options{ timeout(time: 1, unit: 'HOURS') }
             steps
             {
-                mail (to: '1140953@isep.ipp.pt 1141233@isep.ipp.pt', 
+                mail (to: "${emailDestination}", 
                     subject: "Manual Tests", 
                     body: "Please do some testing and approve the build on jenkins. CHOP CHOP! Get to work!")
 
@@ -417,8 +421,6 @@ pipeline
 /*
         always
         {
-            //bitbucketStatusNotify(buildState: currentBuild.currentResult)
-
             //discordSend description: "Finished: ${BUILD_TAG}\nBuild Status: ${currentBuild.currentResult}\nStart Build Time: ${startTime}\nFinish Build Time: ${new Date().format('dd/MM/yyyy HH:mm:ss')}", result: currentBuild.currentResult, webhookURL: "${discordWebHook}"
         }
 */
